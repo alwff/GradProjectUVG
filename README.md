@@ -4,7 +4,7 @@ Alejandra Cardona (22043)
 
 ## Propósito
 
-Se busca la creación e implementación de una exhibición virtual en el entorno \textit{Unity}; medio que se vincula a una base de datos alimentada por un sistema de lectura de códigos de barra mediante un escáner. El propósito de esta exhibición es difundir las Colecciones Biológicas de la Universidad del Valle de Guatemala a través de un ambiente atractivo e interactivo. 
+Se busca la creación e implementación de una exhibición virtual en el entorno Unity medio que se vincula a una base de datos alimentada por un sistema de lectura de códigos de barra mediante un escáner. El propósito de esta exhibición es difundir las Colecciones Biológicas de la Universidad del Valle de Guatemala a través de un ambiente atractivo e interactivo. 
 
 ## ¿Cómo se divide el proyecto?
 * Unity
