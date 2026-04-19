@@ -1,4 +1,4 @@
-# Trabajo de Graduación (2026): Diseño e implementación de una exhibición virtual para colecciones biológicas utilizando códigos de barras y entornos inmersivos 
+# Trabajo de Graduación: Diseño e implementación de una exhibición virtual para colecciones biológicas utilizando códigos de barras y entornos inmersivos 
 
 Alejandra Cardona (22043)
 
