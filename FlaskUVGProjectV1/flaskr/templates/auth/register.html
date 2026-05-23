@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrarse{% endblock %}
+
+{% block content %}
+
+<div class="login-layout">
+
+    <div class="login-art">
+
+        <pre id="ascii-container-large" class="ascii-large"></pre>
+
+    </div>
+
+    <div class="login-form-container">
+
+        <form method="post">
+
+            <label for="username">Usuario</label>
+            <input name="username" id="username" required>
+
+            <label for="password">Contraseña</label>
+            <input type="password" name="password" id="password" required>
+
+            <input type="submit" value="Registrarse">
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+fetch("{{ url_for('static', filename='img/asciiDragon.txt') }}")
+  .then(response => response.text())
+  .then(data => {
+    document.getElementById("ascii-container-large").textContent = data;
+  });
+</script>
+
+{% endblock %}

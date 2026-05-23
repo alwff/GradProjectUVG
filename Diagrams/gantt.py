@@ -1,3 +1,5 @@
+# Creado con ayuda de Chat GPT y partiendo del tutorial https://anasilva.org/rediscovering-matplotlib-how-to-make-a-super-nice-gantt-chart-84b8d162857f
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import matplotlib.dates as mdates
@@ -191,10 +193,10 @@ for i, task in df.iterrows():
                         ))
 
 # Línea hoy
-#ax.axvline(mdates.date2num(today_dt),
-#           color=TODAY_COLOR,
-#           linestyle="--",
-#           linewidth=1.5)
+ax.axvline(mdates.date2num(today_dt),
+           color=TODAY_COLOR,
+           linestyle="--",
+           linewidth=1.5)
 
 # ======================================
 # EJE EN ESPAÑOL + SEMANAS

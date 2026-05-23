@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>{% block title %}{% endblock %} | UVG Collections</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+  <nav class="navbar">
+    <div class="nav-logo">
+     Colecciones UVG 
+</div>
+
+
+    <ul class="nav-links">
+
+      {% if g.user %}
+
+        <li class="username">
+          {{ g.user['username'] }}
+        </li>
+
+        <li>
+          <a href="{{ url_for('auth.logout') }}">Cerrar Sesión</a>
+        </li>
+
+      {% else %}
+
+        <li>
+          <a href="{{ url_for('auth.login') }}">Iniciar Sesión</a>
+        </li>
+
+        <li>
+          <a href="{{ url_for('auth.register') }}">Registrarse</a>
+        </li>
+
+      {% endif %}
+
+    </ul>
+
+  </nav>
+
+  <main class="main-container">
+
+    {% for message in get_flashed_messages() %}
+      <div class="flash">
+        {{ message }}
+      </div>
+    {% endfor %}
+
+    {% block content %}{% endblock %}
+
+  </main>
+
+</body>
+</html>
