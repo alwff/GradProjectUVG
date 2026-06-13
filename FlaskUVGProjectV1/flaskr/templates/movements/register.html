@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Registrar Movimiento
+{% endblock %}
+
+{% block content %}
+
+<h1>
+    Registrar Movimiento
+</h1>
+
+<form method="post">
+
+    <div class="request-notes">
+
+        <strong>
+            Métodos de identificación admitidos:
+        </strong>
+
+        <ul>
+
+            <li>
+                Código Portal UVG
+            </li>
+
+            <li>
+                Código de Barras
+            </li>
+
+            <li>
+                EPC RFID UHF
+            </li>
+
+        </ul>
+
+    </div>
+
+    <label>
+        Identificador del espécimen
+
+    </label>
+
+    <input
+        name="identifier"
+        required
+        autofocus
+    >
+
+    <input
+        type="submit"
+        value="BUSCAR"
+    >
+
+</form>
+
+{% if specimen %}
+
+<div class="request-summary">
+
+    <h2>
+        Especímen Encontrado
+    </h2>
+
+    <p>
+
+        <strong>
+            Código Portal:
+        </strong>
+
+        {{ specimen.portal_code }}
+
+    </p>
+
+    <p>
+
+        <strong>
+            Barcode:
+        </strong>
+
+        {{ specimen.barcode }}
+
+    </p>
+
+    <p>
+
+        <strong>
+            EPC RFID:
+        </strong>
+
+        {{ specimen.rfid_epc }}
+
+    </p>
+
+    <p>
+
+        <strong>
+            Colección:
+        </strong>
+
+        {{ specimen.collection }}
+
+    </p>
+
+    <p>
+
+        <strong>
+            Nombre Científico:
+        </strong>
+
+        {{ specimen.scientific_name }}
+
+    </p>
+
+    <p>
+
+        <strong>
+            Estado:
+        </strong>
+
+        {% if specimen.status == "available" %}
+
+        <span class="specimen-status-available">
+
+            Disponible
+
+        </span>
+
+        {% elif specimen.status == "loaned" %}
+
+        <span class="specimen-status-loaned">
+
+            Prestado
+
+        </span>
+
+        {% endif %}
+
+    </p>
+
+    <form
+        method="post"
+        action="{{ url_for(
+            'movements.process'
+        ) }}"
+    >
+
+        <input
+            type="hidden"
+            name="specimen_id"
+            value="{{ specimen.id }}"
+        >
+
+        <label>
+            Observaciones
+        </label>
+
+        <textarea
+            name="notes"
+        ></textarea>
+
+        {% if specimen.status == "available" %}
+
+        <input
+            type="hidden"
+            name="movement_type"
+            value="exit"
+        >
+
+        <input
+            type="submit"
+            value="REGISTRAR SALIDA"
+        >
+
+        {% elif specimen.status == "loaned" %}
+
+        <input
+            type="hidden"
+            name="movement_type"
+            value="entry"
+        >
+
+        <input
+            type="submit"
+            value="REGISTRAR ENTRADA"
+        >
+
+        {% endif %}
+
+    </form>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

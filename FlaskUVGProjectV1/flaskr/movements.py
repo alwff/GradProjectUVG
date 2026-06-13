@@ -33,6 +33,13 @@ def find_specimen(identifier):
         return specimen
 
     specimen = Specimen.query.filter_by(
+        barcode=identifier
+    ).first()
+
+    if specimen:
+        return specimen
+
+    specimen = Specimen.query.filter_by(
         rfid_epc=identifier
     ).first()
 
@@ -85,18 +92,22 @@ def index():
     )
 
 @bp.route(
-    "/entry",
+    "/register",
     methods=("GET", "POST")
 )
 @login_required
-def entry():
+def register():
+
+    specimen = None
 
     if request.method == "POST":
 
+        identifier = request.form[
+            "identifier"
+        ]
+
         specimen = find_specimen(
-            request.form[
-                "portal_code"
-            ]
+            identifier
         )
 
         if specimen is None:
@@ -105,123 +116,61 @@ def entry():
                 "Especímen no encontrado."
             )
 
-            return redirect(
-                url_for(
-                    "movements.entry"
-                )
-            )
+    return render_template(
+        "movements/register.html",
+        specimen=specimen
+    )
 
-        if specimen.status == "available":
 
-            flash(
-                "El espécimen ya se encuentra disponible."
-            )
+@bp.route(
+    "/process",
+    methods=("POST",)
+)
+@login_required
+def process():
 
-            return redirect(
-                url_for(
-                    "movements.entry"
-                )
-            )
+    specimen = Specimen.query.get_or_404(
+        request.form["specimen_id"]
+    )
 
-        create_movement(
-            specimen,
-            "entry",
-            "manual",
-            g.user.username,
-            request.form["notes"]
-        )
+    movement_type = request.form[
+        "movement_type"
+    ]
+
+    if movement_type == "entry":
 
         specimen.status = (
             "available"
         )
 
-        db.session.add(
-            movement
-        )
-
-        db.session.commit()
-
-        flash(
-            "Entrada registrada."
-        )
-
-        return redirect(
-            url_for(
-                "movements.index"
-            )
-        )
-
-    return render_template(
-        "movements/entry.html"
-    )
-
-@bp.route(
-    "/exit",
-    methods=("GET", "POST")
-)
-@login_required
-def exit():
-
-    if request.method == "POST":
-
-        specimen = find_specimen(
-            request.form[
-                "portal_code"
-            ]
-        )
-
-        if specimen is None:
-
-            flash(
-                "Especímen no encontrado."
-            )
-
-            return redirect(
-                url_for(
-                    "movements.exit"
-                )
-            )
-        
-        if specimen.status == "loaned":
-
-            flash(
-                "El espécimen ya se encuentra prestado."
-            )
-
-            return redirect(
-                url_for(
-                    "movements.exit"
-                )
-            )
-
-        create_movement(
-            specimen,
-            "exit",
-            "manual",
-            g.user.username,
-            request.form["notes"]
-        )
+    elif movement_type == "exit":
 
         specimen.status = (
             "loaned"
         )
 
-        db.session.add(
-            movement
+    create_movement(
+
+        specimen,
+
+        movement_type,
+
+        "manual",
+
+        g.user.username,
+
+        request.form["notes"]
+
+    )
+
+    db.session.commit()
+
+    flash(
+        "Movimiento registrado correctamente."
+    )
+
+    return redirect(
+        url_for(
+            "movements.index"
         )
-
-        db.session.commit()
-
-        flash(
-            "Salida registrada."
-        )
-
-        return redirect(
-            url_for(
-                "movements.index"
-            )
-        )
-
-    return render_template(
-        "movements/exit.html"
     )

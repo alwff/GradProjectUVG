@@ -29,6 +29,10 @@ Movimientos
             </th>
 
             <th>
+                Colección
+            </th>
+
+            <th>
                 Estado Actual
             </th>
 
@@ -73,11 +77,20 @@ Movimientos
             </td>
 
             <td>
-                {{ movement.specimen.portal_code }}
+                <strong>
+                    {{ movement.specimen.portal_code }}
+                </strong>
+                
             </td>
 
             <td>
                 {{ movement.specimen.scientific_name }}
+            </td>
+
+            <td>
+
+                {{ movement.specimen.collection }}
+
             </td>
 
             <td>
@@ -128,15 +141,27 @@ Movimientos
 
                 {% if movement.source == "manual" %}
 
+                <span class="source-badge-manual">
+
                     Manual
+
+                </span>
 
                 {% elif movement.source == "barcode" %}
 
-                    Código de Barras
+                <span class="source-badge-barcode">
+
+                    Barcode
+
+                </span>
 
                 {% elif movement.source == "rfid" %}
 
+                <span class="source-badge-rfid">
+
                     RFID
+
+                </span>
 
                 {% endif %}
 
