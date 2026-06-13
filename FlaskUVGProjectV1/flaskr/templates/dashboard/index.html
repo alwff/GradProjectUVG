@@ -89,14 +89,21 @@
 
         <a
             class="dashboard-button"
-            href="#"
+            href="{{ url_for('movements.index') }}"
+        >
+            HISTORIAL DE MOVIMIENTOS
+        </a>
+
+        <a
+            class="dashboard-button"
+            href="{{ url_for('movements.entry') }}"
         >
             REGISTRAR ENTRADA
         </a>
 
         <a
             class="dashboard-button"
-            href="#"
+            href="{{ url_for('movements.exit') }}"
         >
             REGISTRAR SALIDA
         </a>

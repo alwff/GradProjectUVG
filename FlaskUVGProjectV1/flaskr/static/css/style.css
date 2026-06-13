@@ -1009,3 +1009,87 @@ tr:hover {
 
     margin-bottom: 0.75rem;
 }
+
+/* =========================
+   MOVEMENT BADGES
+========================= */
+
+.movement-badge-entry {
+
+    display: inline-block;
+
+    padding: 0.3rem 0.8rem;
+
+    border-radius: 15px;
+
+    background-color: #5DA63C;
+
+    color: white;
+
+    font-size: 0.8rem;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+}
+
+.movement-badge-exit {
+
+    display: inline-block;
+
+    padding: 0.3rem 0.8rem;
+
+    border-radius: 15px;
+
+    background-color: #D97706;
+
+    color: white;
+
+    font-size: 0.8rem;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+}
+
+/* =========================
+   SPECIMEN STATUS BADGES
+========================= */
+
+.specimen-status-available {
+
+    display: inline-block;
+
+    padding: 0.3rem 0.8rem;
+
+    border-radius: 15px;
+
+    background-color: #5DA63C;
+
+    color: white;
+
+    font-size: 0.8rem;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+}
+
+.specimen-status-loaned {
+
+    display: inline-block;
+
+    padding: 0.3rem 0.8rem;
+
+    border-radius: 15px;
+
+    background-color: #D97706;
+
+    color: white;
+
+    font-size: 0.8rem;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+}

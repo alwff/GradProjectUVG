@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Movimientos
+{% endblock %}
+
+{% block content %}
+
+<h1>
+    Historial de Movimientos
+</h1>
+
+<table>
+
+    <thead>
+
+        <tr>
+
+            <th>
+                Fecha
+            </th>
+
+            <th>
+                Código Portal
+            </th>
+
+            <th>
+                Especímen
+            </th>
+
+            <th>
+                Estado Actual
+            </th>
+
+            <th>
+                Movimiento
+            </th>
+
+            <th>
+                Origen
+            </th>
+
+            <th>
+                Usuario
+            </th>
+
+            <th>
+                Observaciones
+            </th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+    {% for movement in movements %}
+
+        <tr>
+
+            <td>
+
+                {{ movement.created_at.strftime(
+                    "%d/%m/%Y"
+                ) }}
+
+                <br>
+
+                {{ movement.created_at.strftime(
+                    "%H:%M"
+                ) }}
+
+            </td>
+
+            <td>
+                {{ movement.specimen.portal_code }}
+            </td>
+
+            <td>
+                {{ movement.specimen.scientific_name }}
+            </td>
+
+            <td>
+
+                {% if movement.specimen.status == "available" %}
+
+                <span class="specimen-status-available">
+
+                    Disponible
+
+                </span>
+
+                {% elif movement.specimen.status == "loaned" %}
+
+                <span class="specimen-status-loaned">
+
+                    Prestado
+
+                </span>
+
+                {% endif %}
+
+            </td>
+
+            <td>
+
+                {% if movement.movement_type == "entry" %}
+
+                <span class="movement-badge-entry">
+
+                    Entrada
+
+                </span>
+
+                {% elif movement.movement_type == "exit" %}
+
+                <span class="movement-badge-exit">
+
+                    Salida
+
+                </span>
+
+                {% endif %}
+
+            </td>
+
+            <td>
+
+                {% if movement.source == "manual" %}
+
+                    Manual
+
+                {% elif movement.source == "barcode" %}
+
+                    Código de Barras
+
+                {% elif movement.source == "rfid" %}
+
+                    RFID
+
+                {% endif %}
+
+            </td>
+
+            <td>
+                {{ movement.performed_by }}
+            </td>
+
+            <td>
+                {{ movement.notes }}
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}

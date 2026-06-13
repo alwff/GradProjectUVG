@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Registrar Salida
+{% endblock %}
+
+{% block content %}
+
+<h1>
+    Registrar Salida
+</h1>
+
+<form method="post">
+
+    <label>
+        Código Portal
+    </label>
+
+    <input
+        name="portal_code"
+        required
+        autofocus
+    >
+
+    <label>
+        Observaciones
+    </label>
+
+    <textarea
+        name="notes"
+    ></textarea>
+
+    <input
+        type="submit"
+        value="REGISTRAR SALIDA"
+    >
+
+</form>
+
+{% endblock %}

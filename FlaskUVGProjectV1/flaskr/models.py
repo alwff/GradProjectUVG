@@ -205,9 +205,19 @@ class Movement(db.Model):
         nullable=False
     )
 
+    specimen = db.relationship(
+    "Specimen"
+    )
+
     movement_type = db.Column(
         db.String(20),
         nullable=False
+    )
+
+    source = db.Column(
+    db.String(20),
+    nullable=False,
+    default="manual"
     )
 
     performed_by = db.Column(

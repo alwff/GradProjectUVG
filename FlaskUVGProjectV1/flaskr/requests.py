@@ -46,13 +46,6 @@ def detail(id):
         request_record=request_record
     )
 
-@bp.route("/create")
-@login_required
-def create():
-    return render_template(
-        "requests/create.html"
-    )
-
 @bp.route(
     "/<int:id>/update",
     methods=("POST",)
