@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Material Solicitado
+{% endblock %}
+
+{% block content %}
+
+<div class="request-header">
+
+    <h1>
+        Formulario de Solicitud de Material
+    </h1>
+
+    <h3>
+        Colecciones Biológicas UVG
+    </h3>
+
+    <div class="request-notes">
+
+        <strong>CONSIDERACIONES:</strong>
+
+        <ul>
+
+            <li>
+                El formulario debe llenarse y enviarse al menos una semana antes de necesitar el material.
+            </li>
+
+            <li>
+                El catedrático es responsable de revisar el pedido antes de iniciar la práctica y de colaborar con el resguardo del material al finalizar la actividad.
+            </li>
+
+        </ul>
+
+    </div>
+
+</div>
+
+<a
+    class="small-button"
+    href="{{ url_for('public.create_request') }}"
+>
+    ← Volver a Datos Generales
+</a>
+
+<div class="request-top">
+
+    <div class="request-summary">
+
+        <h2>Datos de la Solicitud</h2>
+
+        <p>
+            <strong>Catedrático:</strong>
+            {{ request_data.teacher_name }}
+        </p>
+
+        <p>
+            <strong>Curso:</strong>
+            {{ request_data.course }}
+        </p>
+
+        <p>
+            <strong>Auxiliar:</strong>
+            {{ request_data.assistant }}
+        </p>
+
+        <p>
+            <strong>Fecha solicitud:</strong>
+            {{ request_data.request_date }}
+        </p>
+
+        <p>
+            <strong>Fecha uso:</strong>
+            {{ request_data.needed_date }}
+        </p>
+
+        <p>
+            <strong>Fecha devolución:</strong>
+            {{ request_data.return_date }}
+        </p>
+
+        <p>
+            <strong>Horario:</strong>
+            {{ request_data.start_time }}
+            -
+            {{ request_data.end_time }}
+        </p>
+
+    </div>
+
+    <div class="request-add-material">
+
+        <h2>
+            Paso 2: Especímenes de la Colección a Solicitar
+        </h2>
+
+        <form method="post">
+
+            <label>Código Portal</label>
+            <input name="portal_code">
+
+            <label>Especie o Familia</label>
+            <input
+                name="species_or_family"
+                required
+            >
+
+            <label>Especificaciones</label>
+
+            <textarea
+                name="specifications"
+            ></textarea>
+
+            <input
+                type="submit"
+                value="AGREGAR MATERIAL"
+            >
+
+        </form>
+
+    </div>
+
+</div>
+
+<h2>
+    Material Solicitado
+</h2>
+
+<table>
+
+    <thead>
+
+        <tr>
+
+            <th>Código Portal</th>
+
+            <th>Especie o Familia</th>
+
+            <th>Especificaciones</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+    {% for item in request_items %}
+
+        <tr>
+
+            <td>
+                {{ item.portal_code }}
+            </td>
+
+            <td>
+                {{ item.species_or_family }}
+            </td>
+
+            <td>
+                {{ item.specifications }}
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+<form
+    method="post"
+    action="{{ url_for('public.submit_request') }}"
+>
+
+    <div class="submit-request">
+
+        <input
+            type="submit"
+            value="ENVIAR SOLICITUD"
+        >
+
+    </div>
+
+</form>
+
+{% endblock %}

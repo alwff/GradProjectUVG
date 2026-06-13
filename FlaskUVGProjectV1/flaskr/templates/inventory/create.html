@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Ingresar Nuevo Especímen{% endblock %}
+
+{% block content %}
+
+<h1>Ingresar Nuevo Especímen</h1>
+
+<form method="post">
+
+    <label>Código Portal</label>
+    <input name="portal_code" required>
+
+    <label>Número de Catálogo</label>
+    <input name="catalog_number">
+
+    <label>Nombre Científico</label>
+    <input name="scientific_name" required>
+
+    <label>Familia Taxonómica</label>
+    <input name="taxon_family">
+
+    <label>Colección</label>
+    <input name="collection" required>
+
+    <label>RFID EPC</label>
+    <input name="rfid_epc">
+
+    <label>Código de Barras</label>
+    <input name="barcode">
+
+    <label>Descripción</label>
+    <textarea name="description"></textarea>
+
+    <input type="submit" value="Guardar Especímen">
+
+</form>
+
+{% endblock %}

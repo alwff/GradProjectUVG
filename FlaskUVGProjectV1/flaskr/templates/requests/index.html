@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Solicitudes
+{% endblock %}
+
+{% block content %}
+
+<h1>
+    Historial de Solicitudes
+</h1>
+
+<table>
+
+    <thead>
+
+        <tr>
+
+            <th>
+                Código
+            </th>
+
+            <th>
+                Catedrático
+            </th>
+
+            <th>
+                Curso
+            </th>
+
+            <th>
+                Fecha
+            </th>
+
+            <th>
+                Estado
+            </th>
+
+            <th>
+                Acción
+            </th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+    {% for request in requests %}
+
+        <tr>
+
+            <td>
+                {{ request.tracking_code }}
+            </td>
+
+            <td>
+                {{ request.teacher_name }}
+            </td>
+
+            <td>
+                {{ request.course }}
+            </td>
+
+            <td>
+                {{ request.request_date }}
+            </td>
+
+            <td>
+
+                {% if request.status == "pending" %}
+
+                <span class="status-badge pending">
+
+                    Pendiente
+
+                </span>
+
+                {% elif request.status == "approved" %}
+
+                <span class="status-badge approved">
+
+                    Aprobada
+
+                </span>
+
+                {% elif request.status == "rejected" %}
+
+                <span class="status-badge rejected">
+
+                    Rechazada
+
+                </span>
+
+                {% elif request.status == "returned" %}
+
+                <span class="status-badge returned">
+
+                    Devuelta
+
+                </span>
+
+                {% endif %}
+
+            </td>
+
+            <td>
+
+                <a
+                    class="small-button"
+                    href="{{ url_for(
+                        'requests.detail',
+                        id=request.id
+                    ) }}"
+                >
+                    Ver
+                </a>
+
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}

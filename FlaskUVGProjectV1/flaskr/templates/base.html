@@ -13,34 +13,79 @@
 <body>
 
   <nav class="navbar">
-    <div class="nav-logo">
-     Colecciones UVG 
-</div>
 
+    <div class="nav-logo">
+      Colecciones UVG
+    </div>
 
     <ul class="nav-links">
 
-      {% if g.user %}
+    {% if g.user %}
 
-        <li class="username">
-          {{ g.user['username'] }}
+        <li>
+
+            <span class="username-pill">
+
+                {{ g.user.username }}
+
+            </span>
+
         </li>
 
         <li>
-          <a href="{{ url_for('auth.logout') }}">Cerrar Sesión</a>
+            <a
+                class="logout-pill"
+                href="{{ url_for('auth.logout') }}"
+            >
+                Cerrar Sesión
+            </a>
         </li>
 
-      {% else %}
+        {% if request.endpoint != 'dashboard.index' %}
 
         <li>
-          <a href="{{ url_for('auth.login') }}">Iniciar Sesión</a>
+            <a
+                class="dashboard-home-button"
+                href="{{ url_for('dashboard.index') }}"
+            >
+                Tablero
+            </a>
         </li>
+
+        {% endif %}
+
+    {% else %}
+
+        {% if request.endpoint not in [
+            'public.home',
+            'public.request_success'
+        ] %}
 
         <li>
-          <a href="{{ url_for('auth.register') }}">Registrarse</a>
+            <a
+                class="dashboard-home-button"
+                href="{{ url_for('public.home') }}"
+            >
+                Inicio
+            </a>
         </li>
 
-      {% endif %}
+        {% endif %}
+
+        {% if request.endpoint == 'public.home' %}
+
+        <li>
+            <a
+                class="dashboard-home-button"
+                href="{{ url_for('auth.login') }}"
+            >
+                Acceso Interno
+            </a>
+        </li>
+
+        {% endif %}
+
+    {% endif %}
 
     </ul>
 
@@ -59,4 +104,5 @@
   </main>
 
 </body>
+
 </html>

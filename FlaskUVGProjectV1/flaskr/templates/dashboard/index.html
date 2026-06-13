@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-section">
+
+    <div class="dashboard-image">
+
+        <img
+            src="{{ url_for(
+                'static',
+                filename='img/DashboardInventario.jpg'
+            ) }}"
+            alt="Inventario"
+        >
+
+    </div>
+
+    <div class="dashboard-content">
+
+        <h2>INVENTARIO</h2>
+
+        <a
+            class="dashboard-button"
+            href="{{ url_for('inventory.index') }}"
+        >
+            VER INVENTARIO
+        </a>
+
+        <a
+            class="dashboard-button"
+            href="{{ url_for('inventory.create') }}"
+        >
+            INGRESAR ESPECÍMEN
+        </a>
+
+    </div>
+
+</div>
+
+<div class="dashboard-section">
+
+    <div class="dashboard-image">
+
+        <img
+            src="{{ url_for(
+                'static',
+                filename='img/DashboardSolicitudes.jpg'
+            ) }}"
+            alt="Solicitudes"
+        >
+
+    </div>
+
+    <div class="dashboard-content">
+
+        <h2>SOLICITUDES</h2>
+
+        <a
+            class="dashboard-button"
+            href="{{ url_for('requests.index') }}"
+        >
+            GESTIÓN DE SOLICITUDES
+        </a>
+
+    </div>
+
+</div>
+
+<div class="dashboard-section">
+
+    <div class="dashboard-image">
+
+        <img
+            src="{{ url_for(
+                'static',
+                filename='img/DashboardMovimiento.jpg'
+            ) }}"
+            alt="Movimientos"
+        >
+
+    </div>
+
+    <div class="dashboard-content">
+
+        <h2>MOVIMIENTOS</h2>
+
+        <a
+            class="dashboard-button"
+            href="#"
+        >
+            REGISTRAR ENTRADA
+        </a>
+
+        <a
+            class="dashboard-button"
+            href="#"
+        >
+            REGISTRAR SALIDA
+        </a>
+
+    </div>
+
+</div>
+
+<div class="dashboard-section">
+
+    <div class="dashboard-image">
+
+        <img
+            src="{{ url_for(
+                'static',
+                filename='img/DashboardUsers.jpg'
+            ) }}"
+            alt="Usuarios"
+        >
+
+    </div>
+
+    <div class="dashboard-content">
+
+        <h2>
+            USUARIOS
+        </h2>
+
+        <a
+            class="dashboard-button"
+            href="{{ url_for('users.index') }}"
+        >
+            GESTIONAR USUARIOS
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

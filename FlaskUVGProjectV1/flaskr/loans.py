@@ -4,7 +4,7 @@ from flask import (
 from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
-from flaskr.db import get_db
+from flaskr.sqlite_db import get_db
 
 bp = Blueprint('loans', __name__)
 

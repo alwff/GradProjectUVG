@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Solicitud Enviada
+{% endblock %}
+
+{% block content %}
+
+<div class="success-container">
+
+    <h1>
+        Solicitud Enviada Correctamente
+    </h1>
+
+    <h2>
+        Código:
+    </h2>
+
+    <div class="tracking-code">
+
+        {{ tracking_code }}
+
+    </div>
+
+    <div class="request-notes">
+
+        <strong>
+            IMPORTANTE
+        </strong>
+
+        <p>
+
+            Conserve este código de seguimiento.
+
+        </p>
+
+        <p>
+
+            Será necesario para consultar el estado de su solicitud y para cualquier comunicación relacionada con el material solicitado.
+
+        </p>
+
+    </div>
+
+    <a
+        class="action-button"
+        href="{{ url_for('public.home') }}"
+    >
+        INICIO
+    </a>
+
+</div>
+
+{% endblock %}

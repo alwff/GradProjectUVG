@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Solicitud de Material
+{% endblock %}
+
+{% block content %}
+
+<div class="request-header">
+
+    <h1>
+        Formulario de Solicitud de Material
+    </h1>
+
+    <h3>
+        Colecciones Biológicas UVG
+    </h3>
+
+    <div class="request-notes">
+
+        <strong>CONSIDERACIONES:</strong>
+
+        <ul>
+
+            <li>
+                El formulario debe llenarse y enviarse al menos una semana antes de necesitar el material.
+            </li>
+
+            <li>
+                El catedrático es responsable de revisar el pedido antes de iniciar la práctica y de colaborar con el resguardo del material al finalizar la actividad.
+            </li>
+
+        </ul>
+
+    </div>
+
+</div>
+
+<form method="post">
+
+    <div class="request-top">
+
+        <div class="request-summary">
+
+            <h2>
+                Datos Académicos
+            </h2>
+
+            <label>Catedrático</label>
+
+            <input
+                name="teacher_name"
+                required
+            >
+
+            <label>Curso</label>
+
+            <input
+                name="course"
+                required
+            >
+
+            <label>Auxiliar</label>
+
+            <input
+                name="assistant"
+            >
+
+        </div>
+
+        <div class="request-add-material">
+
+            <h2>
+                Datos de Préstamo
+            </h2>
+
+            <div class="request-date">
+
+                <strong>
+                    Fecha de Solicitud:
+                </strong>
+
+                <span>
+                    {{ current_date }}
+                </span>
+
+            </div>
+
+            <label>
+                Fecha en que necesita el material
+            </label>
+
+            <input
+                type="date"
+                name="needed_date"
+                required
+            >
+
+            <label>
+                Fecha de devolución
+            </label>
+
+            <input
+                type="date"
+                name="return_date"
+                required
+            >
+
+            <label>
+                Hora de inicio
+            </label>
+
+            <input
+                type="time"
+                name="start_time"
+            >
+
+            <label>
+                Hora de finalización
+            </label>
+
+            <input
+                type="time"
+                name="end_time"
+            >
+
+        </div>
+
+    </div>
+
+    <div class="submit-request">
+
+        <input
+            type="submit"
+            value="CONTINUAR"
+        >
+
+    </div>
+
+</form>
+
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Inventario{% endblock %}
+
+{% block content %}
+
+<h1>Inventario</h1>
+
+<a
+    class="action-button"
+    href="{{ url_for('inventory.create') }}"
+>
+    Ingresar Especímen
+</a>
+
+<table>
+
+    <thead>
+        <tr>
+            <th>Portal</th>
+            <th>Nombre Científico</th>
+            <th>Familia</th>
+            <th>Colección</th>
+            <th>Estado</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% for specimen in specimens %}
+
+        <tr>
+            <td>{{ specimen.portal_code }}</td>
+
+            <td>{{ specimen.scientific_name }}</td>
+
+            <td>{{ specimen.taxon_family }}</td>
+
+            <td>{{ specimen.collection }}</td>
+
+            <td>{{ specimen.status }}</td>
+
+            <td>
+                <a
+                    class="small-button"
+                    href="{{ url_for('inventory.edit', id=specimen.id) }}"
+                >
+                    Editar
+                </a>
+            </td>
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}

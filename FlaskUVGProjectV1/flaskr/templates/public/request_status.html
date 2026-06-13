@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Consultar Estado
+{% endblock %}
+
+{% block content %}
+
+<div class="request-header">
+
+    <h1>
+        Consultar Estado de Solicitud
+    </h1>
+
+    <h3>
+        Colecciones Biológicas UVG
+    </h3>
+
+</div>
+
+<form method="post">
+
+    <label>
+        Código de Seguimiento
+    </label>
+
+    <input
+        name="tracking_code"
+        placeholder="UVG-2026-00001"
+        required
+    >
+
+    <input
+        type="submit"
+        value="CONSULTAR"
+    >
+
+</form>
+
+{% if request_record %}
+
+<div class="request-summary request-status-result">
+
+    <h2>
+        Información de la Solicitud
+    </h2>
+
+    <p>
+        <strong>Código:</strong>
+        <span class="tracking-inline">
+            {{ request_record.tracking_code }}
+        </span>
+    </p>
+
+   <p>
+
+        <strong>Estado:</strong>
+
+        {% if request_record.status == "pending" %}
+
+        <span class="status-badge-skinny pending">
+
+            Pendiente
+
+        </span>
+
+        {% elif request_record.status == "approved" %}
+
+        <span class="status-badge-skinny approved">
+
+            Aprobada
+
+        </span>
+
+        {% elif request_record.status == "rejected" %}
+
+        <span class="status-badge-skinny rejected">
+
+            Rechazada
+
+        </span>
+
+        {% elif request_record.status == "returned" %}
+
+        <span class="status-badge-skinny returned">
+
+            Devuelta
+
+        </span>
+
+        {% endif %}
+
+    </p>
+
+    <p>
+        <strong>Catedrático:</strong>
+        {{ request_record.teacher_name }}
+    </p>
+
+    <p>
+        <strong>Curso:</strong>
+        {{ request_record.course }}
+    </p>
+
+    <p>
+        <strong>Fecha Solicitud:</strong>
+        {{ request_record.request_date }}
+    </p>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

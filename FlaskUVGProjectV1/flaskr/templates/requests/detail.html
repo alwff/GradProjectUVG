@@ -1,0 +1,244 @@
+
+{% extends 'base.html' %}
+
+{% block title %}
+Solicitud
+{% endblock %}
+
+{% block content %}
+
+<div class="request-header-row">
+
+    <h1>
+
+        {{ request_record.tracking_code }}
+
+    </h1>
+
+    {% if request_record.status == "pending" %}
+
+    <span class="status-badge pending">
+
+        Pendiente
+
+    </span>
+
+    {% elif request_record.status == "approved" %}
+
+    <span class="status-badge approved">
+
+        Aprobada
+
+    </span>
+
+    {% elif request_record.status == "rejected" %}
+
+    <span class="status-badge rejected">
+
+        Rechazada
+
+    </span>
+
+    {% elif request_record.status == "returned" %}
+
+    <span class="status-badge returned">
+
+        Devuelta
+
+    </span>
+
+    {% endif %}
+
+</div>
+
+<div class="request-summary">
+
+    <h2>
+        Datos Generales
+    </h2>
+
+    <p>
+        <strong>Catedrático:</strong>
+        {{ request_record.teacher_name }}
+    </p>
+
+    <p>
+        <strong>Curso:</strong>
+        {{ request_record.course }}
+    </p>
+
+    <p>
+        <strong>Auxiliar:</strong>
+        {{ request_record.assistant }}
+    </p>
+
+    <p>
+        <strong>Fecha Solicitud:</strong>
+        {{ request_record.request_date }}
+    </p>
+
+    <p>
+        <strong>Fecha Uso:</strong>
+        {{ request_record.needed_date }}
+    </p>
+
+    <p>
+        <strong>Fecha Devolución:</strong>
+        {{ request_record.return_date }}
+    </p>
+
+    <p>
+        <strong>Horario:</strong>
+
+        {{ request_record.start_time }}
+
+        -
+
+        {{ request_record.end_time }}
+    </p>
+
+</div>
+
+<hr class="section-divider">
+
+<h2 class="materials-title">
+    Material Solicitado
+</h2>
+
+<table>
+
+    <thead>
+
+        <tr>
+
+            <th>
+                Código Portal
+            </th>
+
+            <th>
+                Especie o Familia
+            </th>
+
+            <th>
+                Especificaciones
+            </th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+    {% for item in request_record.items %}
+
+        <tr>
+
+            <td>
+                {{ item.portal_code }}
+            </td>
+
+            <td>
+                {{ item.species_or_family }}
+            </td>
+
+            <td>
+                {{ item.specifications }}
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+<form
+    method="post"
+    action="{{ url_for(
+        'requests.update_status',
+        id=request_record.id
+    ) }}"
+>
+
+<div class="request-summary">
+
+    <h2>
+        Gestión de Solicitud
+    </h2>
+
+    <div class="management-field">
+
+        <label>
+            Estado
+        </label>
+
+        <select
+            name="status"
+            class="request-status-select"
+        >
+
+        <option
+            value="pending"
+            {% if request_record.status == "pending" %}
+            selected
+            {% endif %}
+        >
+            Pendiente
+        </option>
+
+        <option
+            value="approved"
+            {% if request_record.status == "approved" %}
+            selected
+            {% endif %}
+        >
+            Aprobada
+        </option>
+
+        <option
+            value="rejected"
+            {% if request_record.status == "rejected" %}
+            selected
+            {% endif %}
+        >
+            Rechazada
+        </option>
+
+        <option
+            value="returned"
+            {% if request_record.status == "returned" %}
+            selected
+            {% endif %}
+        >
+            Devuelta
+        </option>
+
+    </select>
+
+    <div class="management-field">
+
+        <label>
+            Observaciones
+        </label>
+
+        <textarea
+            class="status-notes"
+            name="status_notes"
+        >{{ request_record.status_notes or '' }}</textarea>
+
+    </div>
+
+    <div class="submit-request">
+
+        <input
+            type="submit"
+            value="GUARDAR CAMBIOS"
+        >
+
+    </div>
+
+</form>
+</div>
+
+{% endblock %}

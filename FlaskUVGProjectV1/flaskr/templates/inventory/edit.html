@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Especímen{% endblock %}
+
+{% block content %}
+
+<h1>Editar Especímen</h1>
+
+<form method="post">
+
+    <label>Código Portal</label>
+    <input
+        name="portal_code"
+        value="{{ specimen.portal_code }}"
+        required
+    >
+
+    <label>Número de Catálogo</label>
+    <input
+        name="catalog_number"
+        value="{{ specimen.catalog_number }}"
+    >
+
+    <label>Nombre Científico</label>
+    <input
+        name="scientific_name"
+        value="{{ specimen.scientific_name }}"
+        required
+    >
+
+    <label>Familia Taxonómica</label>
+    <input
+        name="taxon_family"
+        value="{{ specimen.taxon_family }}"
+    >
+
+    <label>Colección</label>
+    <input
+        name="collection"
+        value="{{ specimen.collection }}"
+        required
+    >
+
+    <label>RFID EPC</label>
+    <input
+        name="rfid_epc"
+        value="{{ specimen.rfid_epc }}"
+    >
+
+    <label>Código de Barras</label>
+    <input
+        name="barcode"
+        value="{{ specimen.barcode }}"
+    >
+
+    <label>Descripción</label>
+    <textarea
+        name="description"
+    >{{ specimen.description }}</textarea>
+
+    <input
+        type="submit"
+        value="Guardar Cambios"
+    >
+
+</form>
+
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Eliminar Usuario
+{% endblock %}
+
+{% block content %}
+
+<h1>
+    Confirmar Eliminación
+</h1>
+
+<div class="request-summary">
+
+    <p>
+
+        <strong>
+            Usuario:
+        </strong>
+
+        {{ user.username }}
+
+    </p>
+
+    <form
+        method="post"
+        action="{{ url_for(
+            'users.delete',
+            id=user.id
+        ) }}"
+    >
+
+        <label>
+            Contraseña Maestra
+        </label>
+
+        <input
+            type="password"
+            name="master_password"
+            required
+        >
+
+        <div class="submit-request">
+
+            <input
+                type="submit"
+                value="ELIMINAR USUARIO"
+            >
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

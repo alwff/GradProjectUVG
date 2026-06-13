@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Colecciones UVG{% endblock %}
+
+{% block content %}
+
+<div class="public-home">
+
+    <img
+        class="public-home-image"
+        src="{{ url_for(
+            'static',
+            filename='img/Inicio.png'
+        ) }}"
+        alt="Colecciones Biológicas UVG"
+    >
+
+    <a
+        class="public-main-button"
+        href="{{ url_for('public.create_request') }}"
+    >
+        SOLICITUD DE MATERIAL
+    </a>
+
+    <div class="public-status">
+
+        <a href="{{ url_for('public.request_status') }}">
+            ¿YA HICISTE UNA SOLICITUD?, CONSULTAR ESTADO
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

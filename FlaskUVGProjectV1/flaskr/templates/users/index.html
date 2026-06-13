@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Usuarios
+{% endblock %}
+
+{% block content %}
+
+<h1>
+    Gestión de Usuarios
+</h1>
+
+<a
+    class="action-button"
+    href="{{ url_for('auth.register') }}"
+>
+    CREAR USUARIO
+</a>
+
+<table>
+
+    <thead>
+
+        <tr>
+
+            <th>
+                Usuario
+            </th>
+
+            <th>
+                Acción
+            </th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+    {% for user in users %}
+
+        <tr>
+
+            <td>
+
+                {{ user.username }}
+
+            </td>
+
+            <td>
+
+                {% if user.id != g.user.id %}
+
+                <a
+                    class="danger-button"
+                    href="{{ url_for(
+                        'users.confirm_delete',
+                        id=user.id
+                    ) }}"
+                >
+                    ELIMINAR
+                </a>
+
+                {% else %}
+
+                Usuario Actual
+
+                {% endif %}
+
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}
