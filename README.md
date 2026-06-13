@@ -25,7 +25,7 @@ Se busca la creación e implementación de una exhibición virtual en el entorno
 
 ## ¿Qué tengo ya y qué me falta?
 
-* [ ] Unity
+* [\(\checkmark \)] Unity
 * [ ] Base de Datos
   * [ ] Especímenes
     * [ ] Ingresados por el lector de códigos de barras.
