@@ -48,6 +48,9 @@ def create_app(test_config=None):
     from . import movements
     app.register_blueprint(movements.bp)
 
+    from . import api
+    app.register_blueprint(api.bp)
+
     db.init_app(app)
     
     with app.app_context():
