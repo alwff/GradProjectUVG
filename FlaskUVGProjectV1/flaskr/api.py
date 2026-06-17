@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from flaskr.models import Specimen
 from flaskr.movements import find_specimen
 
@@ -12,7 +12,7 @@ def get_specimen(identifier):
     if specimen is None:
         return jsonify({"error": "Not found"}), 404
 
-    base_url = f"http://127.0.0.1:5000/assets/specimens/{specimen.portal_code}"
+    base_url = request.host_url + f"assets/specimens/{specimen.portal_code}"
 
     return jsonify({
         "id": specimen.portal_code,
