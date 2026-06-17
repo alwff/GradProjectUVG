@@ -29,8 +29,10 @@ def create_app(test_config=None):
 
     @app.route('/assets/<path:filename>')
     def serve_assets(filename):
-      return send_from_directory('flaskr/assets', filename)
+        base_dir = os.path.dirname(__file__)  # flaskr
+        assets_path = os.path.join(base_dir, "assets")
 
+        return send_from_directory(assets_path, filename)
 
     from . import public
     app.register_blueprint(public.bp)
