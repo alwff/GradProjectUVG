@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, url_for
 from flaskr.models import Specimen
 from flaskr.movements import find_specimen
 
@@ -19,9 +19,17 @@ def get_specimen(identifier):
         "collection": specimen.collection,
         "status": specimen.status,
 
-        # Conecta las imagenes
+        # Imagenes
         "images": [
-            f"http://127.0.0.1:5000/static/specimens/{specimen.portal_code}/0.jpg",
-            f"http://127.0.0.1:5000/static/specimens/{specimen.portal_code}/1.jpg"
+            url_for(
+                'static',
+                filename=f"specimens/{specimen.portal_code}/0.jpg",
+                _external=True
+            ),
+            url_for(
+                'static',
+                filename=f"specimens/{specimen.portal_code}/1.jpg",
+                _external=True
+            )
         ]
     })
