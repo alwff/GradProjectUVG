@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, url_for
+from flask import Blueprint, jsonify
 from flaskr.models import Specimen
 from flaskr.movements import find_specimen
 
@@ -12,6 +12,8 @@ def get_specimen(identifier):
     if specimen is None:
         return jsonify({"error": "Not found"}), 404
 
+    base_url = f"http://127.0.0.1:5000/assets/specimens/{specimen.portal_code}"
+
     return jsonify({
         "id": specimen.portal_code,
         "name": specimen.scientific_name,
@@ -19,17 +21,9 @@ def get_specimen(identifier):
         "collection": specimen.collection,
         "status": specimen.status,
 
-        # Imagenes
+        # 🔥 ahora usando assets (no static)
         "images": [
-            url_for(
-                'static',
-                filename=f"specimens/{specimen.portal_code}/0.jpg",
-                _external=True
-            ),
-            url_for(
-                'static',
-                filename=f"specimens/{specimen.portal_code}/1.jpg",
-                _external=True
-            )
+            f"{base_url}/0.jpg",
+            f"{base_url}/1.jpg"
         ]
     })

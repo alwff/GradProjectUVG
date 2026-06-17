@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask
+from flask import Flask, send_from_directory
 from .extensions import db
 from . import models
 
@@ -26,6 +26,11 @@ def create_app(test_config=None):
 
     # ensure the instance folder exists
     os.makedirs(app.instance_path, exist_ok=True)
+
+    @app.route('/assets/<path:filename>')
+    def serve_assets(filename):
+      return send_from_directory('flaskr/assets', filename)
+
 
     from . import public
     app.register_blueprint(public.bp)
