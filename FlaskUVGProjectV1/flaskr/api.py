@@ -21,7 +21,7 @@ def get_specimen(identifier):
 
         # Conecta las imagenes
         "images": [
-            f"http://localhost:5000/images/{specimen.portal_code}/0.jpg",
-            f"http://localhost:5000/images/{specimen.portal_code}/1.jpg"
+            f"http://127.0.0.1:5000/static/specimens/{specimen.portal_code}/0.jpg",
+            f"http://127.0.0.1:5000/static/specimens/{specimen.portal_code}/1.jpg"
         ]
     })
