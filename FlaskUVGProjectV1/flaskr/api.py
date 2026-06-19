@@ -21,9 +21,8 @@ def get_specimen(identifier):
         "collection": specimen.collection,
         "status": specimen.status,
 
-        # 🔥 ahora usando assets (no static)
         "images": [
-            f"{base_url}/0.jpg",
-            f"{base_url}/1.jpg"
+            f"{base_url}/1.png",
+            f"{base_url}/2.png"
         ]
     })
