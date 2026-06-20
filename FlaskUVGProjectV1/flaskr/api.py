@@ -26,3 +26,15 @@ def get_specimen(identifier):
             f"{base_url}/2.png"
         ]
     })
+
+@bp.route("/specimens", methods=["GET"])
+def get_all_specimens():
+    specimens = Specimen.query.all()
+
+    return jsonify([
+        {
+            "id": s.portal_code,
+            "name": s.scientific_name
+        }
+        for s in specimens
+    ])
