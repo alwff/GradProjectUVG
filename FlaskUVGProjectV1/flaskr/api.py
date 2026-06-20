@@ -32,9 +32,11 @@ def get_all_specimens():
     specimens = Specimen.query.all()
 
     return jsonify([
-        {
-            "id": s.portal_code,
-            "name": s.scientific_name
-        }
-        for s in specimens
+    {
+        "id": s.portal_code,
+        "name": s.scientific_name,
+        "collection": s.collection
+    }
+    for s in specimens
+    
     ])
