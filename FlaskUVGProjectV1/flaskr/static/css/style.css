@@ -1260,3 +1260,144 @@ tr:hover {
 
     opacity: 0.5;
 }
+
+/* =========================================
+   EXHIBITION - ESTADOS
+   ========================================= */
+
+.exhibition-landing.is-hidden {
+    display: none;
+}
+
+
+/* =========================================
+   LOADER
+   ========================================= */
+
+.exhibition-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    background: #f4ecd8;
+}
+
+
+.exhibition-loader.is-visible {
+    display: flex;
+}
+
+
+.exhibition-loader.is-hidden {
+    display: none;
+}
+
+
+.exhibition-loader-content {
+    width: min(90vw, 960px);
+
+    text-align: center;
+}
+
+
+.exhibition-splash {
+    display: block;
+
+    width: 100%;
+    height: auto;
+
+    max-height: 75vh;
+
+    object-fit: contain;
+
+    margin: 0 auto;
+}
+
+
+.exhibition-loading-info {
+    width: min(70%, 620px);
+
+    display: flex;
+    justify-content: space-between;
+
+    margin: 22px auto 8px;
+
+    font-size: 0.78rem;
+    font-weight: 600;
+
+    letter-spacing: 0.06em;
+
+    color: #405b45;
+}
+
+
+.exhibition-progress-track {
+    width: min(70%, 620px);
+    height: 4px;
+
+    margin: 0 auto;
+
+    overflow: hidden;
+
+    background: rgba(64, 91, 69, 0.18);
+}
+
+
+.exhibition-progress-bar {
+    width: 0;
+    height: 100%;
+
+    background: #405b45;
+
+    transition: width 0.15s ease;
+}
+
+
+/* =========================================
+   UNITY PLAYER
+   ========================================= */
+
+.exhibition-player {
+    position: fixed;
+    inset: 0;
+
+    z-index: 900;
+
+    display: none;
+
+    width: 100vw;
+    height: 100vh;
+
+    overflow: hidden;
+
+    background: #111;
+}
+
+
+.exhibition-player.is-visible {
+    display: block;
+}
+
+
+#unity-container {
+    width: 100%;
+    height: 100%;
+}
+
+
+#unity-canvas {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    border: 0;
+    outline: none;
+
+    background: #111;
+}

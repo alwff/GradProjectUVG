@@ -8,7 +8,11 @@ Exhibición Virtual
 
 {% block content %}
 
-<section class="exhibition-landing">
+<!-- =========================================
+     LANDING
+     ========================================= -->
+
+<section class="exhibition-landing" id="exhibitionLanding">
 
     <div class="exhibition-hero">
 
@@ -41,5 +45,211 @@ Exhibición Virtual
     </div>
 
 </section>
+
+
+<!-- =========================================
+     LOADER
+     ========================================= -->
+
+<section class="exhibition-loader" id="exhibitionLoader">
+
+    <div class="exhibition-loader-content">
+
+        <img
+            src="{{ url_for('static', filename='exhibition/images/splash.png') }}"
+            alt="Exhibición Virtual"
+            class="exhibition-splash"
+        >
+
+        <div class="exhibition-loading-info">
+
+            <span id="loadingText">
+                Cargando exhibición...
+            </span>
+
+            <span id="loadingPercentage">
+                0%
+            </span>
+
+        </div>
+
+        <div class="exhibition-progress-track">
+            <div
+                class="exhibition-progress-bar"
+                id="loadingBar"
+            ></div>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     UNITY
+     ========================================= -->
+
+<section class="exhibition-player" id="exhibitionPlayer">
+
+    <div id="unity-container">
+
+        <canvas
+            id="unity-canvas"
+            tabindex="-1"
+        ></canvas>
+
+    </div>
+
+</section>
+
+
+<script>
+
+const landing = document.getElementById("exhibitionLanding");
+const loader = document.getElementById("exhibitionLoader");
+const player = document.getElementById("exhibitionPlayer");
+
+const enterButton = document.getElementById("enterExhibition");
+
+const loadingBar = document.getElementById("loadingBar");
+const loadingPercentage = document.getElementById("loadingPercentage");
+const loadingText = document.getElementById("loadingText");
+
+const canvas = document.getElementById("unity-canvas");
+
+let unityStarted = false;
+
+
+/* =========================================
+   INICIAR EXHIBICION
+   ========================================= */
+
+enterButton.addEventListener("click", function () {
+
+    if (unityStarted) {
+        return;
+    }
+
+    unityStarted = true;
+
+    landing.classList.add("is-hidden");
+    loader.classList.add("is-visible");
+
+    loadUnity();
+
+});
+
+
+/* =========================================
+   CARGAR UNITY
+   ========================================= */
+
+function loadUnity() {
+
+    const buildUrl =
+        "{{ url_for('static', filename='exhibition/Build') }}";
+
+    const loaderUrl =
+        buildUrl + "/Builds.loader.js";
+
+
+    const config = {
+
+        dataUrl:
+            buildUrl + "/Builds.data",
+
+        frameworkUrl:
+            buildUrl + "/Builds.framework.js",
+
+        codeUrl:
+            buildUrl + "/Builds.wasm",
+
+        streamingAssetsUrl:
+            "StreamingAssets",
+
+        companyName:
+            "Universidad del Valle de Guatemala",
+
+        productName:
+            "Exhibición Virtual",
+
+        productVersion:
+            "1.0"
+
+    };
+
+
+    const script = document.createElement("script");
+
+    script.src = loaderUrl;
+
+
+    script.onload = function () {
+
+        createUnityInstance(
+            canvas,
+            config,
+
+            function (progress) {
+
+                const percentage =
+                    Math.round(progress * 100);
+
+                loadingBar.style.width =
+                    percentage + "%";
+
+                loadingPercentage.textContent =
+                    percentage + "%";
+
+            }
+
+        )
+        .then(function (unityInstance) {
+
+            loadingBar.style.width = "100%";
+            loadingPercentage.textContent = "100%";
+            loadingText.textContent = "Exhibición lista";
+
+            setTimeout(function () {
+
+                loader.classList.remove("is-visible");
+                loader.classList.add("is-hidden");
+
+                player.classList.add("is-visible");
+
+                canvas.focus();
+
+            }, 450);
+
+        })
+        .catch(function (message) {
+
+            console.error(message);
+
+            loadingText.textContent =
+                "No fue posible cargar la exhibición.";
+
+            unityStarted = false;
+
+        });
+
+    };
+
+
+    script.onerror = function () {
+
+        loadingText.textContent =
+            "No fue posible cargar la exhibición.";
+
+        unityStarted = false;
+
+    };
+
+
+    document.body.appendChild(script);
+
+}
+
+</script>
 
 {% endblock %}
