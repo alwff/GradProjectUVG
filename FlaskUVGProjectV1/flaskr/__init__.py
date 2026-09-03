@@ -1,12 +1,25 @@
 import os
 
 from flask import Flask, send_from_directory
+from flask_cors import CORS
 from .extensions import db
 from . import models
 
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
+    
+    CORS(
+        app,
+        resources={
+            r"/api/*": {
+                "origins": "*"
+            },
+            r"/assets/specimens/*": {
+                "origins": "*"
+            }
+        }
+    )
     app.config["SQLALCHEMY_DATABASE_URI"] = (
     "postgresql://postgres:UVGserver@localhost:5432/uvg_collections"
     )
