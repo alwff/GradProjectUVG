@@ -50,6 +50,9 @@ def create_app(test_config=None):
     from . import public
     app.register_blueprint(public.bp)
 
+    from . import exhibition
+    app.register_blueprint(exhibition.bp)
+
     from . import auth
     app.register_blueprint(auth.bp)
 

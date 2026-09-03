@@ -1155,3 +1155,108 @@ tr:hover {
 
     text-transform: uppercase;
 }
+
+/* =========================================
+   EXHIBICION VIRTUAL
+   ========================================= */
+
+.exhibition-landing {
+    min-height: calc(100vh - 90px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 60px 24px;
+
+    text-align: center;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(44, 94, 70, 0.08),
+            transparent 55%
+        );
+}
+
+
+.exhibition-hero {
+    width: 100%;
+    max-width: 760px;
+}
+
+
+.exhibition-eyebrow {
+    margin-bottom: 18px;
+
+    font-size: 0.85rem;
+    font-weight: 700;
+
+    letter-spacing: 0.22em;
+
+    color: #2f855a;
+}
+
+
+.exhibition-title {
+    margin: 0 0 24px;
+
+    font-size: clamp(2.8rem, 6vw, 5.5rem);
+    line-height: 1;
+
+    letter-spacing: -0.03em;
+}
+
+
+.exhibition-description {
+    max-width: 620px;
+
+    margin: 0 auto 38px;
+
+    font-size: 1.15rem;
+    line-height: 1.8;
+
+    opacity: 0.75;
+}
+
+
+.exhibition-enter-button {
+    padding: 16px 34px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: #2f855a;
+    color: white;
+
+    font-size: 0.9rem;
+    font-weight: 700;
+
+    letter-spacing: 0.08em;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease;
+}
+
+
+.exhibition-enter-button:hover {
+    transform: translateY(-2px);
+    background: #276749;
+}
+
+
+.exhibition-enter-button:active {
+    transform: translateY(0);
+}
+
+
+.exhibition-recommendation {
+    margin-top: 20px;
+
+    font-size: 0.78rem;
+
+    opacity: 0.5;
+}
