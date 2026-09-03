@@ -1161,7 +1161,7 @@ tr:hover {
    ========================================= */
 
 .exhibition-landing {
-    min-height: calc(100vh - 90px);
+    min-height: calc(100vh);
 
     display: flex;
     align-items: center;
