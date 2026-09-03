@@ -30,6 +30,9 @@ htmlcov/
 
 # Build
 build/
+# Unity Web build used by Flask exhibition
+!FlaskUVGProjectV1/flaskr/static/exhibition/Build/
+!FlaskUVGProjectV1/flaskr/static/exhibition/Build/**
 dist/
 *.egg-info/
 
