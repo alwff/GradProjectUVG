@@ -117,6 +117,22 @@ const loadingText = document.getElementById("loadingText");
 
 const canvas = document.getElementById("unity-canvas");
 
+function resizeUnityCanvas() {
+
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
+
+    canvas.width = width;
+    canvas.height = height;
+}
+
+window.addEventListener("resize", resizeUnityCanvas);
+
+resizeUnityCanvas();
+
 let unityStarted = false;
 
 
