@@ -234,3 +234,35 @@ class Movement(db.Model):
         nullable=False,
         server_default=db.func.now()
     )
+
+class ExhibitionSlot(db.Model):
+
+    __tablename__ = "exhibition_slots"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    slot_index = db.Column(
+        db.Integer,
+        unique=True,
+        nullable=False
+    )
+
+    specimen_id = db.Column(
+        db.Integer,
+        db.ForeignKey("specimens.id"),
+        nullable=True
+    )
+
+    specimen = db.relationship(
+        "Specimen"
+    )
+
+    updated_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        server_default=db.func.now(),
+        onupdate=db.func.now()
+    )
