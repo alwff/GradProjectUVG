@@ -45,9 +45,26 @@ Gestión de Exhibición
                 <h3>PAREDES</h3>
 
                 <div class="exhibition-texture-preview">
-                    <span>
-                        Textura predeterminada
-                    </span>
+
+                    {% if settings.wall_texture %}
+
+                        <img
+                            src="{{ url_for(
+                                'serve_assets',
+                                filename='exhibition/textures/' +
+                                settings.wall_texture
+                            ) }}"
+                            alt="Textura actual de paredes"
+                        >
+
+                    {% else %}
+
+                        <span>
+                            Textura predeterminada
+                        </span>
+
+                    {% endif %}
+
                 </div>
 
                 <p>
@@ -55,21 +72,52 @@ Gestión de Exhibición
                     de la exhibición.
                 </p>
 
-                <button
-                    type="button"
-                    class="dashboard-button"
-                    disabled
-                >
-                    CAMBIAR TEXTURA
-                </button>
 
-                <button
-                    type="button"
-                    class="exhibition-secondary-button"
-                    disabled
+                <form
+                    method="post"
+                    enctype="multipart/form-data"
+                    action="{{ url_for(
+                        'dashboard.upload_exhibition_texture',
+                        surface='walls'
+                    ) }}"
                 >
-                    RESTAURAR PREDETERMINADA
-                </button>
+
+                    <input
+                        type="file"
+                        name="texture"
+                        accept=".png,.jpg,.jpeg"
+                        required
+                    >
+
+                    <button
+                        type="submit"
+                        class="dashboard-button"
+                    >
+                        CAMBIAR TEXTURA
+                    </button>
+
+                </form>
+
+
+                <form
+                    method="post"
+                    action="{{ url_for(
+                        'dashboard.reset_exhibition_texture',
+                        surface='walls'
+                    ) }}"
+                >
+
+                    <button
+                        type="submit"
+                        class="exhibition-secondary-button"
+                        {% if not settings.wall_texture %}
+                            disabled
+                        {% endif %}
+                    >
+                        RESTAURAR PREDETERMINADA
+                    </button>
+
+                </form>
 
             </div>
 

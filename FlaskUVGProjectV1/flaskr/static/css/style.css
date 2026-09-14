@@ -1598,3 +1598,31 @@ tr:hover {
     }
 
 }
+
+.exhibition-texture-preview img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+
+.exhibition-texture-option form {
+    width: 100%;
+    gap: 0.75rem;
+}
+
+
+.exhibition-texture-option input[type="file"] {
+    width: 100%;
+
+    padding: 0.75rem;
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+
+    background: rgba(0, 0, 0, 0.15);
+
+    color: white;
+}

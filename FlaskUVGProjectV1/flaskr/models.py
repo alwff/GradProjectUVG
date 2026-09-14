@@ -266,3 +266,34 @@ class ExhibitionSlot(db.Model):
         server_default=db.func.now(),
         onupdate=db.func.now()
     )
+
+class ExhibitionSettings(db.Model):
+
+    __tablename__ = "exhibition_settings"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    wall_texture = db.Column(
+        db.String(500),
+        nullable=True
+    )
+
+    floor_texture = db.Column(
+        db.String(500),
+        nullable=True
+    )
+
+    ceiling_texture = db.Column(
+        db.String(500),
+        nullable=True
+    )
+
+    updated_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        server_default=db.func.now(),
+        onupdate=db.func.now()
+    )
