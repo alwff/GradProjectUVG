@@ -129,34 +129,78 @@ Gestión de Exhibición
                 <h3>PISO</h3>
 
                 <div class="exhibition-texture-preview">
-                    <span>
-                        Textura predeterminada
-                    </span>
+
+                    {% if settings.floor_texture %}
+
+                        <img
+                            src="{{ url_for(
+                                'serve_assets',
+                                filename='exhibition/textures/' +
+                                settings.floor_texture
+                            ) }}"
+                            alt="Textura actual del piso"
+                        >
+
+                    {% else %}
+
+                        <span>
+                            Textura predeterminada
+                        </span>
+
+                    {% endif %}
+
                 </div>
 
                 <p>
-                    Textura utilizada en el suelo de la
-                    exhibición.
+                    Textura utilizada en el suelo de la exhibición.
                 </p>
 
-                <button
-                    type="button"
-                    class="dashboard-button"
-                    disabled
+                <form
+                    method="post"
+                    enctype="multipart/form-data"
+                    action="{{ url_for(
+                        'dashboard.upload_exhibition_texture',
+                        surface='floor'
+                    ) }}"
                 >
-                    CAMBIAR TEXTURA
-                </button>
 
-                <button
-                    type="button"
-                    class="exhibition-secondary-button"
-                    disabled
+                    <input
+                        type="file"
+                        name="texture"
+                        accept=".png,.jpg,.jpeg"
+                        required
+                    >
+
+                    <button
+                        type="submit"
+                        class="dashboard-button"
+                    >
+                        CAMBIAR TEXTURA
+                    </button>
+
+                </form>
+
+                <form
+                    method="post"
+                    action="{{ url_for(
+                        'dashboard.reset_exhibition_texture',
+                        surface='floor'
+                    ) }}"
                 >
-                    RESTAURAR PREDETERMINADA
-                </button>
+
+                    <button
+                        type="submit"
+                        class="exhibition-secondary-button"
+                        {% if not settings.floor_texture %}
+                            disabled
+                        {% endif %}
+                    >
+                        RESTAURAR PREDETERMINADA
+                    </button>
+
+                </form>
 
             </div>
-
 
             <!-- TECHO -->
 
@@ -165,34 +209,78 @@ Gestión de Exhibición
                 <h3>TECHO</h3>
 
                 <div class="exhibition-texture-preview">
-                    <span>
-                        Textura predeterminada
-                    </span>
+
+                    {% if settings.ceiling_texture %}
+
+                        <img
+                            src="{{ url_for(
+                                'serve_assets',
+                                filename='exhibition/textures/' +
+                                settings.ceiling_texture
+                            ) }}"
+                            alt="Textura actual del techo"
+                        >
+
+                    {% else %}
+
+                        <span>
+                            Textura predeterminada
+                        </span>
+
+                    {% endif %}
+
                 </div>
 
                 <p>
-                    Textura aplicada al techo de la
-                    exhibición.
+                    Textura aplicada al techo de la exhibición.
                 </p>
 
-                <button
-                    type="button"
-                    class="dashboard-button"
-                    disabled
+                <form
+                    method="post"
+                    enctype="multipart/form-data"
+                    action="{{ url_for(
+                        'dashboard.upload_exhibition_texture',
+                        surface='ceiling'
+                    ) }}"
                 >
-                    CAMBIAR TEXTURA
-                </button>
 
-                <button
-                    type="button"
-                    class="exhibition-secondary-button"
-                    disabled
+                    <input
+                        type="file"
+                        name="texture"
+                        accept=".png,.jpg,.jpeg"
+                        required
+                    >
+
+                    <button
+                        type="submit"
+                        class="dashboard-button"
+                    >
+                        CAMBIAR TEXTURA
+                    </button>
+
+                </form>
+
+                <form
+                    method="post"
+                    action="{{ url_for(
+                        'dashboard.reset_exhibition_texture',
+                        surface='ceiling'
+                    ) }}"
                 >
-                    RESTAURAR PREDETERMINADA
-                </button>
+
+                    <button
+                        type="submit"
+                        class="exhibition-secondary-button"
+                        {% if not settings.ceiling_texture %}
+                            disabled
+                        {% endif %}
+                    >
+                        RESTAURAR PREDETERMINADA
+                    </button>
+
+                </form>
 
             </div>
-
         </div>
 
     </section>
