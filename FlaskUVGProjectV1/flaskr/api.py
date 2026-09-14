@@ -1,5 +1,9 @@
 from flask import Blueprint, jsonify, request
-from flaskr.models import Specimen, ExhibitionSlot
+from flaskr.models import (
+    Specimen,
+    ExhibitionSlot,
+    ExhibitionSettings
+)
 from flaskr.movements import find_specimen
 from flaskr.extensions import db
 
@@ -130,4 +134,38 @@ def save_exhibition_config():
 
     return jsonify({
         "success": True
+    })
+
+@bp.route("/exhibition/settings", methods=["GET"])
+def get_exhibition_settings():
+
+    settings = ExhibitionSettings.query.first()
+
+    if settings is None:
+        return jsonify({
+            "wall_texture": None,
+            "floor_texture": None,
+            "ceiling_texture": None
+        })
+
+    def texture_url(filename):
+
+        if not filename:
+            return None
+
+        return (
+            request.host_url.rstrip("/")
+            + "/assets/exhibition/textures/"
+            + filename
+        )
+
+    return jsonify({
+        "wall_texture":
+            texture_url(settings.wall_texture),
+
+        "floor_texture":
+            texture_url(settings.floor_texture),
+
+        "ceiling_texture":
+            texture_url(settings.ceiling_texture)
     })
