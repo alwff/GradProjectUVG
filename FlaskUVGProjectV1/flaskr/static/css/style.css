@@ -1416,7 +1416,9 @@ tr:hover {
 
 .exhibition-admin-page {
     width: 100%;
-    padding: 2rem 0 4rem;
+    max-width: none;
+
+    padding: 1rem 0 4rem;
 }
 
 
@@ -1478,7 +1480,7 @@ tr:hover {
     grid-template-columns:
         repeat(3, minmax(0, 1fr));
 
-    gap: 1.5rem;
+    gap: 2rem;
 }
 
 
