@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Gestión de Exhibición
+{% endblock %}
+
+{% block content %}
+
+<div class="exhibition-admin-page">
+
+    <div class="exhibition-admin-header">
+
+        <div>
+            <h1>GESTIÓN DE EXHIBICIÓN</h1>
+
+            <p>
+                Personaliza la apariencia y configuración
+                de la exhibición virtual.
+            </p>
+        </div>
+
+        <a
+            href="{{ url_for('dashboard.index') }}"
+            class="small-button"
+        >
+            VOLVER AL TABLERO
+        </a>
+
+    </div>
+
+
+    <section class="exhibition-admin-card">
+
+        <div class="exhibition-admin-card-header">
+
+            <h2>APARIENCIA DEL ESPACIO</h2>
+
+            <p>
+                Configura las texturas utilizadas en el
+                entorno de la exhibición.
+            </p>
+
+        </div>
+
+        <div class="exhibition-texture-grid">
+
+
+            <!-- PAREDES -->
+
+            <div class="exhibition-texture-option">
+
+                <h3>PAREDES</h3>
+
+                <div class="exhibition-texture-preview">
+                    <span>
+                        Textura predeterminada
+                    </span>
+                </div>
+
+                <p>
+                    Una textura aplicada a todas las paredes
+                    de la exhibición.
+                </p>
+
+                <button
+                    type="button"
+                    class="dashboard-button"
+                    disabled
+                >
+                    CAMBIAR TEXTURA
+                </button>
+
+                <button
+                    type="button"
+                    class="exhibition-secondary-button"
+                    disabled
+                >
+                    RESTAURAR PREDETERMINADA
+                </button>
+
+            </div>
+
+
+            <!-- PISO -->
+
+            <div class="exhibition-texture-option">
+
+                <h3>PISO</h3>
+
+                <div class="exhibition-texture-preview">
+                    <span>
+                        Textura predeterminada
+                    </span>
+                </div>
+
+                <p>
+                    Textura utilizada en el suelo de la
+                    exhibición.
+                </p>
+
+                <button
+                    type="button"
+                    class="dashboard-button"
+                    disabled
+                >
+                    CAMBIAR TEXTURA
+                </button>
+
+                <button
+                    type="button"
+                    class="exhibition-secondary-button"
+                    disabled
+                >
+                    RESTAURAR PREDETERMINADA
+                </button>
+
+            </div>
+
+
+            <!-- TECHO -->
+
+            <div class="exhibition-texture-option">
+
+                <h3>TECHO</h3>
+
+                <div class="exhibition-texture-preview">
+                    <span>
+                        Textura predeterminada
+                    </span>
+                </div>
+
+                <p>
+                    Textura aplicada al techo de la
+                    exhibición.
+                </p>
+
+                <button
+                    type="button"
+                    class="dashboard-button"
+                    disabled
+                >
+                    CAMBIAR TEXTURA
+                </button>
+
+                <button
+                    type="button"
+                    class="exhibition-secondary-button"
+                    disabled
+                >
+                    RESTAURAR PREDETERMINADA
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="exhibition-admin-card">
+
+        <div class="exhibition-admin-card-header">
+
+            <h2>ACCESO ADMINISTRATIVO</h2>
+
+            <p>
+                Configura la clave utilizada para acceder
+                al modo administrador dentro de la exhibición.
+            </p>
+
+        </div>
+
+        <div class="exhibition-password-placeholder">
+
+            <div>
+                <strong>CLAVE DE ACCESO</strong>
+
+                <p>
+                    La autenticación segura será configurada
+                    en el siguiente paso.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                class="dashboard-button"
+                disabled
+            >
+                CAMBIAR CLAVE
+            </button>
+
+        </div>
+
+    </section>
+
+</div>
+
+{% endblock %}

@@ -14,3 +14,10 @@ def index():
     return render_template(
         "dashboard/index.html"
     )
+
+@bp.route("/exhibicion")
+@login_required
+def exhibition():
+    return render_template(
+        "dashboard/exhibition.html"
+    )

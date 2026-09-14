@@ -136,4 +136,35 @@
 
 </div>
 
+<div class="dashboard-section">
+
+    <div class="dashboard-image">
+
+        <img
+            src="{{ url_for(
+                'static',
+                filename='img/DashboardExhibition.png'
+            ) }}"
+            alt="Exhibición Virtual"
+        >
+
+    </div>
+
+    <div class="dashboard-content">
+
+        <h2>
+            EXHIBICIÓN VIRTUAL
+        </h2>
+
+        <a
+            class="dashboard-button"
+            href="{{ url_for('dashboard.exhibition') }}"
+        >
+            GESTIONAR EXHIBICIÓN
+        </a>
+
+    </div>
+
+</div>
+
 {% endblock %}

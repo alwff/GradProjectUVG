@@ -1409,3 +1409,192 @@ tr:hover {
 
     background: #111;
 }
+
+/* =========================================
+   ADMIN - EXHIBICION
+   ========================================= */
+
+.exhibition-admin-page {
+    width: 100%;
+    padding: 2rem 0 4rem;
+}
+
+
+.exhibition-admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 2rem;
+
+    margin-bottom: 2rem;
+}
+
+
+.exhibition-admin-header h1 {
+    margin-bottom: 0.5rem;
+}
+
+
+.exhibition-admin-header p {
+    opacity: 0.75;
+}
+
+
+.exhibition-admin-card {
+    width: 100%;
+
+    margin-bottom: 2rem;
+    padding: 2rem;
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    background: rgba(255, 255, 255, 0.03);
+}
+
+
+.exhibition-admin-card-header {
+    margin-bottom: 2rem;
+
+    padding-bottom: 1.5rem;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+
+.exhibition-admin-card-header h2 {
+    margin-bottom: 0.5rem;
+}
+
+
+.exhibition-admin-card-header p {
+    opacity: 0.7;
+}
+
+
+.exhibition-texture-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 1.5rem;
+}
+
+
+.exhibition-texture-option {
+    display: flex;
+    flex-direction: column;
+
+    gap: 1rem;
+
+    min-width: 0;
+}
+
+
+.exhibition-texture-option h3 {
+    font-size: 1rem;
+}
+
+
+.exhibition-texture-option p {
+    min-height: 48px;
+
+    line-height: 1.5;
+
+    opacity: 0.7;
+}
+
+
+.exhibition-texture-preview {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    aspect-ratio: 16 / 9;
+
+    overflow: hidden;
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    background: rgba(255, 255, 255, 0.05);
+
+    color: rgba(255, 255, 255, 0.55);
+
+    font-size: 0.85rem;
+}
+
+
+.exhibition-texture-option .dashboard-button {
+    max-width: none;
+}
+
+
+.exhibition-secondary-button {
+    width: 100%;
+
+    min-height: 46px;
+
+    padding: 0.7rem 1rem;
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 30px;
+
+    background: transparent;
+
+    color: white;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+
+.exhibition-secondary-button:disabled,
+.exhibition-texture-option .dashboard-button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+
+.exhibition-password-placeholder {
+    display: grid;
+
+    grid-template-columns: 1fr 380px;
+
+    align-items: center;
+
+    gap: 3rem;
+}
+
+
+.exhibition-password-placeholder p {
+    margin-top: 0.5rem;
+
+    opacity: 0.7;
+}
+
+
+.exhibition-password-placeholder .dashboard-button {
+    max-width: none;
+}
+
+
+@media (max-width: 900px) {
+
+    .exhibition-texture-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .exhibition-password-placeholder {
+        grid-template-columns: 1fr;
+    }
+
+    .exhibition-admin-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+}
