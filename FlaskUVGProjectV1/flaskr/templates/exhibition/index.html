@@ -212,12 +212,19 @@ function loadUnity() {
 
             setTimeout(function () {
 
+                // Unity ya está listo detrás del splash.
+                player.classList.add("is-visible");
+
+                // Comenzar transición del splash.
                 loader.classList.remove("is-visible");
                 loader.classList.add("is-hidden");
 
-                player.classList.add("is-visible");
+                // Dar foco cuando termine el fade.
+                setTimeout(function () {
 
-                canvas.focus();
+                    canvas.focus();
+
+                }, 650);
 
             }, 450);
 

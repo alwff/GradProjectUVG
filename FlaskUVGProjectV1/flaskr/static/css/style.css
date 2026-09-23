@@ -1274,27 +1274,39 @@ tr:hover {
    LOADER
    ========================================= */
 
-.exhibition-loader {
+   .exhibition-loader {
     position: fixed;
     inset: 0;
     z-index: 1000;
 
-    display: none;
+    display: flex;
 
     align-items: center;
     justify-content: center;
 
     background: #f4ecd8;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition:
+        opacity 0.65s ease,
+        visibility 0.65s ease;
 }
 
 
 .exhibition-loader.is-visible {
-    display: flex;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
 }
 
 
 .exhibition-loader.is-hidden {
-    display: none;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
 }
 
 
