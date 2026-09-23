@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from flaskr.models import (
     Specimen,
     ExhibitionSlot,
@@ -7,6 +7,12 @@ from flaskr.models import (
 from flaskr.movements import find_specimen
 from flaskr.extensions import db
 from werkzeug.security import check_password_hash
+
+from itsdangerous import (
+    URLSafeTimedSerializer,
+    BadSignature,
+    SignatureExpired
+)
 
 bp = Blueprint("api", __name__, url_prefix="/api")
 
@@ -71,6 +77,26 @@ def get_exhibition_config():
 
 @bp.route("/exhibition/config", methods=["PUT"])
 def save_exhibition_config():
+
+    # -----------------------------------------
+    # AUTORIZACION ADMINISTRATIVA
+    # -----------------------------------------
+
+    token = get_bearer_token()
+
+    if (
+        token is None
+        or not validate_exhibition_token(token)
+    ):
+        return jsonify({
+            "success": False,
+            "error": "Unauthorized"
+        }), 401
+
+
+    # -----------------------------------------
+    # CONFIGURACION DE LA GALERIA
+    # -----------------------------------------
 
     data = request.get_json(silent=True)
 
@@ -211,6 +237,58 @@ def exhibition_auth():
             "success": False
         }), 401
 
+    token = create_exhibition_token()
+
     return jsonify({
-        "success": True
+        "success": True,
+        "token": token
     })
+
+def get_exhibition_serializer():
+    return URLSafeTimedSerializer(
+        current_app.config["SECRET_KEY"],
+        salt="exhibition-admin"
+    )
+
+
+def create_exhibition_token():
+    serializer = get_exhibition_serializer()
+
+    return serializer.dumps({
+        "role": "exhibition_admin"
+    })
+
+
+def validate_exhibition_token(token):
+    serializer = get_exhibition_serializer()
+
+    try:
+        data = serializer.loads(
+            token,
+            max_age=3600
+        )
+
+        return (
+            data.get("role")
+            == "exhibition_admin"
+        )
+
+    except (
+        SignatureExpired,
+        BadSignature
+    ):
+        return False
+
+def get_bearer_token():
+
+    authorization = request.headers.get(
+        "Authorization",
+        ""
+    )
+
+    if not authorization.startswith(
+        "Bearer "
+    ):
+        return None
+
+    return authorization[7:].strip()
