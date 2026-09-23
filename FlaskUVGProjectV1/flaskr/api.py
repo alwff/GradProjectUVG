@@ -6,6 +6,7 @@ from flaskr.models import (
 )
 from flaskr.movements import find_specimen
 from flaskr.extensions import db
+from werkzeug.security import check_password_hash
 
 bp = Blueprint("api", __name__, url_prefix="/api")
 
@@ -168,4 +169,48 @@ def get_exhibition_settings():
 
         "ceiling_texture":
             texture_url(settings.ceiling_texture)
+    })
+
+@bp.route(
+    "/exhibition/auth",
+    methods=["POST"]
+)
+def exhibition_auth():
+
+    data = request.get_json(
+        silent=True
+    )
+
+    if not data:
+        return jsonify({
+            "success": False,
+            "error": "Invalid request"
+        }), 400
+
+    password = data.get(
+        "password",
+        ""
+    )
+
+    settings = ExhibitionSettings.query.first()
+
+    if (
+        settings is None
+        or not settings.admin_password
+    ):
+        return jsonify({
+            "success": False,
+            "error": "Administrative access is not configured"
+        }), 503
+
+    if not check_password_hash(
+        settings.admin_password,
+        password
+    ):
+        return jsonify({
+            "success": False
+        }), 401
+
+    return jsonify({
+        "success": True
     })

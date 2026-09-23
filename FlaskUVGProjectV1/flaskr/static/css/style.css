@@ -1626,3 +1626,60 @@ tr:hover {
 
     color: white;
 }
+
+.exhibition-password-form {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr)
+        300px;
+
+    align-items: end;
+
+    gap: 1.5rem;
+}
+
+
+.exhibition-password-field {
+    display: flex;
+    flex-direction: column;
+
+    gap: 0.6rem;
+}
+
+
+.exhibition-password-field label {
+    font-weight: bold;
+}
+
+
+.exhibition-password-field input {
+    width: 100%;
+
+    min-height: 44px;
+
+    padding: 0.7rem 1rem;
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+
+    background: rgba(0, 0, 0, 0.18);
+
+    color: white;
+}
+
+
+.exhibition-password-form .dashboard-button {
+    width: 100%;
+    max-width: none;
+}
+
+
+@media (max-width: 900px) {
+
+    .exhibition-password-form {
+        grid-template-columns: 1fr;
+    }
+
+}

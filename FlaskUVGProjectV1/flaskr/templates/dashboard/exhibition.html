@@ -299,26 +299,56 @@ Gestión de Exhibición
 
         </div>
 
-        <div class="exhibition-password-placeholder">
+        <form
+            class="exhibition-password-form"
+            method="post"
+            action="{{ url_for(
+                'dashboard.change_exhibition_password'
+            ) }}"
+        >
 
-            <div>
-                <strong>CLAVE DE ACCESO</strong>
+            <div class="exhibition-password-field">
 
-                <p>
-                    La autenticación segura será configurada
-                    en el siguiente paso.
-                </p>
+                <label for="password">
+                    NUEVA CLAVE
+                </label>
+
+                <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    autocomplete="new-password"
+                    required
+                >
+
             </div>
 
+
+            <div class="exhibition-password-field">
+
+                <label for="confirmation">
+                    CONFIRMAR CLAVE
+                </label>
+
+                <input
+                    id="confirmation"
+                    name="confirmation"
+                    type="password"
+                    autocomplete="new-password"
+                    required
+                >
+
+            </div>
+
+
             <button
-                type="button"
+                type="submit"
                 class="dashboard-button"
-                disabled
             >
-                CAMBIAR CLAVE
+                ACTUALIZAR CLAVE
             </button>
 
-        </div>
+        </form>
 
     </section>
 

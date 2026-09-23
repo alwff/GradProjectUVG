@@ -291,6 +291,11 @@ class ExhibitionSettings(db.Model):
         nullable=True
     )
 
+    admin_password = db.Column(
+        db.String(255),
+        nullable=True
+    )
+
     updated_at = db.Column(
         db.DateTime,
         nullable=False,

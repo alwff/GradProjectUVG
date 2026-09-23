@@ -12,6 +12,7 @@ from flask import (
 )
 
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash
 
 from flaskr.auth import login_required
 from flaskr.extensions import db
@@ -214,6 +215,62 @@ def reset_exhibition_texture(surface):
             os.remove(old_path)
 
     flash("Textura predeterminada restaurada.")
+
+    return redirect(
+        url_for("dashboard.exhibition")
+    )
+
+@bp.route(
+    "/exhibicion/clave",
+    methods=["POST"]
+)
+@login_required
+def change_exhibition_password():
+
+    password = request.form.get(
+        "password",
+        ""
+    )
+
+    confirmation = request.form.get(
+        "confirmation",
+        ""
+    )
+
+    if not password:
+        flash("Ingresa una nueva clave.")
+
+        return redirect(
+            url_for("dashboard.exhibition")
+        )
+
+    if password != confirmation:
+        flash("Las claves no coinciden.")
+
+        return redirect(
+            url_for("dashboard.exhibition")
+        )
+
+    if len(password) < 4:
+        flash(
+            "La clave debe contener al menos 4 caracteres."
+        )
+
+        return redirect(
+            url_for("dashboard.exhibition")
+        )
+
+    settings = get_exhibition_settings()
+
+    settings.admin_password = (
+        generate_password_hash(password)
+    )
+
+    db.session.commit()
+
+    flash(
+        "Clave administrativa actualizada correctamente."
+    )
 
     return redirect(
         url_for("dashboard.exhibition")
