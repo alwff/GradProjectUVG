@@ -302,48 +302,46 @@ Gestión de Exhibición
         <form
             class="exhibition-password-form"
             method="post"
-            action="{{ url_for(
-                'dashboard.change_exhibition_password'
-            ) }}"
+            action="{{ url_for('dashboard.change_exhibition_password') }}"
         >
 
             <div class="exhibition-password-field">
 
-                <label for="password">
+                <label for="exhibition-password">
                     NUEVA CLAVE
                 </label>
 
                 <input
-                    id="password"
+                    id="exhibition-password"
                     name="password"
                     type="password"
                     inputmode="numeric"
-                    pattern="[0-9]*"
+                    pattern="[0-9]+"
+                    minlength="4"
                     autocomplete="new-password"
                     required
                 >
 
             </div>
 
-
             <div class="exhibition-password-field">
 
-                <label for="confirmation">
+                <label for="exhibition-confirmation">
                     CONFIRMAR CLAVE
                 </label>
 
                 <input
-                    id="password"
-                    name="password"
+                    id="exhibition-confirmation"
+                    name="confirmation"
                     type="password"
                     inputmode="numeric"
-                    pattern="[0-9]*"
+                    pattern="[0-9]+"
+                    minlength="4"
                     autocomplete="new-password"
                     required
                 >
 
             </div>
-
 
             <button
                 type="submit"
