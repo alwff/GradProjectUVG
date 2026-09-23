@@ -155,14 +155,11 @@ function loadUnity() {
 
     const config = {
 
-        dataUrl:
-            buildUrl + "/Builds.data",
+        dataUrl: buildUrl + "/Builds.data.unityweb",
+        
+        frameworkUrl: buildUrl + "/Builds.framework.js.unityweb",
 
-        frameworkUrl:
-            buildUrl + "/Builds.framework.js",
-
-        codeUrl:
-            buildUrl + "/Builds.wasm",
+        codeUrl: buildUrl + "/Builds.wasm.unityweb",
 
         streamingAssetsUrl:
             "StreamingAssets",
