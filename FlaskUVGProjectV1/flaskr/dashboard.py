@@ -251,9 +251,18 @@ def change_exhibition_password():
             url_for("dashboard.exhibition")
         )
 
+    if not password.isdigit():
+        flash(
+            "La clave debe contener únicamente números."
+        )
+
+        return redirect(
+            url_for("dashboard.exhibition")
+        )
+
     if len(password) < 4:
         flash(
-            "La clave debe contener al menos 4 caracteres."
+            "La clave debe contener al menos 4 dígitos."
         )
 
         return redirect(
