@@ -575,6 +575,12 @@ tr:hover {
     );
 }
 
+.portal-instructions {
+    margin-top: 0.75rem;
+    white-space: pre-line;
+    line-height: 1.6;
+}
+
 /* =========================
    REQUEST LAYOUT
 ========================= */

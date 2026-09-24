@@ -11,7 +11,8 @@ from datetime import date, datetime
 
 from flaskr.models import (
     Request,
-    RequestItem
+    RequestItem,
+    PortalSettings
 )
 
 from flaskr.extensions import db
@@ -20,6 +21,29 @@ bp = Blueprint(
     "public",
     __name__
 )
+
+def get_portal_settings():
+
+    settings = PortalSettings.query.first()
+
+    if settings is None:
+
+        settings = PortalSettings(
+            request_instructions=(
+                "El formulario debe llenarse y enviarse "
+                "al menos una semana antes de necesitar "
+                "el material.\n\n"
+                "El catedrático es responsable de revisar "
+                "el pedido antes de iniciar la práctica y "
+                "de colaborar con el resguardo del material "
+                "al finalizar la actividad."
+            )
+        )
+
+        db.session.add(settings)
+        db.session.commit()
+
+    return settings
 
 @bp.route("/")
 def home():
@@ -67,9 +91,12 @@ def create_request():
             url_for("public.request_items")
         )
 
+    settings = get_portal_settings()
+
     return render_template(
         "public/request_create.html",
-        current_date=date.today()
+        current_date=date.today(),
+        settings=settings
     )
 
 @bp.route(
@@ -111,10 +138,13 @@ def request_items():
 
         session["request_items"] = items
 
+    settings = get_portal_settings()
+
     return render_template(
         "public/request_items.html",
         request_data=request_data,
-        request_items=session["request_items"]
+        request_items=session["request_items"],
+        settings=settings
     )
 
 
