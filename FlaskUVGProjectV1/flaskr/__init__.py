@@ -6,7 +6,7 @@ from flask import (
     request
 )
 from flask_cors import CORS
-from .extensions import db
+from .extensions import db, migrate
 from . import models
 
 def create_app(test_config=None):
@@ -111,6 +111,7 @@ def create_app(test_config=None):
     app.register_blueprint(api.bp)
 
     db.init_app(app)
+    migrate.init_app(app, db)
     
     with app.app_context():
         db.create_all()
