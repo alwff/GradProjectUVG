@@ -151,13 +151,15 @@ class Request(db.Model):
     )
 
     start_time = db.Column(
-        db.Time
+        db.Time,
+        nullable=False
     )
 
     end_time = db.Column(
-        db.Time
+        db.Time,
+        nullable=False
     )
-
+    
     status = db.Column(
         db.String(50),
         nullable=False,
@@ -197,8 +199,19 @@ class RequestItem(db.Model):
         nullable=False
     )
 
+    specimen_id = db.Column(
+        db.Integer,
+        db.ForeignKey("specimens.id"),
+        nullable=False
+    )
+
+    specimen = db.relationship(
+        "Specimen"
+    )
+
     portal_code = db.Column(
-        db.String(100)
+        db.String(100),
+        nullable=False
     )
 
     species_or_family = db.Column(
@@ -207,6 +220,20 @@ class RequestItem(db.Model):
     )
 
     specifications = db.Column(
+        db.Text
+    )
+
+    item_status = db.Column(
+        db.String(50),
+        nullable=False,
+        default="pending"
+    )
+
+    rejection_reason = db.Column(
+        db.String(100)
+    )
+
+    rejection_comment = db.Column(
         db.Text
     )
 
