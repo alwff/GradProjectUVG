@@ -107,6 +107,7 @@ def create_request():
                 f"{return_date} {end_time}",
                 "%Y-%m-%d %H:%M"
             )
+            
 
         except ValueError:
 
@@ -117,6 +118,18 @@ def create_request():
                 error=(
                     "Las fechas u horas ingresadas "
                     "no son válidas."
+                )
+            )
+
+        if start_datetime < now:
+
+            return render_template(
+                "public/request_create.html",
+                current_date=date.today(),
+                settings=get_portal_settings(),
+                error=(
+                    "La fecha y hora de uso no puede "
+                    "ser anterior al momento actual."
                 )
             )
 

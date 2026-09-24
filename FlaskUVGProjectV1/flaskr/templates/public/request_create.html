@@ -94,6 +94,7 @@ Solicitud de Material
                 id="needed-date"
                 type="date"
                 name="needed_date"
+                min="{{ current_date }}"
                 required
             >
 
@@ -160,15 +161,43 @@ document.addEventListener("DOMContentLoaded", function () {
     const endTime =
         document.getElementById("end-time");
 
+    const today = "{{ current_date }}";
+
 
     function updateLimits() {
+
+        if (neededDate.value === today) {
+
+            const now = new Date();
+
+            const hours =
+                String(now.getHours()).padStart(2, "0");
+
+            const minutes =
+                String(now.getMinutes()).padStart(2, "0");
+
+            const currentTime =
+                hours + ":" + minutes;
+
+            startTime.min = currentTime;
+
+            if (
+                startTime.value &&
+                startTime.value < currentTime
+            ) {
+                startTime.value = "";
+            }
+
+        } else {
+
+            startTime.removeAttribute("min");
+
+        }
 
         if (!neededDate.value) {
             return;
         }
 
-        // La devolución nunca puede ser
-        // anterior al día de uso.
         returnDate.min = neededDate.value;
 
         if (
@@ -179,9 +208,6 @@ document.addEventListener("DOMContentLoaded", function () {
             endTime.value = "";
         }
 
-
-        // Si uso y devolución son el mismo día,
-        // la hora final debe ser posterior.
         if (
             returnDate.value &&
             returnDate.value === neededDate.value
@@ -199,12 +225,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         } else {
 
-            // En días diferentes cualquier hora
-            // es válida.
             endTime.removeAttribute("min");
 
         }
-
     }
 
 
@@ -227,6 +250,8 @@ document.addEventListener("DOMContentLoaded", function () {
         "change",
         updateLimits
     );
+
+    updateLimits();
 
 });
 </script>
