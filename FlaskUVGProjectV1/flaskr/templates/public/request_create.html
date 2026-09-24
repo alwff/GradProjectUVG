@@ -91,6 +91,7 @@ Solicitud de Material
             </label>
 
             <input
+                id="needed-date"
                 type="date"
                 name="needed_date"
                 required
@@ -101,6 +102,7 @@ Solicitud de Material
             </label>
 
             <input
+                id="return-date"
                 type="date"
                 name="return_date"
                 required
@@ -140,5 +142,30 @@ Solicitud de Material
     </div>
 
 </form>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const neededDate =
+        document.getElementById("needed-date");
+
+    const returnDate =
+        document.getElementById("return-date");
+
+    neededDate.addEventListener("change", function () {
+
+        returnDate.min = neededDate.value;
+
+        if (
+            returnDate.value &&
+            returnDate.value < neededDate.value
+        ) {
+            returnDate.value = "";
+        }
+
+    });
+
+});
+</script>
 
 {% endblock %}
