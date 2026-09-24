@@ -273,38 +273,97 @@ def request_items():
             ""
         ).strip()
 
-        if action == "search":
+        if not portal_code:
 
-            if not portal_code:
+            availability_error = (
+                "Ingresa un código de portal."
+            )
+
+        else:
+
+            selected_specimen = (
+                Specimen.query.filter_by(
+                    portal_code=portal_code
+                ).first()
+            )
+
+            if selected_specimen is None:
 
                 availability_error = (
-                    "Ingresa un código de portal."
+                    "No se encontró ningún espécimen "
+                    "con ese código de portal."
                 )
 
             else:
 
-                selected_specimen = (
-                    Specimen.query.filter_by(
-                        portal_code=portal_code
-                    ).first()
+                conflict = get_specimen_conflict(
+                    selected_specimen.id,
+                    request_data["needed_date"],
+                    request_data["return_date"],
+                    request_data["start_time"],
+                    request_data["end_time"]
                 )
 
-                if selected_specimen is None:
+                if action == "add":
 
-                    availability_error = (
-                        "No se encontró ningún espécimen "
-                        "con ese código de portal."
-                    )
+                    if conflict:
 
-                else:
+                        availability_error = (
+                            "El espécimen ya no está "
+                            "disponible para el período "
+                            "seleccionado."
+                        )
 
-                    conflict = get_specimen_conflict(
-                        selected_specimen.id,
-                        request_data["needed_date"],
-                        request_data["return_date"],
-                        request_data["start_time"],
-                        request_data["end_time"]
-                    )
+                    else:
+
+                        items = session[
+                            "request_items"
+                        ]
+
+                        already_added = any(
+                            item["specimen_id"]
+                            == selected_specimen.id
+                            for item in items
+                        )
+
+                        if already_added:
+
+                            availability_error = (
+                                "Este espécimen ya fue "
+                                "agregado a la solicitud."
+                            )
+
+                        else:
+
+                            species_or_family = (
+                                selected_specimen.scientific_name
+                                or selected_specimen.taxon_family
+                                or "—"
+                            )
+
+                            items.append({
+                                "specimen_id":
+                                    selected_specimen.id,
+
+                                "portal_code":
+                                    selected_specimen.portal_code,
+
+                                "species_or_family":
+                                    species_or_family,
+
+                                "specifications":
+                                    request.form.get(
+                                        "specifications",
+                                        ""
+                                    ).strip()
+                            })
+
+                            session[
+                                "request_items"
+                            ] = items
+
+                            selected_specimen = None
+                            conflict = None
 
     settings = get_portal_settings()
 
