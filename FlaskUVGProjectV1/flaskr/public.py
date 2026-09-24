@@ -398,7 +398,27 @@ def submit_request():
             url_for("public.create_request")
         )
 
-    # Crear Request
+    if not request_items:
+
+        return redirect(
+            url_for("public.request_items")
+        )
+
+    for item in request_items:
+
+        conflict = get_specimen_conflict(
+            item["specimen_id"],
+            request_data["needed_date"],
+            request_data["return_date"],
+            request_data["start_time"],
+            request_data["end_time"]
+        )
+
+        if conflict:
+
+            return redirect(
+                url_for("public.request_items")
+            )
 
     new_request = Request(
 
@@ -433,29 +453,24 @@ def submit_request():
             datetime.strptime(
                 request_data["start_time"],
                 "%H:%M"
-            ).time()
-            if request_data["start_time"]
-            else None,
+            ).time(),
 
         end_time=
             datetime.strptime(
                 request_data["end_time"],
                 "%H:%M"
-            ).time()
-            if request_data["end_time"]
-            else None,
+            ).time(),
 
         status="pending"
-
     )
 
     db.session.add(
         new_request
     )
 
-    db.session.commit()
-
-    # Generar tracking code
+    # Necesitamos el ID antes del commit,
+    # pero seguimos dentro de la misma transacción.
+    db.session.flush()
 
     tracking_code = (
         f"UVG-{date.today().year}-"
@@ -466,9 +481,6 @@ def submit_request():
         tracking_code
     )
 
-    db.session.commit()
-
-    # Crear RequestItems
 
     for item in request_items:
 
@@ -477,6 +489,9 @@ def submit_request():
             request_id=
                 new_request.id,
 
+            specimen_id=
+                item["specimen_id"],
+
             portal_code=
                 item["portal_code"],
 
@@ -484,17 +499,18 @@ def submit_request():
                 item["species_or_family"],
 
             specifications=
-                item["specifications"]
+                item["specifications"],
 
+            item_status="pending"
         )
 
         db.session.add(
             request_item
         )
 
+
     db.session.commit()
 
-    # Limpiar sesión
 
     session.pop(
         "request_data",
@@ -506,31 +522,9 @@ def submit_request():
         None
     )
 
+
     return render_template(
         "public/request_success.html",
         tracking_code=
             tracking_code
-    )
-
-@bp.route(
-    "/request/status",
-    methods=("GET", "POST")
-)
-def request_status():
-
-    request_record = None
-
-    if request.method == "POST":
-
-        tracking_code = request.form[
-            "tracking_code"
-        ]
-
-        request_record = Request.query.filter_by(
-            tracking_code=tracking_code
-        ).first()
-
-    return render_template(
-        "public/request_status.html",
-        request_record=request_record
     )
