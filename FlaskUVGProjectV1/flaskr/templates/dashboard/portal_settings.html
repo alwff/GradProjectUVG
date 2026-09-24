@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Configuración del Portal
+{% endblock %}
+
+{% block content %}
+
+<h1>
+    CONFIGURACIÓN DEL PORTAL
+</h1>
+
+<p>
+    Administra la configuración general del portal.
+</p>
+
+<div class="request-summary">
+
+    <h2>
+        INDICACIONES PARA SOLICITUDES
+    </h2>
+
+    <p>
+        Configura las indicaciones que se muestran a los
+        usuarios al realizar una solicitud de especímenes.
+    </p>
+
+    <form method="post">
+
+        <label for="request-instructions">
+            INDICACIONES
+        </label>
+
+        <textarea
+            id="request-instructions"
+            name="request_instructions"
+            rows="10"
+            required
+        >{{ settings.request_instructions or '' }}</textarea>
+
+        <button
+            type="submit"
+            class="dashboard-button"
+        >
+            GUARDAR CAMBIOS
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

@@ -16,7 +16,10 @@ from werkzeug.security import generate_password_hash
 
 from flaskr.auth import login_required
 from flaskr.extensions import db
-from flaskr.models import ExhibitionSettings
+from flaskr.models import (
+    ExhibitionSettings,
+    PortalSettings
+)
 
 ALLOWED_TEXTURE_EXTENSIONS = {
     "png",
@@ -36,6 +39,29 @@ def get_exhibition_settings():
 
     if settings is None:
         settings = ExhibitionSettings()
+        db.session.add(settings)
+        db.session.commit()
+
+    return settings
+
+def get_portal_settings():
+
+    settings = PortalSettings.query.first()
+
+    if settings is None:
+
+        settings = PortalSettings(
+            request_instructions=(
+                "El formulario debe llenarse y enviarse "
+                "al menos una semana antes de necesitar "
+                "el material.\n\n"
+                "El catedrático es responsable de revisar "
+                "el pedido antes de iniciar la práctica y "
+                "de colaborar con el resguardo del material "
+                "al finalizar la actividad."
+            )
+        )
+
         db.session.add(settings)
         db.session.commit()
 
@@ -283,4 +309,47 @@ def change_exhibition_password():
 
     return redirect(
         url_for("dashboard.exhibition")
+    )
+
+@bp.route(
+    "/configuracion/portal",
+    methods=["GET", "POST"]
+)
+@login_required
+def portal_settings():
+
+    settings = get_portal_settings()
+
+    if request.method == "POST":
+
+        instructions = request.form.get(
+            "request_instructions",
+            ""
+        ).strip()
+
+        if not instructions:
+
+            flash(
+                "Las indicaciones no pueden quedar vacías."
+            )
+
+            return redirect(
+                url_for("dashboard.portal_settings")
+            )
+
+        settings.request_instructions = instructions
+
+        db.session.commit()
+
+        flash(
+            "Configuración del portal actualizada correctamente."
+        )
+
+        return redirect(
+            url_for("dashboard.portal_settings")
+        )
+
+    return render_template(
+        "dashboard/portal_settings.html",
+        settings=settings
     )
