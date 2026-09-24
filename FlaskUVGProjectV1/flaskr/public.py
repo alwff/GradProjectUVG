@@ -59,6 +59,80 @@ def create_request():
 
     if request.method == "POST":
 
+        needed_date = request.form.get(
+            "needed_date",
+            ""
+        )
+
+        return_date = request.form.get(
+            "return_date",
+            ""
+        )
+
+        start_time = request.form.get(
+            "start_time",
+            ""
+        )
+
+        end_time = request.form.get(
+            "end_time",
+            ""
+        )
+
+        if (
+            not needed_date
+            or not return_date
+            or not start_time
+            or not end_time
+        ):
+
+            return render_template(
+                "public/request_create.html",
+                current_date=date.today(),
+                settings=get_portal_settings(),
+                error=(
+                    "Debes indicar las fechas y horas "
+                    "de uso y devolución."
+                )
+            )
+
+        try:
+
+            start_datetime = datetime.strptime(
+                f"{needed_date} {start_time}",
+                "%Y-%m-%d %H:%M"
+            )
+
+            end_datetime = datetime.strptime(
+                f"{return_date} {end_time}",
+                "%Y-%m-%d %H:%M"
+            )
+
+        except ValueError:
+
+            return render_template(
+                "public/request_create.html",
+                current_date=date.today(),
+                settings=get_portal_settings(),
+                error=(
+                    "Las fechas u horas ingresadas "
+                    "no son válidas."
+                )
+            )
+
+        if end_datetime <= start_datetime:
+
+            return render_template(
+                "public/request_create.html",
+                current_date=date.today(),
+                settings=get_portal_settings(),
+                error=(
+                    "La fecha y hora de devolución "
+                    "debe ser posterior a la fecha "
+                    "y hora de uso."
+                )
+            )
+
         session["request_data"] = {
 
             "teacher_name":
@@ -74,18 +148,20 @@ def create_request():
                 str(date.today()),
 
             "needed_date":
-                request.form["needed_date"],
+                needed_date,
 
             "return_date":
-                request.form["return_date"],
+                return_date,
 
             "start_time":
-                request.form["start_time"],
+                start_time,
 
             "end_time":
-                request.form["end_time"]
+                end_time
 
         }
+
+        session["request_items"] = []
 
         return redirect(
             url_for("public.request_items")

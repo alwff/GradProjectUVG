@@ -28,6 +28,14 @@ Solicitud de Material
 
 </div>
 
+{% if error %}
+
+<div class="form-error">
+    {{ error }}
+</div>
+
+{% endif %}
+
 <form method="post">
 
     <div class="request-top">
@@ -105,6 +113,7 @@ Solicitud de Material
             <input
                 type="time"
                 name="start_time"
+                required
             >
 
             <label>
@@ -114,6 +123,7 @@ Solicitud de Material
             <input
                 type="time"
                 name="end_time"
+                required
             >
 
         </div>
