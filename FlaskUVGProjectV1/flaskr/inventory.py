@@ -12,6 +12,8 @@ from flaskr.auth import login_required
 from flaskr.models import Specimen
 from flaskr.extensions import db
 
+from sqlalchemy import or_
+
 bp = Blueprint(
     "inventory",
     __name__,
@@ -22,13 +24,37 @@ bp = Blueprint(
 @login_required
 def index():
 
-    specimens = Specimen.query.order_by(
+    search = request.args.get(
+        "search",
+        ""
+    ).strip()
+
+    query = Specimen.query
+
+    if search:
+
+        query = query.filter(
+            or_(
+                Specimen.portal_code.ilike(
+                    f"%{search}%"
+                ),
+                Specimen.barcode.ilike(
+                    f"%{search}%"
+                ),
+                Specimen.rfid_epc.ilike(
+                    f"%{search}%"
+                )
+            )
+        )
+
+    specimens = query.order_by(
         Specimen.portal_code
     ).all()
 
     return render_template(
         "inventory/index.html",
-        specimens=specimens
+        specimens=specimens,
+        search=search
     )
 
 @bp.route("/create", methods=("GET", "POST"))
@@ -56,6 +82,30 @@ def create():
         return redirect(url_for("inventory.index"))
 
     return render_template("inventory/create.html")
+
+@bp.route("/<int:id>")
+@login_required
+def detail(id):
+
+    specimen = db.session.get(
+        Specimen,
+        id
+    )
+
+    if specimen is None:
+
+        flash(
+            "Especímen no encontrado."
+        )
+
+        return redirect(
+            url_for("inventory.index")
+        )
+
+    return render_template(
+        "inventory/detail.html",
+        specimen=specimen
+    )
 
 @bp.route("/<int:id>/edit", methods=("GET", "POST"))
 @login_required

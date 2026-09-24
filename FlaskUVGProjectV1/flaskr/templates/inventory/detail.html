@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Detalle del Especímen
+{% endblock %}
+
+{% block content %}
+
+<h1>
+    Detalle del Especímen
+</h1>
+
+<div class="request-summary">
+
+    <h2>
+        {{ specimen.scientific_name }}
+    </h2>
+
+    <p>
+        <strong>Familia:</strong>
+        {{ specimen.taxon_family or '—' }}
+    </p>
+
+    <p>
+        <strong>Colección:</strong>
+        {{ specimen.collection }}
+    </p>
+
+    <p>
+        <strong>Estado:</strong>
+
+        {% if specimen.status == "available" %}
+
+        <span class="specimen-status-available">
+            Disponible
+        </span>
+
+        {% elif specimen.status == "loaned" %}
+
+        <span class="specimen-status-loaned">
+            Prestado
+        </span>
+
+        {% else %}
+
+        {{ specimen.status }}
+
+        {% endif %}
+
+    </p>
+
+</div>
+
+
+<div class="request-summary">
+
+    <h2>
+        Identificadores
+    </h2>
+
+    <p>
+        <strong>Código de Portal:</strong>
+        {{ specimen.portal_code }}
+    </p>
+
+    <p>
+        <strong>Número de Catálogo:</strong>
+        {{ specimen.catalog_number or '—' }}
+    </p>
+
+    <p>
+        <strong>Código de Barras:</strong>
+        {{ specimen.barcode or '—' }}
+    </p>
+
+    <p>
+        <strong>UHF / EPC:</strong>
+        {{ specimen.rfid_epc or '—' }}
+    </p>
+
+</div>
+
+
+<div class="request-summary">
+
+    <h2>
+        Descripción
+    </h2>
+
+    <p>
+        {{ specimen.description or 'Sin descripción.' }}
+    </p>
+
+</div>
+
+
+<div class="inventory-detail-actions">
+
+    <a
+        class="action-button"
+        href="{{ url_for(
+            'inventory.edit',
+            id=specimen.id
+        ) }}"
+    >
+        EDITAR ESPECÍMEN
+    </a>
+
+    <a
+        class="small-button"
+        href="{{ url_for('inventory.index') }}"
+    >
+        VOLVER AL INVENTARIO
+    </a>
+
+</div>
+
+{% endblock %}

@@ -13,6 +13,46 @@
     Ingresar Especímen
 </a>
 
+<form
+    method="get"
+    class="inventory-search-form"
+>
+
+    <label for="inventory-search">
+        Buscar espécimen
+    </label>
+
+    <div class="inventory-search-row">
+
+        <input
+            id="inventory-search"
+            name="search"
+            value="{{ search }}"
+            placeholder="Código de portal, barras o UHF"
+        >
+
+        <button
+            type="submit"
+            class="small-button"
+        >
+            BUSCAR
+        </button>
+
+        {% if search %}
+
+        <a
+            class="small-button"
+            href="{{ url_for('inventory.index') }}"
+        >
+            LIMPIAR
+        </a>
+
+        {% endif %}
+
+    </div>
+
+</form>
+
 <table>
 
     <thead>
@@ -42,6 +82,17 @@
             <td>{{ specimen.status }}</td>
 
             <td>
+
+                <a
+                    class="small-button"
+                    href="{{ url_for(
+                        'inventory.detail',
+                        id=specimen.id
+                    ) }}"
+                >
+                    Ver
+                </a>
+                
                 <a
                     class="small-button"
                     href="{{ url_for('inventory.edit', id=specimen.id) }}"

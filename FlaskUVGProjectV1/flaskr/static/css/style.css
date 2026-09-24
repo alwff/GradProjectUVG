@@ -228,6 +228,37 @@ h1 {
     width: 400px;
 }
 
+/* =========================
+   INVENTORY SEARCH
+========================= */
+
+.inventory-search-form {
+    margin-top: 2rem;
+}
+
+.inventory-search-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.inventory-search-row input {
+    flex: 1;
+}
+
+.inventory-search-row .small-button {
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.inventory-detail-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
 /* INVENTORY TABLE */
 
 table {
