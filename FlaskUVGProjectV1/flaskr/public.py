@@ -528,3 +528,26 @@ def submit_request():
         tracking_code=
             tracking_code
     )
+
+@bp.route(
+    "/request/status",
+    methods=("GET", "POST")
+)
+def request_status():
+
+    request_record = None
+
+    if request.method == "POST":
+
+        tracking_code = request.form[
+            "tracking_code"
+        ]
+
+        request_record = Request.query.filter_by(
+            tracking_code=tracking_code
+        ).first()
+
+    return render_template(
+        "public/request_status.html",
+        request_record=request_record
+    )
