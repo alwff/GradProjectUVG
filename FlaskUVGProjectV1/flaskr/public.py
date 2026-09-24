@@ -12,7 +12,8 @@ from datetime import date, datetime
 from flaskr.models import (
     Request,
     RequestItem,
-    PortalSettings
+    PortalSettings,
+    Specimen
 )
 
 from flaskr.extensions import db
@@ -44,6 +45,54 @@ def get_portal_settings():
         db.session.commit()
 
     return settings
+
+def get_specimen_conflict(
+    specimen_id,
+    needed_date,
+    return_date,
+    start_time,
+    end_time
+):
+
+    requested_start = datetime.strptime(
+        f"{needed_date} {start_time}",
+        "%Y-%m-%d %H:%M"
+    )
+
+    requested_end = datetime.strptime(
+        f"{return_date} {end_time}",
+        "%Y-%m-%d %H:%M"
+    )
+
+    approved_items = (
+        RequestItem.query
+        .join(Request)
+        .filter(
+            RequestItem.specimen_id == specimen_id,
+            RequestItem.item_status == "approved"
+        )
+        .all()
+    )
+
+    for item in approved_items:
+
+        existing_start = datetime.combine(
+            item.request.needed_date,
+            item.request.start_time
+        )
+
+        existing_end = datetime.combine(
+            item.request.return_date,
+            item.request.end_time
+        )
+
+        if (
+            requested_start < existing_end
+            and requested_end > existing_start
+        ):
+            return item
+
+    return None
 
 @bp.route("/")
 def home():
@@ -121,6 +170,8 @@ def create_request():
                 )
             )
 
+        now = datetime.now()
+
         if start_datetime < now:
 
             return render_template(
@@ -192,7 +243,6 @@ def create_request():
     "/request/items",
     methods=("GET", "POST")
 )
-
 def request_items():
 
     request_data = session.get(
@@ -208,24 +258,53 @@ def request_items():
     if "request_items" not in session:
         session["request_items"] = []
 
+    selected_specimen = None
+    availability_error = None
+    conflict = None
+
     if request.method == "POST":
 
-        items = session["request_items"]
+        action = request.form.get(
+            "action"
+        )
 
-        items.append({
+        portal_code = request.form.get(
+            "portal_code",
+            ""
+        ).strip()
 
-            "portal_code":
-                request.form["portal_code"],
+        if action == "search":
 
-            "species_or_family":
-                request.form["species_or_family"],
+            if not portal_code:
 
-            "specifications":
-                request.form["specifications"]
+                availability_error = (
+                    "Ingresa un código de portal."
+                )
 
-        })
+            else:
 
-        session["request_items"] = items
+                selected_specimen = (
+                    Specimen.query.filter_by(
+                        portal_code=portal_code
+                    ).first()
+                )
+
+                if selected_specimen is None:
+
+                    availability_error = (
+                        "No se encontró ningún espécimen "
+                        "con ese código de portal."
+                    )
+
+                else:
+
+                    conflict = get_specimen_conflict(
+                        selected_specimen.id,
+                        request_data["needed_date"],
+                        request_data["return_date"],
+                        request_data["start_time"],
+                        request_data["end_time"]
+                    )
 
     settings = get_portal_settings()
 
@@ -233,9 +312,11 @@ def request_items():
         "public/request_items.html",
         request_data=request_data,
         request_items=session["request_items"],
-        settings=settings
+        settings=settings,
+        selected_specimen=selected_specimen,
+        availability_error=availability_error,
+        conflict=conflict
     )
-
 
 @bp.route(
     "/request/submit",

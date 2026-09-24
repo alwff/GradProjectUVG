@@ -568,6 +568,71 @@ tr:hover {
     background: rgba(0, 0, 0, 0.15);
 }
 
+.specimen-search-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.specimen-search-row input {
+    flex: 1;
+}
+
+.specimen-search-row .small-button {
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.specimen-request-result {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+
+    border: 1px solid rgba(
+        255,
+        255,
+        255,
+        0.1
+    );
+
+    border-radius: 10px;
+
+    background-color: rgba(
+        255,
+        255,
+        255,
+        0.03
+    );
+}
+
+.specimen-request-result p {
+    margin-top: 0.6rem;
+}
+
+.request-availability {
+    margin: 1.5rem 0;
+    padding: 1rem;
+
+    border-left: 4px solid #5DA63C;
+
+    background-color: rgba(
+        255,
+        255,
+        255,
+        0.03
+    );
+}
+
+.availability-available {
+    color: #5DA63C;
+    font-weight: bold;
+}
+
+.availability-unavailable {
+    color: #D97706;
+    font-weight: bold;
+}
+
 .request-header {
 
     text-align: center;

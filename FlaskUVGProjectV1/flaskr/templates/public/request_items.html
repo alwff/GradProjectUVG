@@ -35,11 +35,14 @@ Material Solicitado
     ← Volver a Datos Generales
 </a>
 
+
 <div class="request-top">
 
     <div class="request-summary">
 
-        <h2>Datos de la Solicitud</h2>
+        <h2>
+            Datos de la Solicitud
+        </h2>
 
         <p>
             <strong>Catedrático:</strong>
@@ -80,39 +83,157 @@ Material Solicitado
 
     </div>
 
+
     <div class="request-add-material">
 
         <h2>
             Paso 2: Especímenes de la Colección a Solicitar
         </h2>
 
+
         <form method="post">
 
-            <label>Código Portal</label>
-            <input name="portal_code">
+            <label for="portal-code">
+                Código Portal
+            </label>
 
-            <label>Especie o Familia</label>
-            <input
-                name="species_or_family"
-                required
-            >
+            <div class="specimen-search-row">
 
-            <label>Especificaciones</label>
+                <input
+                    id="portal-code"
+                    name="portal_code"
+                    value="{{
+                        selected_specimen.portal_code
+                        if selected_specimen
+                        else ''
+                    }}"
+                    required
+                >
 
-            <textarea
-                name="specifications"
-            ></textarea>
+                <button
+                    type="submit"
+                    name="action"
+                    value="search"
+                    class="small-button"
+                >
+                    BUSCAR
+                </button>
 
-            <input
-                type="submit"
-                value="AGREGAR MATERIAL"
-            >
+            </div>
 
         </form>
+
+
+        {% if availability_error %}
+
+        <div class="form-error">
+            {{ availability_error }}
+        </div>
+
+        {% endif %}
+
+
+        {% if selected_specimen %}
+
+        <div class="specimen-request-result">
+
+            <h3>
+                {{ selected_specimen.portal_code }}
+            </h3>
+
+            <p>
+                <strong>Nombre científico:</strong>
+                {{ selected_specimen.scientific_name }}
+            </p>
+
+            <p>
+                <strong>Familia:</strong>
+                {{ selected_specimen.taxon_family or '—' }}
+            </p>
+
+            <p>
+                <strong>Colección:</strong>
+                {{ selected_specimen.collection }}
+            </p>
+
+
+            <div class="request-availability">
+
+                <strong>
+                    DISPONIBILIDAD
+                </strong>
+
+                <p>
+                    {{ request_data.needed_date }}
+                    {{ request_data.start_time }}
+                    →
+                    {{ request_data.return_date }}
+                    {{ request_data.end_time }}
+                </p>
+
+
+                {% if conflict %}
+
+                <p class="availability-unavailable">
+                    ✕ No disponible para el período seleccionado.
+                </p>
+
+                <p>
+                    Este espécimen ya se encuentra reservado
+                    durante parte del período solicitado.
+                </p>
+
+                {% else %}
+
+                <p class="availability-available">
+                    ✓ Disponible para el período seleccionado.
+                </p>
+
+                {% endif %}
+
+            </div>
+
+
+            {% if not conflict %}
+
+            <form method="post">
+
+                <input
+                    type="hidden"
+                    name="portal_code"
+                    value="{{ selected_specimen.portal_code }}"
+                >
+
+                <label for="specifications">
+                    Especificaciones
+                </label>
+
+                <textarea
+                    id="specifications"
+                    name="specifications"
+                ></textarea>
+
+                <button
+                    type="submit"
+                    name="action"
+                    value="add"
+                    class="dashboard-button"
+                >
+                    AGREGAR ESPÉCIMEN
+                </button>
+
+            </form>
+
+            {% endif %}
+
+        </div>
+
+        {% endif %}
 
     </div>
 
 </div>
+
 
 <h2>
     Material Solicitado
@@ -123,13 +244,9 @@ Material Solicitado
     <thead>
 
         <tr>
-
             <th>Código Portal</th>
-
             <th>Especie o Familia</th>
-
             <th>Especificaciones</th>
-
         </tr>
 
     </thead>
@@ -159,6 +276,7 @@ Material Solicitado
     </tbody>
 
 </table>
+
 
 <form
     method="post"
