@@ -113,6 +113,7 @@ Solicitud de Material
             </label>
 
             <input
+                id="start-time"
                 type="time"
                 name="start_time"
                 required
@@ -123,6 +124,7 @@ Solicitud de Material
             </label>
 
             <input
+                id="end-time"
                 type="time"
                 name="end_time"
                 required
@@ -152,8 +154,21 @@ document.addEventListener("DOMContentLoaded", function () {
     const returnDate =
         document.getElementById("return-date");
 
-    neededDate.addEventListener("change", function () {
+    const startTime =
+        document.getElementById("start-time");
 
+    const endTime =
+        document.getElementById("end-time");
+
+
+    function updateLimits() {
+
+        if (!neededDate.value) {
+            return;
+        }
+
+        // La devolución nunca puede ser
+        // anterior al día de uso.
         returnDate.min = neededDate.value;
 
         if (
@@ -161,9 +176,57 @@ document.addEventListener("DOMContentLoaded", function () {
             returnDate.value < neededDate.value
         ) {
             returnDate.value = "";
+            endTime.value = "";
         }
 
-    });
+
+        // Si uso y devolución son el mismo día,
+        // la hora final debe ser posterior.
+        if (
+            returnDate.value &&
+            returnDate.value === neededDate.value
+        ) {
+
+            endTime.min = startTime.value;
+
+            if (
+                startTime.value &&
+                endTime.value &&
+                endTime.value <= startTime.value
+            ) {
+                endTime.value = "";
+            }
+
+        } else {
+
+            // En días diferentes cualquier hora
+            // es válida.
+            endTime.removeAttribute("min");
+
+        }
+
+    }
+
+
+    neededDate.addEventListener(
+        "change",
+        updateLimits
+    );
+
+    returnDate.addEventListener(
+        "change",
+        updateLimits
+    );
+
+    startTime.addEventListener(
+        "change",
+        updateLimits
+    );
+
+    endTime.addEventListener(
+        "change",
+        updateLimits
+    );
 
 });
 </script>
