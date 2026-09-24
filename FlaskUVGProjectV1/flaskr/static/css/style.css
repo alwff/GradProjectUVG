@@ -516,11 +516,15 @@ tr:hover {
 }
 
 .public-status a {
-
     color: white;
-
     text-decoration: none;
+    transition: 0.2s ease;
 }
+
+.public-status a:hover {
+    color: #5DA63C;
+}
+
 /* =========================
    REQUESTS
 ========================= */

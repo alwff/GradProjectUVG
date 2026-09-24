@@ -19,6 +19,26 @@ class User(db.Model):
         nullable=False
     )
 
+class PortalSettings(db.Model):
+    __tablename__ = "portal_settings"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    request_instructions = db.Column(
+        db.Text,
+        nullable=True
+    )
+
+    updated_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        server_default=db.func.now(),
+        onupdate=db.func.now()
+    )
+
 class Specimen(db.Model):
     __tablename__ = "specimens"
 
