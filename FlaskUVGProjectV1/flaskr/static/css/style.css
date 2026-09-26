@@ -703,42 +703,13 @@ tr:hover {
 }
 
 .public-rejection-info {
-    margin-top: 1rem;
-    padding-top: 1rem;
-
-    border-top: 1px solid rgba(
-        255,
-        255,
-        255,
-        0.1
-    );
-}
-
-.public-rejection-info p {
-    margin-top: 0.4rem;
-    margin-bottom: 0;
-}
-
-.request-item-detail-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 2rem;
-    margin-top: 0.5rem;
-}
-
-.request-item-detail-row > div {
-    flex: 1;
-}
-
-.public-rejection-info {
-    margin: 0;
+    margin-top: 0.6rem;
     padding: 0;
     border: none;
 }
 
-.public-rejection-comment {
-    margin-top: 0.6rem;
-    opacity: 0.9;
+.public-rejection-info p {
+    margin: 0.3rem 0 0;
 }
 
 .form-error {
