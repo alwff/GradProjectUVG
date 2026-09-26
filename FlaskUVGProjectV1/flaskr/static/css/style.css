@@ -719,6 +719,28 @@ tr:hover {
     margin-bottom: 0;
 }
 
+.request-item-detail-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    margin-top: 0.5rem;
+}
+
+.request-item-detail-row > div {
+    flex: 1;
+}
+
+.public-rejection-info {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+.public-rejection-comment {
+    margin-top: 0.6rem;
+    opacity: 0.9;
+}
+
 .form-error {
     margin-bottom: 1.5rem;
     padding: 1rem;
