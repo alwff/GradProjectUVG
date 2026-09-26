@@ -246,14 +246,14 @@ class Movement(db.Model):
         primary_key=True
     )
 
-    specimen_id = db.Column(
+    request_id = db.Column(
         db.Integer,
-        db.ForeignKey("specimens.id"),
-        nullable=False
+        db.ForeignKey("requests.id"),
+        nullable=True
     )
 
-    specimen = db.relationship(
-    "Specimen"
+    request_record = db.relationship(
+        "Request"
     )
 
     movement_type = db.Column(
@@ -262,9 +262,9 @@ class Movement(db.Model):
     )
 
     source = db.Column(
-    db.String(20),
-    nullable=False,
-    default="manual"
+        db.String(20),
+        nullable=False,
+        default="manual"
     )
 
     performed_by = db.Column(
@@ -282,6 +282,39 @@ class Movement(db.Model):
         server_default=db.func.now()
     )
 
+    items = db.relationship(
+        "MovementItem",
+        backref="movement",
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
+
+
+class MovementItem(db.Model):
+
+    __tablename__ = "movement_items"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    movement_id = db.Column(
+        db.Integer,
+        db.ForeignKey("movements.id"),
+        nullable=False
+    )
+
+    specimen_id = db.Column(
+        db.Integer,
+        db.ForeignKey("specimens.id"),
+        nullable=False
+    )
+
+    specimen = db.relationship(
+        "Specimen"
+    )
+    
 class ExhibitionSlot(db.Model):
 
     __tablename__ = "exhibition_slots"
