@@ -27,6 +27,7 @@ Consultar Estado
 
     <input
         name="tracking_code"
+        value="{{ tracking_code }}"
         placeholder="UVG-2026-00001"
         required
     >
@@ -38,6 +39,13 @@ Consultar Estado
 
 </form>
 
+{% if status_error %}
+
+<div class="form-error request-status-error">
+    {{ status_error }}
+</div>
+
+{% endif %}
 
 {% if request_record %}
 

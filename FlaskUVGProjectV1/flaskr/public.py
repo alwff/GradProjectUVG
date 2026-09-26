@@ -536,18 +536,32 @@ def submit_request():
 def request_status():
 
     request_record = None
+    tracking_code = ""
+    status_error = None
 
     if request.method == "POST":
 
-        tracking_code = request.form[
-            "tracking_code"
-        ]
+        tracking_code = request.form.get(
+            "tracking_code",
+            ""
+        ).strip().upper()
 
-        request_record = Request.query.filter_by(
-            tracking_code=tracking_code
-        ).first()
+        request_record = (
+            Request.query.filter_by(
+                tracking_code=tracking_code
+            ).first()
+        )
+
+        if request_record is None:
+
+            status_error = (
+                "No se encontró una solicitud "
+                "con ese código de seguimiento."
+            )
 
     return render_template(
         "public/request_status.html",
-        request_record=request_record
+        request_record=request_record,
+        tracking_code=tracking_code,
+        status_error=status_error
     )

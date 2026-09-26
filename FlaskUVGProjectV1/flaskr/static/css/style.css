@@ -712,6 +712,10 @@ tr:hover {
     margin: 0.3rem 0 0;
 }
 
+.request-status-error {
+    margin-top: 1rem;
+}
+
 .form-error {
     margin-bottom: 1.5rem;
     padding: 1rem;
