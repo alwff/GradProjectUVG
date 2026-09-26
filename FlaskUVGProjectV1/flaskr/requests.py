@@ -9,7 +9,9 @@ from flaskr.auth import login_required
 
 from flaskr.models import (
     Request,
-    RequestItem
+    RequestItem,
+    Movement,
+    MovementItem
 )
 
 from flaskr.extensions import db
@@ -135,6 +137,7 @@ def detail(id):
     )
 
     item_checks = {}
+    item_movement_status = {}
 
     for item in request_record.items:
 
@@ -151,10 +154,54 @@ def detail(id):
                 conflict
         }
 
+        has_exit = (
+            Movement.query
+            .join(MovementItem)
+            .filter(
+                Movement.request_id == request_record.id,
+                Movement.movement_type == "exit",
+                MovementItem.specimen_id == item.specimen_id
+            )
+            .first()
+            is not None
+        )
+
+        has_entry = (
+            Movement.query
+            .join(MovementItem)
+            .filter(
+                Movement.request_id == request_record.id,
+                Movement.movement_type == "entry",
+                MovementItem.specimen_id == item.specimen_id
+            )
+            .first()
+            is not None
+        )
+
+
+        if has_entry:
+
+            movement_status = "returned"
+
+        elif has_exit:
+
+            movement_status = "delivered"
+
+        else:
+
+            movement_status = "reserved"
+
+
+        item_movement_status[
+            item.id
+        ] = movement_status
+        
+
     return render_template(
         "requests/detail.html",
         request_record=request_record,
-        item_checks=item_checks
+        item_checks=item_checks,
+        item_movement_status=item_movement_status
     )
 
 @bp.route(

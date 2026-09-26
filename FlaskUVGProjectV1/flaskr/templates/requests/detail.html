@@ -254,9 +254,27 @@ Solicitud
 
                 {% elif item.item_status == "approved" %}
 
+                    {% if item_movement_status[item.id] == "returned" %}
+
+                    <span class="status-badge returned">
+                        Devuelto
+                    </span>
+
+
+                    {% elif item_movement_status[item.id] == "delivered" %}
+
+                    <span class="status-badge approved">
+                        Entregado
+                    </span>
+
+
+                    {% else %}
+
                     <span class="status-badge approved">
                         Reservado
                     </span>
+
+                    {% endif %}
 
 
                 {% elif item.item_status == "rejected" %}

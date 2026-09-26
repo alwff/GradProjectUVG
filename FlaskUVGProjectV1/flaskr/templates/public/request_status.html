@@ -203,12 +203,12 @@ Consultar Estado
         {% elif request_record.status == "returned" %}
 
         <strong>
-            DEVUELTA
+            PRÉSTAMO COMPLETADO
         </strong>
 
         <p>
-            El préstamo asociado a esta solicitud
-            ha sido completado.
+            Todos los especímenes entregados asociados
+            a esta solicitud han sido devueltos.
         </p>
 
         {% endif %}
@@ -254,9 +254,19 @@ Consultar Estado
 
                 {% elif item.item_status == "approved" %}
 
-                <span class="status-badge approved">
-                    Aprobado
-                </span>
+                    {% if request_record.status == "returned" %}
+
+                    <span class="status-badge returned">
+                        Devuelto
+                    </span>
+
+                    {% else %}
+
+                    <span class="status-badge approved">
+                        Aprobado
+                    </span>
+
+                    {% endif %}
 
                 {% elif item.item_status == "rejected" %}
 
