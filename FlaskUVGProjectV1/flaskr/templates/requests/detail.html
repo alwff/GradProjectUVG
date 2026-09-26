@@ -123,6 +123,14 @@ Solicitud
                 Especificaciones
             </th>
 
+            <th>
+                Estado
+            </th>
+
+            <th>
+                Verificación Actual
+            </th>
+
         </tr>
 
     </thead>
@@ -142,7 +150,49 @@ Solicitud
             </td>
 
             <td>
-                {{ item.specifications }}
+                {{ item.specifications or '—' }}
+            </td>
+
+            <td>
+
+                {% if item.item_status == "pending" %}
+
+                <span class="status-badge pending">
+                    Pendiente
+                </span>
+
+                {% elif item.item_status == "approved" %}
+
+                <span class="status-badge approved">
+                    Aprobado
+                </span>
+
+                {% elif item.item_status == "rejected" %}
+
+                <span class="status-badge rejected">
+                    Rechazado
+                </span>
+
+                {% endif %}
+
+            </td>
+
+            <td>
+
+                {% if item_checks[item.id].available %}
+
+                <span class="availability-available">
+                    ✓ Disponible
+                </span>
+
+                {% else %}
+
+                <span class="availability-unavailable">
+                    ✕ No disponible
+                </span>
+
+                {% endif %}
+
             </td>
 
         </tr>
