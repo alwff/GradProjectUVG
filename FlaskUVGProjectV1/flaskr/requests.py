@@ -188,6 +188,15 @@ def approve_item(
             )
         )
 
+    if item.item_status != "pending":
+
+        return redirect(
+            url_for(
+                "requests.detail",
+                id=request_id
+            )
+        )
+
     conflict = get_item_conflict(
         item,
         request_record
@@ -203,6 +212,109 @@ def approve_item(
         )
 
     item.item_status = "approved"
+
+    update_request_status(
+        request_record
+    )
+
+    db.session.commit()
+
+    return redirect(
+        url_for(
+            "requests.detail",
+            id=request_id
+        )
+    )
+
+@bp.route(
+    "/<int:request_id>/items/<int:item_id>/reject",
+    methods=("POST",)
+)
+@login_required
+def reject_item(
+    request_id,
+    item_id
+):
+
+    request_record = (
+        Request.query.get_or_404(
+            request_id
+        )
+    )
+
+    item = (
+        RequestItem.query.get_or_404(
+            item_id
+        )
+    )
+
+    if item.request_id != request_record.id:
+
+        return redirect(
+            url_for(
+                "requests.detail",
+                id=request_id
+            )
+        )
+
+    # Solo permitimos decidir items pendientes.
+    if item.item_status != "pending":
+
+        return redirect(
+            url_for(
+                "requests.detail",
+                id=request_id
+            )
+        )
+
+    rejection_reason = request.form.get(
+        "rejection_reason",
+        ""
+    ).strip()
+
+    rejection_comment = request.form.get(
+        "rejection_comment",
+        ""
+    ).strip()
+
+    valid_reasons = {
+        "unavailable",
+        "schedule_conflict",
+        "specimen_condition",
+        "incomplete_request",
+        "other"
+    }
+
+    if rejection_reason not in valid_reasons:
+
+        return redirect(
+            url_for(
+                "requests.detail",
+                id=request_id
+            )
+        )
+
+    if (
+        rejection_reason == "other"
+        and not rejection_comment
+    ):
+
+        return redirect(
+            url_for(
+                "requests.detail",
+                id=request_id
+            )
+        )
+
+    item.item_status = "rejected"
+
+    item.rejection_reason = (
+        rejection_reason
+    )
+
+    item.rejection_comment = (
+        rejection_comment or None
+    )
 
     update_request_status(
         request_record

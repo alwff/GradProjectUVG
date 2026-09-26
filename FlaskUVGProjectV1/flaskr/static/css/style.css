@@ -560,6 +560,53 @@ tr:hover {
    REQUESTS
 ========================= */
 
+.request-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+}
+
+.reject-form-row td {
+    padding: 1.2rem;
+}
+
+.reject-item-form {
+    padding: 1rem;
+
+    border: 1px solid rgba(
+        255,
+        255,
+        255,
+        0.1
+    );
+
+    border-radius: 8px;
+
+    background-color: rgba(
+        255,
+        255,
+        255,
+        0.03
+    );
+}
+
+.reject-fields {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.reject-fields label {
+    display: block;
+    margin-bottom: 0.4rem;
+}
+
+.reject-fields select,
+.reject-fields textarea {
+    width: 100%;
+}
+
 .form-error {
     margin-bottom: 1.5rem;
     padding: 1rem;

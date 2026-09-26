@@ -210,47 +210,60 @@ Solicitud
 
                 {% if item.item_status == "pending" %}
 
-                    {% if item_checks[item.id].available %}
+                    <div class="request-item-actions">
 
-                    <form
-                        method="post"
-                        action="{{ url_for(
-                            'requests.approve_item',
-                            request_id=request_record.id,
-                            item_id=item.id
-                        ) }}"
-                    >
+                        {% if item_checks[item.id].available %}
+
+                        <form
+                            method="post"
+                            action="{{ url_for(
+                                'requests.approve_item',
+                                request_id=request_record.id,
+                                item_id=item.id
+                            ) }}"
+                        >
+
+                            <button
+                                type="submit"
+                                class="small-button"
+                            >
+                                APROBAR
+                            </button>
+
+                        </form>
+
+                        {% else %}
+
+                        <span class="availability-unavailable">
+                            No se puede aprobar
+                        </span>
+
+                        {% endif %}
+
 
                         <button
-                            type="submit"
-                            class="small-button"
+                            type="button"
+                            class="small-button reject-toggle"
+                            data-target="reject-{{ item.id }}"
                         >
-                            APROBAR
+                            RECHAZAR
                         </button>
 
-                    </form>
-
-                    {% else %}
-
-                    <span class="availability-unavailable">
-                        No se puede aprobar
-                    </span>
-
-                    {% endif %}
+                    </div>
 
 
                 {% elif item.item_status == "approved" %}
 
-                <span class="status-badge approved">
-                    Reservado
-                </span>
+                    <span class="status-badge approved">
+                        Reservado
+                    </span>
 
 
                 {% elif item.item_status == "rejected" %}
 
-                <span class="status-badge rejected">
-                    Rechazado
-                </span>
+                    <span class="status-badge rejected">
+                        Rechazado
+                    </span>
 
                 {% endif %}
 
@@ -258,10 +271,178 @@ Solicitud
 
         </tr>
 
+                {% if item.item_status == "pending" %}
+
+        <tr
+            id="reject-{{ item.id }}"
+            class="reject-form-row"
+            style="display: none;"
+        >
+
+            <td colspan="6">
+
+                <form
+                    method="post"
+                    action="{{ url_for(
+                        'requests.reject_item',
+                        request_id=request_record.id,
+                        item_id=item.id
+                    ) }}"
+                    class="reject-item-form"
+                >
+
+                    <div class="reject-fields">
+
+                        <div>
+
+                            <label>
+                                Motivo del rechazo
+                            </label>
+
+                            <select
+                                name="rejection_reason"
+                                class="request-status-select"
+                                required
+                            >
+
+                                <option value="">
+                                    Seleccionar motivo
+                                </option>
+
+                                <option value="unavailable">
+                                    Espécimen no disponible
+                                </option>
+
+                                <option value="schedule_conflict">
+                                    Conflicto de horario
+                                </option>
+
+                                <option value="specimen_condition">
+                                    Condición del espécimen
+                                </option>
+
+                                <option value="incomplete_request">
+                                    Solicitud incompleta
+                                </option>
+
+                                <option value="other">
+                                    Otro
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div>
+
+                            <label>
+                                Comentario
+                            </label>
+
+                            <textarea
+                                name="rejection_comment"
+                                class="status-notes"
+                                placeholder="Opcional, excepto si selecciona Otro"
+                            ></textarea>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="request-item-actions">
+
+                        <button
+                            type="button"
+                            class="small-button reject-cancel"
+                            data-target="reject-{{ item.id }}"
+                        >
+                            CANCELAR
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="small-button"
+                        >
+                            CONFIRMAR RECHAZO
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </td>
+
+        </tr>
+
+        {% endif %}
+
     {% endfor %}
 
     </tbody>
 
 </table>
+
+<script>
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const openButtons =
+            document.querySelectorAll(
+                ".reject-toggle"
+            );
+
+        const cancelButtons =
+            document.querySelectorAll(
+                ".reject-cancel"
+            );
+
+
+        openButtons.forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const target =
+                            document.getElementById(
+                                button.dataset.target
+                            );
+
+                        target.style.display =
+                            "table-row";
+                    }
+                );
+
+            }
+        );
+
+
+        cancelButtons.forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const target =
+                            document.getElementById(
+                                button.dataset.target
+                            );
+
+                        target.style.display =
+                            "none";
+                    }
+                );
+
+            }
+        );
+
+    }
+);
+</script>
 
 {% endblock %}
