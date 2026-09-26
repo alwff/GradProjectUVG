@@ -261,9 +261,42 @@ Solicitud
 
                 {% elif item.item_status == "rejected" %}
 
-                    <span class="status-badge rejected">
-                        Rechazado
-                    </span>
+                    <div class="rejection-detail">
+
+                        <span class="status-badge rejected">
+                            Rechazado
+                        </span>
+
+                        <div class="rejection-info">
+
+                            {% if item.rejection_reason == "unavailable" %}
+                                Espécimen no disponible
+
+                            {% elif item.rejection_reason == "schedule_conflict" %}
+                                Conflicto de horario
+
+                            {% elif item.rejection_reason == "specimen_condition" %}
+                                Condición del espécimen
+
+                            {% elif item.rejection_reason == "incomplete_request" %}
+                                Solicitud incompleta
+
+                            {% elif item.rejection_reason == "other" %}
+                                Otro
+
+                            {% endif %}
+
+                            {% if item.rejection_comment %}
+
+                            <div class="rejection-comment">
+                                {{ item.rejection_comment }}
+                            </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
 
                 {% endif %}
 

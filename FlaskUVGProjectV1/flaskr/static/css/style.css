@@ -607,6 +607,16 @@ tr:hover {
     width: 100%;
 }
 
+.rejection-info {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.rejection-comment {
+    margin-top: 0.3rem;
+    opacity: 0.8;
+}
+
 .form-error {
     margin-bottom: 1.5rem;
     padding: 1rem;
