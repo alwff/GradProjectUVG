@@ -18,6 +18,7 @@ Consultar Estado
 
 </div>
 
+
 <form method="post">
 
     <label>
@@ -37,6 +38,7 @@ Consultar Estado
 
 </form>
 
+
 {% if request_record %}
 
 <div class="request-summary request-status-result">
@@ -47,50 +49,50 @@ Consultar Estado
 
     <p>
         <strong>Código:</strong>
+
         <span class="tracking-inline">
             {{ request_record.tracking_code }}
         </span>
     </p>
 
-   <p>
 
+    <p>
         <strong>Estado:</strong>
 
         {% if request_record.status == "pending" %}
 
         <span class="status-badge-skinny pending">
-
             Pendiente
-
         </span>
 
         {% elif request_record.status == "approved" %}
 
         <span class="status-badge-skinny approved">
-
             Aprobada
+        </span>
 
+        {% elif request_record.status == "partially_approved" %}
+
+        <span class="status-badge-skinny pending">
+            Aprobada Parcialmente
         </span>
 
         {% elif request_record.status == "rejected" %}
 
         <span class="status-badge-skinny rejected">
-
             Rechazada
-
         </span>
 
         {% elif request_record.status == "returned" %}
 
         <span class="status-badge-skinny returned">
-
             Devuelta
-
         </span>
 
         {% endif %}
 
     </p>
+
 
     <p>
         <strong>Catedrático:</strong>
@@ -103,9 +105,229 @@ Consultar Estado
     </p>
 
     <p>
+        <strong>Auxiliar:</strong>
+        {{ request_record.assistant or '—' }}
+    </p>
+
+    <p>
         <strong>Fecha Solicitud:</strong>
         {{ request_record.request_date }}
     </p>
+
+
+    <div class="request-period">
+
+        <strong>
+            Período solicitado
+        </strong>
+
+        <p>
+            {{ request_record.needed_date }}
+            {{ request_record.start_time }}
+
+            →
+
+            {{ request_record.return_date }}
+            {{ request_record.end_time }}
+        </p>
+
+    </div>
+
+
+    <div class="request-status-message">
+
+        {% if request_record.status == "pending" %}
+
+        <strong>
+            PENDIENTE
+        </strong>
+
+        <p>
+            La solicitud aún se encuentra en revisión.
+            Los materiales pueden ser aprobados o
+            rechazados individualmente.
+        </p>
+
+
+        {% elif request_record.status == "approved" %}
+
+        <strong>
+            APROBADA
+        </strong>
+
+        <p>
+            Los especímenes indicados a continuación
+            fueron autorizados para el período solicitado.
+        </p>
+
+
+        {% elif request_record.status == "partially_approved" %}
+
+        <strong>
+            APROBADA PARCIALMENTE
+        </strong>
+
+        <p>
+            La solicitud fue revisada. Algunos de los
+            especímenes solicitados fueron aprobados y
+            otros no pudieron ser autorizados.
+        </p>
+
+        <p>
+            Consulta el detalle de cada material
+            a continuación.
+        </p>
+
+
+        {% elif request_record.status == "rejected" %}
+
+        <strong>
+            RECHAZADA
+        </strong>
+
+        <p>
+            Los especímenes solicitados no pudieron
+            ser autorizados. Consulta el detalle de
+            cada material a continuación.
+        </p>
+
+
+        {% elif request_record.status == "returned" %}
+
+        <strong>
+            DEVUELTA
+        </strong>
+
+        <p>
+            El préstamo asociado a esta solicitud
+            ha sido completado.
+        </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<h2 class="materials-title">
+    Material Solicitado
+</h2>
+
+
+<div class="request-status-materials">
+
+    {% for item in request_record.items %}
+
+    <div class="request-status-item">
+
+        <div class="request-status-item-header">
+
+            <div>
+
+                <strong>
+                    {{ item.portal_code }}
+                </strong>
+
+                <div class="request-item-species">
+                    {{ item.species_or_family }}
+                </div>
+
+            </div>
+
+
+            <div>
+
+                {% if item.item_status == "pending" %}
+
+                <span class="status-badge pending">
+                    Pendiente
+                </span>
+
+                {% elif item.item_status == "approved" %}
+
+                <span class="status-badge approved">
+                    Aprobado
+                </span>
+
+                {% elif item.item_status == "rejected" %}
+
+                <span class="status-badge rejected">
+                    Rechazado
+                </span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <div class="request-status-item-body">
+
+            <p>
+                <strong>Especificaciones:</strong>
+                {{ item.specifications or '—' }}
+            </p>
+
+
+            {% if item.item_status == "rejected" %}
+
+            <div class="public-rejection-info">
+
+                <strong>
+                    Motivo del rechazo:
+                </strong>
+
+                <p>
+
+                    {% if item.rejection_reason == "unavailable" %}
+
+                        Espécimen no disponible
+
+                    {% elif item.rejection_reason == "schedule_conflict" %}
+
+                        Conflicto de horario
+
+                    {% elif item.rejection_reason == "specimen_condition" %}
+
+                        Condición del espécimen
+
+                    {% elif item.rejection_reason == "incomplete_request" %}
+
+                        Solicitud incompleta
+
+                    {% elif item.rejection_reason == "other" %}
+
+                        Otro
+
+                    {% else %}
+
+                        No especificado
+
+                    {% endif %}
+
+                </p>
+
+
+                {% if item.rejection_comment %}
+
+                <p>
+                    <strong>Comentario:</strong>
+                    {{ item.rejection_comment }}
+                </p>
+
+                {% endif %}
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    {% endfor %}
 
 </div>
 

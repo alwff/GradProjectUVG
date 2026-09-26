@@ -617,6 +617,108 @@ tr:hover {
     opacity: 0.8;
 }
 
+.request-period {
+    margin-top: 1.5rem;
+    padding: 1rem;
+
+    border-left: 4px solid #5DA63C;
+
+    background-color: rgba(
+        255,
+        255,
+        255,
+        0.03
+    );
+}
+
+.request-period p {
+    margin-bottom: 0;
+}
+
+.request-status-message {
+    margin-top: 1rem;
+    padding: 1rem;
+
+    border: 1px solid rgba(
+        255,
+        255,
+        255,
+        0.1
+    );
+
+    border-radius: 8px;
+
+    background-color: rgba(
+        255,
+        255,
+        255,
+        0.03
+    );
+}
+
+.request-status-message p {
+    margin-bottom: 0.4rem;
+}
+
+.request-status-materials {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.request-status-item {
+    padding: 1.2rem;
+
+    border: 1px solid rgba(
+        255,
+        255,
+        255,
+        0.1
+    );
+
+    border-radius: 8px;
+
+    background-color: rgba(
+        255,
+        255,
+        255,
+        0.03
+    );
+}
+
+.request-status-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.request-item-species {
+    margin-top: 0.3rem;
+    opacity: 0.8;
+}
+
+.request-status-item-body {
+    margin-top: 1rem;
+}
+
+.public-rejection-info {
+    margin-top: 1rem;
+    padding-top: 1rem;
+
+    border-top: 1px solid rgba(
+        255,
+        255,
+        255,
+        0.1
+    );
+}
+
+.public-rejection-info p {
+    margin-top: 0.4rem;
+    margin-bottom: 0;
+}
+
 .form-error {
     margin-bottom: 1.5rem;
     padding: 1rem;
