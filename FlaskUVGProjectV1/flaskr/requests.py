@@ -77,6 +77,42 @@ def get_item_conflict(
 
     return None
 
+def update_request_status(
+    request_record
+):
+
+    statuses = [
+        item.item_status
+        for item in request_record.items
+    ]
+
+    if not statuses:
+        request_record.status = "pending"
+        return
+
+    if all(
+        status == "approved"
+        for status in statuses
+    ):
+        request_record.status = "approved"
+
+    elif all(
+        status == "rejected"
+        for status in statuses
+    ):
+        request_record.status = "rejected"
+
+    elif all(
+        status != "pending"
+        for status in statuses
+    ):
+        request_record.status = (
+            "partially_approved"
+        )
+
+    else:
+        request_record.status = "pending"
+
 @bp.route("/")
 @login_required
 def index():
@@ -122,29 +158,61 @@ def detail(id):
     )
 
 @bp.route(
-    "/<int:id>/update",
+    "/<int:request_id>/items/<int:item_id>/approve",
     methods=("POST",)
 )
 @login_required
-def update_status(id):
+def approve_item(
+    request_id,
+    item_id
+):
 
-    request_record = Request.query.get_or_404(
-        id
+    request_record = (
+        Request.query.get_or_404(
+            request_id
+        )
     )
 
-    request_record.status = request.form[
-        "status"
-    ]
+    item = (
+        RequestItem.query.get_or_404(
+            item_id
+        )
+    )
 
-    request_record.status_notes = request.form[
-        "status_notes"
-    ]
+    if item.request_id != request_record.id:
+
+        return redirect(
+            url_for(
+                "requests.detail",
+                id=request_id
+            )
+        )
+
+    conflict = get_item_conflict(
+        item,
+        request_record
+    )
+
+    if conflict:
+
+        return redirect(
+            url_for(
+                "requests.detail",
+                id=request_id
+            )
+        )
+
+    item.item_status = "approved"
+
+    update_request_status(
+        request_record
+    )
 
     db.session.commit()
 
     return redirect(
         url_for(
             "requests.detail",
-            id=id
+            id=request_id
         )
     )

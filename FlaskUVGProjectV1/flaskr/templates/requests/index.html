@@ -84,6 +84,12 @@ Solicitudes
 
                 </span>
 
+                {% elif request.status == "partially_approved" %}
+
+                <span class="status-badge pending">
+                    Aprobada Parcialmente
+                </span>
+
                 {% elif request.status == "rejected" %}
 
                 <span class="status-badge rejected">

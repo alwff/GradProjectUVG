@@ -31,6 +31,12 @@ Solicitud
 
     </span>
 
+    {% elif request_record.status == "partially_approved" %}
+
+    <span class="status-badge pending">
+        Aprobada Parcialmente
+    </span>
+
     {% elif request_record.status == "rejected" %}
 
     <span class="status-badge rejected">
@@ -131,6 +137,10 @@ Solicitud
                 Verificación Actual
             </th>
 
+            <th>
+                Acción
+            </th>
+
         </tr>
 
     </thead>
@@ -195,6 +205,57 @@ Solicitud
 
             </td>
 
+
+            <td>
+
+                {% if item.item_status == "pending" %}
+
+                    {% if item_checks[item.id].available %}
+
+                    <form
+                        method="post"
+                        action="{{ url_for(
+                            'requests.approve_item',
+                            request_id=request_record.id,
+                            item_id=item.id
+                        ) }}"
+                    >
+
+                        <button
+                            type="submit"
+                            class="small-button"
+                        >
+                            APROBAR
+                        </button>
+
+                    </form>
+
+                    {% else %}
+
+                    <span class="availability-unavailable">
+                        No se puede aprobar
+                    </span>
+
+                    {% endif %}
+
+
+                {% elif item.item_status == "approved" %}
+
+                <span class="status-badge approved">
+                    Reservado
+                </span>
+
+
+                {% elif item.item_status == "rejected" %}
+
+                <span class="status-badge rejected">
+                    Rechazado
+                </span>
+
+                {% endif %}
+
+            </td>
+
         </tr>
 
     {% endfor %}
@@ -202,93 +263,5 @@ Solicitud
     </tbody>
 
 </table>
-
-<form
-    method="post"
-    action="{{ url_for(
-        'requests.update_status',
-        id=request_record.id
-    ) }}"
->
-
-<div class="request-summary">
-
-    <h2>
-        Gestión de Solicitud
-    </h2>
-
-    <div class="management-field">
-
-        <label>
-            Estado
-        </label>
-
-        <select
-            name="status"
-            class="request-status-select"
-        >
-
-        <option
-            value="pending"
-            {% if request_record.status == "pending" %}
-            selected
-            {% endif %}
-        >
-            Pendiente
-        </option>
-
-        <option
-            value="approved"
-            {% if request_record.status == "approved" %}
-            selected
-            {% endif %}
-        >
-            Aprobada
-        </option>
-
-        <option
-            value="rejected"
-            {% if request_record.status == "rejected" %}
-            selected
-            {% endif %}
-        >
-            Rechazada
-        </option>
-
-        <option
-            value="returned"
-            {% if request_record.status == "returned" %}
-            selected
-            {% endif %}
-        >
-            Devuelta
-        </option>
-
-    </select>
-
-    <div class="management-field">
-
-        <label>
-            Observaciones
-        </label>
-
-        <textarea
-            class="status-notes"
-            name="status_notes"
-        >{{ request_record.status_notes or '' }}</textarea>
-
-    </div>
-
-    <div class="submit-request">
-
-        <input
-            type="submit"
-            value="GUARDAR CAMBIOS"
-        >
-
-    </div>
-
-</form>
-</div>
 
 {% endblock %}
