@@ -417,6 +417,27 @@ Solicitud
 
 </table>
 
+{% if request_record.status in [
+    "approved",
+    "partially_approved"
+] %}
+
+<div class="submit-request">
+
+    <a
+        href="{{ url_for(
+            'movements.request_delivery',
+            request_id=request_record.id
+        ) }}"
+        class="dashboard-button"
+    >
+        REGISTRAR ENTREGA
+    </a>
+
+</div>
+
+{% endif %}
+
 <script>
 document.addEventListener(
     "DOMContentLoaded",

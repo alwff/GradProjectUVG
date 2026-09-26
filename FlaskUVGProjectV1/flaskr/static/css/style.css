@@ -1284,6 +1284,67 @@ tr:hover {
    MOVEMENT BADGES
 ========================= */
 
+.movement-specimens {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.movement-specimen-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.movement-specimen-name {
+    margin-top: 0.2rem;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.movement-request-teacher {
+    margin-top: 0.2rem;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.movement-selection-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    margin: 1rem 0 1.5rem;
+}
+
+.movement-selection-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+
+    padding: 1rem;
+
+    border: 1px solid rgba(
+        255,
+        255,
+        255,
+        0.1
+    );
+
+    border-radius: 8px;
+
+    cursor: pointer;
+}
+
+.movement-selection-item input {
+    width: auto;
+    margin: 0;
+}
+
+.movement-selection-name {
+    margin-left: 0.8rem;
+    opacity: 0.8;
+}
+
 .movement-badge-entry {
 
     display: inline-block;

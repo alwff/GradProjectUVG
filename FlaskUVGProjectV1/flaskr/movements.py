@@ -14,7 +14,9 @@ from flaskr.extensions import db
 
 from flaskr.models import (
     Movement,
-    Specimen
+    MovementItem,
+    Specimen,
+    Request
 )
 
 bp = Blueprint(
@@ -46,17 +48,21 @@ def find_specimen(identifier):
     return specimen
 
 def create_movement(
-    specimen,
+    specimens,
     movement_type,
     source,
     username,
-    notes
+    notes,
+    request_record=None
 ):
 
     movement = Movement(
 
-        specimen_id=
-            specimen.id,
+        request_id=(
+            request_record.id
+            if request_record
+            else None
+        ),
 
         movement_type=
             movement_type,
@@ -69,12 +75,28 @@ def create_movement(
 
         notes=
             notes
-
     )
 
     db.session.add(
         movement
     )
+
+    db.session.flush()
+
+    for specimen in specimens:
+
+        movement_item = MovementItem(
+
+            movement_id=
+                movement.id,
+
+            specimen_id=
+                specimen.id
+        )
+
+        db.session.add(
+            movement_item
+        )
 
     return movement
 
@@ -121,6 +143,198 @@ def register():
         specimen=specimen
     )
 
+@bp.route(
+    "/request/<int:request_id>/delivery",
+    methods=("GET",)
+)
+@login_required
+def request_delivery(request_id):
+
+    request_record = (
+        Request.query.get_or_404(
+            request_id
+        )
+    )
+
+    if request_record.status not in (
+        "approved",
+        "partially_approved"
+    ):
+
+        flash(
+            "La solicitud todavía no tiene "
+            "material aprobado para entregar."
+        )
+
+        return redirect(
+            url_for(
+                "requests.detail",
+                id=request_record.id
+            )
+        )
+
+    approved_items = [
+        item
+        for item in request_record.items
+        if (
+            item.item_status == "approved"
+            and item.specimen.status == "available"
+        )
+    ]
+
+    return render_template(
+        "movements/request_delivery.html",
+        request_record=request_record,
+        approved_items=approved_items
+    )
+
+@bp.route(
+    "/request/<int:request_id>/delivery/process",
+    methods=("POST",)
+)
+@login_required
+def process_request_delivery(request_id):
+
+    request_record = (
+        Request.query.get_or_404(
+            request_id
+        )
+    )
+
+    if request_record.status not in (
+        "approved",
+        "partially_approved"
+    ):
+
+        flash(
+            "Esta solicitud no permite "
+            "registrar una entrega."
+        )
+
+        return redirect(
+            url_for(
+                "requests.detail",
+                id=request_id
+            )
+        )
+
+    specimen_ids = request.form.getlist(
+        "specimen_ids"
+    )
+
+    if not specimen_ids:
+
+        flash(
+            "Debes seleccionar al menos "
+            "un espécimen."
+        )
+
+        return redirect(
+            url_for(
+                "movements.request_delivery",
+                request_id=request_id
+            )
+        )
+
+
+    approved_specimen_ids = {
+        item.specimen_id
+        for item in request_record.items
+        if item.item_status == "approved"
+    }
+
+
+    specimens = (
+        Specimen.query
+        .filter(
+            Specimen.id.in_(
+                specimen_ids
+            )
+        )
+        .all()
+    )
+
+
+    if len(specimens) != len(specimen_ids):
+
+        flash(
+            "Uno o más especímenes "
+            "seleccionados no existen."
+        )
+
+        return redirect(
+            url_for(
+                "movements.request_delivery",
+                request_id=request_id
+            )
+        )
+
+
+    for specimen in specimens:
+
+        if (
+            specimen.id
+            not in approved_specimen_ids
+        ):
+
+            flash(
+                "Uno de los especímenes "
+                "seleccionados no pertenece "
+                "a los materiales aprobados."
+            )
+
+            return redirect(
+                url_for(
+                    "movements.request_delivery",
+                    request_id=request_id
+                )
+            )
+
+        if specimen.status != "available":
+
+            flash(
+                f"{specimen.portal_code} "
+                "ya no se encuentra disponible."
+            )
+
+            return redirect(
+                url_for(
+                    "movements.request_delivery",
+                    request_id=request_id
+                )
+            )
+
+
+    for specimen in specimens:
+
+        specimen.status = "loaned"
+
+
+    create_movement(
+        specimens,
+        "exit",
+        "request",
+        g.user.username,
+        request.form.get(
+            "notes",
+            ""
+        ).strip(),
+        request_record=request_record
+    )
+
+
+    db.session.commit()
+
+
+    flash(
+        "Entrega registrada correctamente."
+    )
+
+    return redirect(
+        url_for(
+            "movements.index"
+        )
+    )
 
 @bp.route(
     "/process",
@@ -151,7 +365,7 @@ def process():
 
     create_movement(
 
-        specimen,
+        [specimen],
 
         movement_type,
 
@@ -159,8 +373,10 @@ def process():
 
         g.user.username,
 
-        request.form["notes"]
-
+        request.form.get(
+            "notes",
+            ""
+        )
     )
 
     db.session.commit()

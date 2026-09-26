@@ -17,31 +17,27 @@ Movimientos
         <tr>
 
             <th>
-                Fecha
-            </th>
-
-            <th>
-                Código Portal
-            </th>
-
-            <th>
-                Especímen
-            </th>
-
-            <th>
-                Colección
-            </th>
-
-            <th>
-                Estado Actual
-            </th>
-
-            <th>
                 Movimiento
             </th>
 
             <th>
+                Fecha
+            </th>
+
+            <th>
+                Especímenes
+            </th>
+
+            <th>
+                Tipo
+            </th>
+
+            <th>
                 Origen
+            </th>
+
+            <th>
+                Solicitud
             </th>
 
             <th>
@@ -63,6 +59,13 @@ Movimientos
         <tr>
 
             <td>
+                <strong>
+                    #{{ movement.id }}
+                </strong>
+            </td>
+
+
+            <td>
 
                 {{ movement.created_at.strftime(
                     "%d/%m/%Y"
@@ -76,103 +79,133 @@ Movimientos
 
             </td>
 
-            <td>
-                <strong>
-                    {{ movement.specimen.portal_code }}
-                </strong>
-                
-            </td>
-
-            <td>
-                {{ movement.specimen.scientific_name }}
-            </td>
 
             <td>
 
-                {{ movement.specimen.collection }}
+                <div class="movement-specimens">
+
+                    {% for item in movement.items %}
+
+                    <div class="movement-specimen-item">
+
+                        <div>
+
+                            <strong>
+                                {{ item.specimen.portal_code }}
+                            </strong>
+
+                            <div class="movement-specimen-name">
+                                {{ item.specimen.scientific_name }}
+                            </div>
+
+                        </div>
+
+
+                        <div>
+
+                            {% if item.specimen.status == "available" %}
+
+                            <span class="specimen-status-available">
+                                Disponible
+                            </span>
+
+                            {% elif item.specimen.status == "loaned" %}
+
+                            <span class="specimen-status-loaned">
+                                Prestado
+                            </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
 
             </td>
 
-            <td>
-
-                {% if movement.specimen.status == "available" %}
-
-                <span class="specimen-status-available">
-
-                    Disponible
-
-                </span>
-
-                {% elif movement.specimen.status == "loaned" %}
-
-                <span class="specimen-status-loaned">
-
-                    Prestado
-
-                </span>
-
-                {% endif %}
-
-            </td>
 
             <td>
 
                 {% if movement.movement_type == "entry" %}
 
                 <span class="movement-badge-entry">
-
                     Entrada
-
                 </span>
 
                 {% elif movement.movement_type == "exit" %}
 
                 <span class="movement-badge-exit">
-
                     Salida
-
                 </span>
 
                 {% endif %}
 
             </td>
+
 
             <td>
 
                 {% if movement.source == "manual" %}
 
                 <span class="source-badge-manual">
-
                     Manual
-
                 </span>
 
                 {% elif movement.source == "barcode" %}
 
                 <span class="source-badge-barcode">
-
                     Barcode
-
                 </span>
 
                 {% elif movement.source == "rfid" %}
 
                 <span class="source-badge-rfid">
-
                     RFID
+                </span>
 
+                {% elif movement.source == "request" %}
+
+                <span class="source-badge-manual">
+                    Solicitud
                 </span>
 
                 {% endif %}
 
             </td>
 
+
+            <td>
+
+                {% if movement.request_record %}
+
+                <strong>
+                    {{ movement.request_record.tracking_code }}
+                </strong>
+
+                <div class="movement-request-teacher">
+                    {{ movement.request_record.teacher_name }}
+                </div>
+
+                {% else %}
+
+                —
+
+                {% endif %}
+
+            </td>
+
+
             <td>
                 {{ movement.performed_by }}
             </td>
 
+
             <td>
-                {{ movement.notes }}
+                {{ movement.notes or '—' }}
             </td>
 
         </tr>

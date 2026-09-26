@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Registrar Entrega
+{% endblock %}
+
+{% block content %}
+
+<h1>
+    Registrar Movimiento
+</h1>
+
+
+<div class="request-summary">
+
+    <h2>
+        Datos de la Solicitud
+    </h2>
+
+    <p>
+        <strong>Solicitud:</strong>
+        {{ request_record.tracking_code }}
+    </p>
+
+    <p>
+        <strong>Catedrático:</strong>
+        {{ request_record.teacher_name }}
+    </p>
+
+    <p>
+        <strong>Curso:</strong>
+        {{ request_record.course }}
+    </p>
+
+    <p>
+        <strong>Período autorizado:</strong>
+
+        {{ request_record.needed_date }}
+        {{ request_record.start_time }}
+
+        →
+
+        {{ request_record.return_date }}
+        {{ request_record.end_time }}
+    </p>
+
+</div>
+
+
+<div class="request-summary">
+
+    <h2>
+        Salida por Préstamo
+    </h2>
+
+
+    {% if approved_items %}
+
+    <form
+        method="post"
+        action="{{ url_for(
+            'movements.process_request_delivery',
+            request_id=request_record.id
+        ) }}"
+    >
+
+        <p>
+            <strong>
+                Especímenes aprobados
+            </strong>
+        </p>
+
+
+        <div class="movement-selection-list">
+
+            {% for item in approved_items %}
+
+            <label class="movement-selection-item">
+
+                <input
+                    type="checkbox"
+                    name="specimen_ids"
+                    value="{{ item.specimen.id }}"
+                    checked
+                >
+
+                <span>
+
+                    <strong>
+                        {{ item.specimen.portal_code }}
+                    </strong>
+
+                    <span class="movement-selection-name">
+                        {{ item.specimen.scientific_name }}
+                    </span>
+
+                    <span class="specimen-status-available">
+                        Disponible
+                    </span>
+
+                </span>
+
+            </label>
+
+            {% endfor %}
+
+        </div>
+
+
+        <label>
+            Observaciones
+        </label>
+
+        <textarea
+            name="notes"
+        ></textarea>
+
+
+        <div class="submit-request">
+
+            <input
+                type="submit"
+                value="REGISTRAR SALIDA"
+            >
+
+        </div>
+
+    </form>
+
+
+    {% else %}
+
+    <div class="form-error">
+        No hay especímenes aprobados pendientes
+        de entrega en esta solicitud.
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
