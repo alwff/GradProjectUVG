@@ -422,7 +422,7 @@ Solicitud
     "partially_approved"
 ] %}
 
-<div class="submit-request">
+<div class="request-movement-actions">
 
     <a
         href="{{ url_for(
@@ -433,6 +433,40 @@ Solicitud
     >
         REGISTRAR ENTREGA
     </a>
+
+    <a
+        href="{{ url_for(
+            'movements.request_return',
+            request_id=request_record.id
+        ) }}"
+        class="dashboard-button"
+    >
+        REGISTRAR DEVOLUCIÓN
+    </a>
+
+</div>
+
+
+{% elif request_record.status == "returned" %}
+
+<div class="loan-completed">
+
+    <span class="loan-completed-check">
+        ✓
+    </span>
+
+    <div>
+
+        <strong>
+            Préstamo completado
+        </strong>
+
+        <p>
+            Todos los especímenes entregados
+            han sido devueltos.
+        </p>
+
+    </div>
 
 </div>
 

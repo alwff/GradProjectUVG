@@ -100,25 +100,6 @@ Movimientos
 
                         </div>
 
-
-                        <div>
-
-                            {% if item.specimen.status == "available" %}
-
-                            <span class="specimen-status-available">
-                                Disponible
-                            </span>
-
-                            {% elif item.specimen.status == "loaned" %}
-
-                            <span class="specimen-status-loaned">
-                                Prestado
-                            </span>
-
-                            {% endif %}
-
-                        </div>
-
                     </div>
 
                     {% endfor %}

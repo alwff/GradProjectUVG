@@ -46,12 +46,20 @@ Registrar Entrega
 
 </div>
 
-
 <div class="request-summary">
 
     <h2>
         Salida por Préstamo
     </h2>
+
+
+    <p>
+        <strong>
+            Aprobados pendientes de entrega:
+        </strong>
+
+        {{ approved_items|length }}
+    </p>
 
 
     {% if approved_items %}
@@ -69,7 +77,6 @@ Registrar Entrega
                 Especímenes aprobados
             </strong>
         </p>
-
 
         <div class="movement-selection-list">
 
@@ -127,12 +134,84 @@ Registrar Entrega
 
     </form>
 
+    {% endif %}
 
-    {% else %}
 
-    <div class="form-error">
-        No hay especímenes aprobados pendientes
-        de entrega en esta solicitud.
+    {% if already_delivered %}
+
+    <div class="delivery-status-section">
+
+        <h3>
+            Ya entregados
+        </h3>
+
+        {% for item in already_delivered %}
+
+        <div class="delivery-status-item">
+
+            <strong>
+                {{ item.specimen.portal_code }}
+            </strong>
+
+            <span>
+                {{ item.specimen.scientific_name }}
+            </span>
+
+            <span class="status-badge approved">
+                Entregado
+            </span>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% endif %}
+
+
+    {% if unavailable_items %}
+
+    <div class="delivery-status-section">
+
+        <h3>
+            No disponibles para entrega
+        </h3>
+
+        {% for item in unavailable_items %}
+
+        <div class="delivery-status-item">
+
+            <strong>
+                {{ item.specimen.portal_code }}
+            </strong>
+
+            <span>
+                {{ item.specimen.scientific_name }}
+            </span>
+
+            <span class="availability-unavailable">
+                Actualmente figura como prestado.
+            </span>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% endif %}
+
+
+    {% if
+        not approved_items
+        and not already_delivered
+        and not unavailable_items
+    %}
+
+    <div class="request-notes">
+        No hay especímenes aprobados asociados
+        a esta solicitud.
     </div>
 
     {% endif %}

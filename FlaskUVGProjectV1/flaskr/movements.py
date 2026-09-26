@@ -47,6 +47,42 @@ def find_specimen(identifier):
 
     return specimen
 
+def specimen_has_request_exit(
+    request_id,
+    specimen_id
+):
+
+    movement = (
+        Movement.query
+        .join(MovementItem)
+        .filter(
+            Movement.request_id == request_id,
+            Movement.movement_type == "exit",
+            MovementItem.specimen_id == specimen_id
+        )
+        .first()
+    )
+
+    return movement is not None
+
+def specimen_has_request_entry(
+    request_id,
+    specimen_id
+):
+
+    movement = (
+        Movement.query
+        .join(MovementItem)
+        .filter(
+            Movement.request_id == request_id,
+            Movement.movement_type == "entry",
+            MovementItem.specimen_id == specimen_id
+        )
+        .first()
+    )
+
+    return movement is not None
+
 def create_movement(
     specimens,
     movement_type,
@@ -99,6 +135,47 @@ def create_movement(
         )
 
     return movement
+
+def update_request_return_status(
+    request_record
+):
+
+    approved_items = [
+        item
+        for item in request_record.items
+        if item.item_status == "approved"
+    ]
+
+    if not approved_items:
+        return
+
+
+    for item in approved_items:
+
+        was_delivered = (
+            specimen_has_request_exit(
+                request_record.id,
+                item.specimen_id
+            )
+        )
+
+        # Todavía existe material aprobado
+        # que nunca fue entregado.
+        if not was_delivered:
+            return
+
+        was_returned = (
+            specimen_has_request_entry(
+                request_record.id,
+                item.specimen_id
+            )
+        )
+
+        if not was_returned:
+            return
+
+
+    request_record.status = "returned"
 
 @bp.route("/")
 @login_required
@@ -173,19 +250,51 @@ def request_delivery(request_id):
             )
         )
 
-    approved_items = [
-        item
-        for item in request_record.items
-        if (
-            item.item_status == "approved"
-            and item.specimen.status == "available"
+
+    pending_delivery = []
+    already_delivered = []
+    unavailable_delivery = []
+
+
+    for item in request_record.items:
+
+        if item.item_status != "approved":
+            continue
+
+
+        was_delivered = (
+            specimen_has_request_exit(
+                request_record.id,
+                item.specimen_id
+            )
         )
-    ]
+
+
+        if was_delivered:
+
+            already_delivered.append(
+                item
+            )
+
+        elif item.specimen.status == "available":
+
+            pending_delivery.append(
+                item
+            )
+
+        else:
+
+            unavailable_delivery.append(
+                item
+            )
+
 
     return render_template(
         "movements/request_delivery.html",
         request_record=request_record,
-        approved_items=approved_items
+        approved_items=pending_delivery,
+        already_delivered=already_delivered,
+        unavailable_items=unavailable_delivery
     )
 
 @bp.route(
@@ -290,6 +399,23 @@ def process_request_delivery(request_id):
                 )
             )
 
+        if specimen_has_request_exit(
+            request_record.id,
+            specimen.id
+        ):
+
+            flash(
+                f"{specimen.portal_code} ya registra "
+                "una entrega para esta solicitud."
+            )
+
+            return redirect(
+                url_for(
+                    "movements.request_delivery",
+                    request_id=request_id
+                )
+            )
+
         if specimen.status != "available":
 
             flash(
@@ -383,6 +509,228 @@ def process():
 
     flash(
         "Movimiento registrado correctamente."
+    )
+
+    return redirect(
+        url_for(
+            "movements.index"
+        )
+    )
+
+
+@bp.route(
+    "/request/<int:request_id>/return",
+    methods=("GET",)
+)
+@login_required
+def request_return(request_id):
+
+    request_record = (
+        Request.query.get_or_404(
+            request_id
+        )
+    )
+
+    returnable_items = []
+
+    for item in request_record.items:
+
+        if item.item_status != "approved":
+            continue
+
+        was_delivered = (
+            specimen_has_request_exit(
+                request_record.id,
+                item.specimen_id
+            )
+        )
+
+        was_returned = (
+            specimen_has_request_entry(
+                request_record.id,
+                item.specimen_id
+            )
+        )
+
+        if (
+            was_delivered
+            and not was_returned
+            and item.specimen.status == "loaned"
+        ):
+
+            returnable_items.append(
+                item
+            )
+
+
+    return render_template(
+        "movements/request_return.html",
+        request_record=request_record,
+        returnable_items=returnable_items
+    )
+
+@bp.route(
+    "/request/<int:request_id>/return/process",
+    methods=("POST",)
+)
+@login_required
+def process_request_return(request_id):
+
+    request_record = (
+        Request.query.get_or_404(
+            request_id
+        )
+    )
+
+    specimen_ids = request.form.getlist(
+        "specimen_ids"
+    )
+
+    if not specimen_ids:
+
+        flash(
+            "Debes seleccionar al menos "
+            "un espécimen."
+        )
+
+        return redirect(
+            url_for(
+                "movements.request_return",
+                request_id=request_id
+            )
+        )
+
+
+    approved_specimen_ids = {
+        item.specimen_id
+        for item in request_record.items
+        if item.item_status == "approved"
+    }
+
+
+    specimens = (
+        Specimen.query
+        .filter(
+            Specimen.id.in_(
+                specimen_ids
+            )
+        )
+        .all()
+    )
+
+
+    if len(specimens) != len(specimen_ids):
+
+        flash(
+            "Uno o más especímenes "
+            "seleccionados no existen."
+        )
+
+        return redirect(
+            url_for(
+                "movements.request_return",
+                request_id=request_id
+            )
+        )
+
+
+    for specimen in specimens:
+
+        if specimen.id not in approved_specimen_ids:
+
+            flash(
+                "Uno de los especímenes no pertenece "
+                "a los materiales aprobados."
+            )
+
+            return redirect(
+                url_for(
+                    "movements.request_return",
+                    request_id=request_id
+                )
+            )
+
+
+        if not specimen_has_request_exit(
+            request_record.id,
+            specimen.id
+        ):
+
+            flash(
+                f"{specimen.portal_code} no registra "
+                "una salida para esta solicitud."
+            )
+
+            return redirect(
+                url_for(
+                    "movements.request_return",
+                    request_id=request_id
+                )
+            )
+
+        if specimen_has_request_entry(
+            request_record.id,
+            specimen.id
+        ):
+
+            flash(
+                f"{specimen.portal_code} ya registra "
+                "una devolución para esta solicitud."
+            )
+
+            return redirect(
+                url_for(
+                    "movements.request_return",
+                    request_id=request_id
+                )
+            )
+
+        if specimen.status != "loaned":
+
+            flash(
+                f"{specimen.portal_code} no figura "
+                "actualmente como prestado."
+            )
+
+            return redirect(
+                url_for(
+                    "movements.request_return",
+                    request_id=request_id
+                )
+            )
+
+
+    for specimen in specimens:
+
+        specimen.status = "available"
+
+
+    create_movement(
+        specimens,
+        "entry",
+        "request",
+        g.user.username,
+        request.form.get(
+            "notes",
+            ""
+        ).strip(),
+        request_record=request_record
+    )
+
+
+    db.session.flush()
+
+
+    update_request_return_status(
+        request_record
+    )
+
+
+    db.session.commit()
+
+
+    flash(
+        "Devolución registrada correctamente."
     )
 
     return redirect(

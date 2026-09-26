@@ -560,6 +560,48 @@ tr:hover {
    REQUESTS
 ========================= */
 
+.request-movement-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.loan-completed {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    margin-top: 1.5rem;
+    padding: 1rem 1.2rem;
+
+    border: 1px solid rgba(
+        255,
+        255,
+        255,
+        0.1
+    );
+
+    border-radius: 8px;
+
+    background-color: rgba(
+        255,
+        255,
+        255,
+        0.03
+    );
+}
+
+.loan-completed-check {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.loan-completed p {
+    margin: 0.25rem 0 0;
+    opacity: 0.8;
+}
+
 .request-item-actions {
     display: flex;
     align-items: center;
@@ -1283,6 +1325,36 @@ tr:hover {
 /* =========================
    MOVEMENT BADGES
 ========================= */
+
+.delivery-status-section {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+
+    border-top: 1px solid rgba(
+        255,
+        255,
+        255,
+        0.1
+    );
+}
+
+.delivery-status-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    margin-top: 0.7rem;
+    padding: 0.8rem;
+
+    border: 1px solid rgba(
+        255,
+        255,
+        255,
+        0.1
+    );
+
+    border-radius: 8px;
+}
 
 .movement-specimens {
     display: flex;

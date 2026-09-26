@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Registrar Devolución
+{% endblock %}
+
+{% block content %}
+
+<h1>
+    Registrar Devolución
+</h1>
+
+
+<div class="request-summary">
+
+    <h2>
+        Datos de la Solicitud
+    </h2>
+
+    <p>
+        <strong>Solicitud:</strong>
+        {{ request_record.tracking_code }}
+    </p>
+
+    <p>
+        <strong>Catedrático:</strong>
+        {{ request_record.teacher_name }}
+    </p>
+
+    <p>
+        <strong>Curso:</strong>
+        {{ request_record.course }}
+    </p>
+
+</div>
+
+
+<div class="request-summary">
+
+    <h2>
+        Entrada por Devolución
+    </h2>
+
+
+    {% if returnable_items %}
+
+    <form
+        method="post"
+        action="{{ url_for(
+            'movements.process_request_return',
+            request_id=request_record.id
+        ) }}"
+    >
+
+        <p>
+            <strong>
+                Especímenes pendientes de devolución
+            </strong>
+        </p>
+
+
+        <div class="movement-selection-list">
+
+            {% for item in returnable_items %}
+
+            <label class="movement-selection-item">
+
+                <input
+                    type="checkbox"
+                    name="specimen_ids"
+                    value="{{ item.specimen.id }}"
+                    checked
+                >
+
+                <span>
+
+                    <strong>
+                        {{ item.specimen.portal_code }}
+                    </strong>
+
+                    <span class="movement-selection-name">
+                        {{ item.specimen.scientific_name }}
+                    </span>
+
+                </span>
+
+            </label>
+
+            {% endfor %}
+
+        </div>
+
+
+        <label>
+            Observaciones
+        </label>
+
+        <textarea
+            name="notes"
+        ></textarea>
+
+
+        <div class="submit-request">
+
+            <input
+                type="submit"
+                value="REGISTRAR ENTRADA"
+            >
+
+        </div>
+
+    </form>
+
+
+    {% else %}
+
+    <div class="request-notes">
+        No hay especímenes pendientes de devolución
+        para esta solicitud.
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
