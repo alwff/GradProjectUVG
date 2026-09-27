@@ -67,3 +67,39 @@ def classify_detection(specimen):
         "reason": "no_active_exit",
         "movement": movement
     }
+
+def supervise_detection():
+
+    specimen, identification_status = (
+        identify_specimen()
+    )
+
+    if identification_status == "no_tag":
+        return {
+            "status": "no_tag",
+            "epc": None,
+            "specimen": None,
+            "reason": "no_tag",
+            "movement": None
+        }
+
+    if identification_status == "unknown_epc":
+        return {
+            "status": "unknown_epc",
+            "epc": None,
+            "specimen": None,
+            "reason": "unknown_epc",
+            "movement": None
+        }
+
+    classification = classify_detection(
+        specimen
+    )
+
+    return {
+        "status": classification["status"],
+        "epc": specimen.rfid_epc,
+        "specimen": specimen,
+        "reason": classification["reason"],
+        "movement": classification["movement"]
+    }

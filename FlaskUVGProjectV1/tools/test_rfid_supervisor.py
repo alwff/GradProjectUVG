@@ -1,8 +1,7 @@
 from flaskr import create_app
+from flaskr import create_app
 from flaskr.services.rfid_supervisor import (
-    identify_specimen,
-    get_latest_movement,
-    classify_detection
+    supervise_detection
 )
 
 app = create_app()
@@ -10,82 +9,42 @@ app = create_app()
 
 with app.app_context():
 
-    print("Esperando lectura RFID...")
+    print("Esperando deteccion RFID...")
 
-    specimen, result = identify_specimen()
+    result = supervise_detection()
 
-    print("Resultado:", result)
+    print()
+    print("Resultado del supervisor")
+    print("Estado:", result["status"])
+    print("Razon:", result["reason"])
+
+    specimen = result["specimen"]
+    movement = result["movement"]
 
     if specimen:
 
-        print("Especimen identificado")
+        print()
+        print("Especimen")
         print("Portal:", specimen.portal_code)
         print("EPC:", specimen.rfid_epc)
         print("Estado:", specimen.status)
 
-        movement = get_latest_movement(
-            specimen
-        )
-
-        if movement:
-
-            print()
-            print("Ultimo movimiento registrado")
-            print("ID:", movement.id)
-            print(
-                "Tipo:",
-                movement.movement_type
-            )
-            print(
-                "Origen:",
-                movement.source
-            )
-            print(
-                "Realizado por:",
-                movement.performed_by
-            )
-            print(
-                "Fecha:",
-                movement.created_at
-            )
-
-            if movement.request_id:
-                print(
-                    "Solicitud:",
-                    movement.request_record.tracking_code
-                )
-
-            if movement.notes:
-                print(
-                    "Observaciones:",
-                    movement.notes
-                )
-
-        else:
-
-            print()
-            print(
-                "El especimen no tiene "
-                "movimientos registrados."
-            )
-
-        classification = classify_detection(
-            specimen
-        )
+    if movement:
 
         print()
-        print("Clasificacion RFID")
-        print(
-            "Estado:",
-            classification["status"]
-        )
-        print(
-            "Razon:",
-            classification["reason"]
-        )
+        print("Movimiento relacionado")
+        print("ID:", movement.id)
+        print("Tipo:", movement.movement_type)
+        print("Origen:", movement.source)
 
-    else:
+        if movement.request_id:
+            print(
+                "Solicitud:",
+                movement.request_record.tracking_code
+            )
 
-        print(
-            "No se identifico un especimen registrado."
-        )
+        if movement.notes:
+            print(
+                "Observaciones:",
+                movement.notes
+            )
