@@ -1,7 +1,9 @@
 from flaskr import create_app
-from flaskr import create_app
 from flaskr.services.rfid_supervisor import (
     supervise_detection
+)
+from flaskr.services.rfid_alerts import (
+    send_unauthorized_alert
 )
 
 app = create_app()
@@ -54,3 +56,13 @@ with app.app_context():
                 "Observaciones:",
                 movement.notes
             )
+
+    alert_sent = send_unauthorized_alert(
+        result
+    )
+
+    print()
+    print(
+        "Alerta enviada:",
+        alert_sent
+    )

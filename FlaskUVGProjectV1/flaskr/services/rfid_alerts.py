@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
-
+from flaskr.models import User
+from flaskr.services.email_service import send_email
 
 RFID_ALERT_COOLDOWN_SECONDS = 300
 
@@ -29,3 +30,89 @@ def can_send_alert(epc):
 def register_alert(epc):
 
     _last_alerts[epc] = datetime.now()
+
+def send_unauthorized_alert(result):
+
+    if result["status"] != "unauthorized":
+        return False
+
+    epc = result["epc"]
+    specimen = result["specimen"]
+
+    if specimen is None or not epc:
+        return False
+
+    if not can_send_alert(epc):
+        return False
+
+    users = (
+        User.query
+        .filter(User.email.isnot(None))
+        .all()
+    )
+
+    recipients = [
+        user.email
+        for user in users
+        if user.email
+    ]
+
+    if not recipients:
+        return False
+
+    subject = (
+        "Alerta de movimiento no autorizado"
+    )
+
+    html = f"""
+        <h2>
+            Alerta de movimiento no autorizado
+        </h2>
+
+        <p>
+            El espécimen
+            <strong>{specimen.portal_code}</strong>
+            fue detectado en el punto de control
+            sin un movimiento autorizado registrado.
+        </p>
+
+        <p>
+            <strong>Código de Portal:</strong>
+            {specimen.portal_code}
+            <br>
+
+            <strong>EPC RFID:</strong>
+            {epc}
+            <br>
+
+            <strong>Nombre científico:</strong>
+            {specimen.scientific_name}
+            <br>
+
+            <strong>Colección:</strong>
+            {specimen.collection}
+        </p>
+
+        <p>
+            Se recomienda verificar la ubicación
+            del espécimen y consultar su historial
+            de movimientos.
+        </p>
+
+        <p>
+            <em>
+                Mensaje generado automáticamente
+                por el Sistema de Colecciones.
+            </em>
+        </p>
+    """
+
+    send_email(
+        recipients=recipients,
+        subject=subject,
+        html=html
+    )
+
+    register_alert(epc)
+
+    return True   
