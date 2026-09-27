@@ -16,56 +16,60 @@ with app.app_context():
     print("Resultado:", result)
 
     if specimen:
+
         print("Especimen identificado")
         print("Portal:", specimen.portal_code)
         print("EPC:", specimen.rfid_epc)
         print("Estado:", specimen.status)
 
-    else:
-        print("No se identifico un especimen registrado.")
-
         movement = get_latest_movement(
             specimen
         )
 
-    if movement:
+        if movement:
 
-        print()
-        print("Ultimo movimiento registrado")
-        print("ID:", movement.id)
-        print(
-            "Tipo:",
-            movement.movement_type
-        )
-        print(
-            "Origen:",
-            movement.source
-        )
-        print(
-            "Realizado por:",
-            movement.performed_by
-        )
-        print(
-            "Fecha:",
-            movement.created_at
-        )
-
-        if movement.request_id:
+            print()
+            print("Ultimo movimiento registrado")
+            print("ID:", movement.id)
             print(
-                "Solicitud:",
-                movement.request_record.tracking_code
+                "Tipo:",
+                movement.movement_type
+            )
+            print(
+                "Origen:",
+                movement.source
+            )
+            print(
+                "Realizado por:",
+                movement.performed_by
+            )
+            print(
+                "Fecha:",
+                movement.created_at
             )
 
-        if movement.notes:
+            if movement.request_id:
+                print(
+                    "Solicitud:",
+                    movement.request_record.tracking_code
+                )
+
+            if movement.notes:
+                print(
+                    "Observaciones:",
+                    movement.notes
+                )
+
+        else:
+
+            print()
             print(
-                "Observaciones:",
-                movement.notes
+                "El especimen no tiene "
+                "movimientos registrados."
             )
 
     else:
 
-        print()
         print(
-            "El especimen no tiene "
-            "movimientos registrados."
+            "No se identifico un especimen registrado."
         )
