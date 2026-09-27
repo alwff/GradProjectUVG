@@ -18,6 +18,12 @@ with app.app_context():
     print("Estado:", result["status"])
     print("Razon:", result["reason"])
 
+    if result["epc"]:
+        print(
+            "EPC detectado:",
+            result["epc"]
+        )
+
     specimen = result["specimen"]
     movement = result["movement"]
 

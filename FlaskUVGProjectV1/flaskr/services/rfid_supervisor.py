@@ -11,16 +11,16 @@ def identify_specimen():
     epc = read_epc()
 
     if not epc:
-        return None, "no_tag"
+        return None, "no_tag", None
 
     specimen = Specimen.query.filter_by(
         rfid_epc=epc
     ).first()
 
     if specimen is None:
-        return None, "unknown_epc"
+        return None, "unknown_epc", epc
 
-    return specimen, "identified"
+    return specimen, "identified", epc
 
 def get_latest_movement(specimen):
 
@@ -70,7 +70,7 @@ def classify_detection(specimen):
 
 def supervise_detection():
 
-    specimen, identification_status = (
+    specimen, identification_status, epc = (
         identify_specimen()
     )
 
@@ -86,7 +86,7 @@ def supervise_detection():
     if identification_status == "unknown_epc":
         return {
             "status": "unknown_epc",
-            "epc": None,
+            "epc": epc,
             "specimen": None,
             "reason": "unknown_epc",
             "movement": None
@@ -98,7 +98,7 @@ def supervise_detection():
 
     return {
         "status": classification["status"],
-        "epc": specimen.rfid_epc,
+        "epc": epc,
         "specimen": specimen,
         "reason": classification["reason"],
         "movement": classification["movement"]
