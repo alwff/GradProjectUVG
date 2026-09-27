@@ -13,27 +13,49 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
     if request.method == 'POST':
-        username = request.form['username']
+        username = request.form['username'].strip()
+        email = request.form['email'].strip().lower()
         password = request.form['password']
         error = None
 
         if not username:
-            error = 'Username is required.'
+            error = 'El usuario es obligatorio.'
+
+        elif not email:
+            error = 'El correo electrónico es obligatorio.'
+
         elif not password:
-            error = 'Password is required.'
+            error = 'La contraseña es obligatoria.'
+
+        elif User.query.filter_by(
+            username=username
+        ).first():
+            error = 'Ese nombre de usuario ya está registrado.'
+
+        elif User.query.filter_by(
+            email=email
+        ).first():
+            error = 'Ese correo electrónico ya está registrado.'
 
         if error is None:
             try:
                 new_user = User(
                     username=username,
-                    password=generate_password_hash(password)
+                    email=email,
+                    password=generate_password_hash(
+                        password
+                    )
                 )
 
                 db.session.add(new_user)
                 db.session.commit()
 
             except Exception:
-                error = f"User {username} is already registered."
+                db.session.rollback()
+
+                error = (
+                    'No fue posible registrar el usuario.'
+                )
             else:
                 return redirect(url_for("auth.login"))
 
