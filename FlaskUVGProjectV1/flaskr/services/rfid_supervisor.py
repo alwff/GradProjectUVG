@@ -38,3 +38,32 @@ def get_latest_movement(specimen):
     )
 
     return movement
+
+def classify_detection(specimen):
+
+    movement = get_latest_movement(
+        specimen
+    )
+
+    if movement is None:
+        return {
+            "status": "unauthorized",
+            "reason": "no_movement",
+            "movement": None
+        }
+
+    if (
+        movement.movement_type == "exit"
+        and specimen.status == "loaned"
+    ):
+        return {
+            "status": "authorized",
+            "reason": movement.source,
+            "movement": movement
+        }
+
+    return {
+        "status": "unauthorized",
+        "reason": "no_active_exit",
+        "movement": movement
+    }

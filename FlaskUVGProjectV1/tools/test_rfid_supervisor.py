@@ -1,7 +1,8 @@
 from flaskr import create_app
 from flaskr.services.rfid_supervisor import (
     identify_specimen,
-    get_latest_movement
+    get_latest_movement,
+    classify_detection
 )
 
 app = create_app()
@@ -67,6 +68,21 @@ with app.app_context():
                 "El especimen no tiene "
                 "movimientos registrados."
             )
+
+        classification = classify_detection(
+            specimen
+        )
+
+        print()
+        print("Clasificacion RFID")
+        print(
+            "Estado:",
+            classification["status"]
+        )
+        print(
+            "Razon:",
+            classification["reason"]
+        )
 
     else:
 
