@@ -1,6 +1,8 @@
 from flaskr import create_app
-from flaskr.services.rfid_supervisor import identify_specimen
-
+from flaskr.services.rfid_supervisor import (
+    identify_specimen,
+    get_latest_movement
+)
 
 app = create_app()
 
@@ -21,3 +23,49 @@ with app.app_context():
 
     else:
         print("No se identifico un especimen registrado.")
+
+        movement = get_latest_movement(
+            specimen
+        )
+
+    if movement:
+
+        print()
+        print("Ultimo movimiento registrado")
+        print("ID:", movement.id)
+        print(
+            "Tipo:",
+            movement.movement_type
+        )
+        print(
+            "Origen:",
+            movement.source
+        )
+        print(
+            "Realizado por:",
+            movement.performed_by
+        )
+        print(
+            "Fecha:",
+            movement.created_at
+        )
+
+        if movement.request_id:
+            print(
+                "Solicitud:",
+                movement.request_record.tracking_code
+            )
+
+        if movement.notes:
+            print(
+                "Observaciones:",
+                movement.notes
+            )
+
+    else:
+
+        print()
+        print(
+            "El especimen no tiene "
+            "movimientos registrados."
+        )

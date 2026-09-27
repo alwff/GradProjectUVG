@@ -1,4 +1,8 @@
-from flaskr.models import Specimen
+from flaskr.models import (
+    Specimen,
+    Movement,
+    MovementItem
+)
 from flaskr.services.rfid_reader import read_epc
 
 
@@ -17,3 +21,20 @@ def identify_specimen():
         return None, "unknown_epc"
 
     return specimen, "identified"
+
+def get_latest_movement(specimen):
+
+    movement = (
+        Movement.query
+        .join(MovementItem)
+        .filter(
+            MovementItem.specimen_id == specimen.id
+        )
+        .order_by(
+            Movement.created_at.desc(),
+            Movement.id.desc()
+        )
+        .first()
+    )
+
+    return movement
