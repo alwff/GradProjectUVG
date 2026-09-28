@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from flaskr.extensions import db
 from flaskr.models import (
     User,
@@ -30,7 +30,7 @@ def create_detection_event(result):
 def can_send_alert(epc):
 
     cooldown_limit = (
-        datetime.now()
+        datetime.now(timezone.utc)
         - timedelta(
             seconds=RFID_ALERT_COOLDOWN_SECONDS
         )

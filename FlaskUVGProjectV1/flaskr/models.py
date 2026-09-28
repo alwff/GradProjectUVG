@@ -356,7 +356,7 @@ class RFIDDetectionEvent(db.Model):
     )
 
     detected_at = db.Column(
-        db.DateTime,
+        db.DateTime(timezone=True),
         nullable=False,
         server_default=db.func.now()
     )
@@ -368,7 +368,7 @@ class RFIDDetectionEvent(db.Model):
     )
 
     alert_sent_at = db.Column(
-        db.DateTime,
+        db.DateTime(timezone=True),
         nullable=True
     )
 
