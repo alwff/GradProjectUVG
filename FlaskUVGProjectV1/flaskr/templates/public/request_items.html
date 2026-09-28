@@ -292,6 +292,8 @@ Material Solicitado
     Material Solicitado
 </h2>
 
+{% if request_items %}
+
 <table>
 
     <thead>
@@ -300,6 +302,9 @@ Material Solicitado
             <th>Código Portal</th>
             <th>Especie o Familia</th>
             <th>Especificaciones</th>
+            <th class="request-material-action">
+                Acción
+            </th>
         </tr>
 
     </thead>
@@ -320,6 +325,29 @@ Material Solicitado
 
             <td>
                 {{ item.specifications }}
+            </td>
+
+            <td class="request-material-action">
+
+                <form method="post">
+
+                    <input
+                        type="hidden"
+                        name="specimen_id"
+                        value="{{ item.specimen_id }}"
+                    >
+
+                    <button
+                        type="submit"
+                        name="action"
+                        value="remove"
+                        class="small-button"
+                    >
+                        Quitar
+                    </button>
+
+                </form>
+
             </td>
 
         </tr>
@@ -346,5 +374,11 @@ Material Solicitado
     </div>
 
 </form>
+
+{% else %}
+
+<div class="request-notes">
+    Aún no has agregado especímenes a esta solicitud.
+</div>
 
 {% endblock %}

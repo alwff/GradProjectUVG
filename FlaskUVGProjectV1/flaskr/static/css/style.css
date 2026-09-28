@@ -918,6 +918,27 @@ tr:hover {
     margin-top: 0;
 }
 
+.request-material-action {
+    text-align: center;
+}
+
+
+.request-material-action form {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+}
+
+
+.request-material-action .small-button {
+    border: none;
+
+    cursor: pointer;
+}
+
 .specimen-request-result {
     margin-top: 1.5rem;
     padding: 1.5rem;

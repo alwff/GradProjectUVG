@@ -322,6 +322,30 @@ def request_items():
                         "con ese criterio de búsqueda."
                     )
 
+        elif action == "remove":
+
+            specimen_id = request.form.get(
+                "specimen_id",
+                type=int
+            )
+
+            if specimen_id is not None:
+
+                items = session[
+                    "request_items"
+                ]
+
+                items = [
+                    item
+                    for item in items
+                    if item["specimen_id"]
+                    != specimen_id
+                ]
+
+                session[
+                    "request_items"
+                ] = items
+
 
         elif action in (
             "select",
