@@ -898,6 +898,26 @@ tr:hover {
 
 }
 
+/* =========================================
+   SOLICITUD - DATOS ACADEMICOS
+   ========================================= */
+
+.request-academic-data {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.request-academic-data label {
+    margin-top: 0.8rem;
+    margin-bottom: 0.5rem;
+}
+
+
+.request-academic-data label:first-of-type {
+    margin-top: 0;
+}
+
 .specimen-request-result {
     margin-top: 1.5rem;
     padding: 1.5rem;
