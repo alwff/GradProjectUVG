@@ -2571,3 +2571,41 @@ tr:hover {
         0.04
     );
 }
+
+.movement-search-result {
+    margin-top: 2rem;
+}
+
+/* =========================================
+   DETALLE DE ESPECIMEN
+   ========================================= */
+
+.inventory-detail-sections {
+    display: flex;
+    flex-direction: column;
+
+    gap: 1.25rem;
+}
+
+
+.inventory-detail-actions {
+    margin-top: 1.5rem;
+}
+
+
+.inventory-save-button {
+    width: auto !important;
+
+    min-width: 190px;
+    min-height: 46px;
+
+    padding: 0.8rem 1.2rem;
+
+    align-self: flex-start;
+
+    border-radius: 10px;
+}
+
+.request-summary form .action-button {
+    margin-top: 0.5rem;
+}
