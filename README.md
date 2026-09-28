@@ -17,9 +17,9 @@ Se busca la creación e implementación de una exhibición virtual en el entorno
     * Eventos (entradas y salidas)     
   * Formularios
     * Solicitudes (la persona interesada ingresa qué especímenes desea retirar de colecciones)
-    * Préstamos (se llena por el encargado al hacer entrega del especímen solicitado)
-    * Devoluciones (se llena por el encargado al recibir el especímen prestado)
-    * Ingreso de especímen manualmente (no cuenta con un código de barras asignado)
+    * Préstamos (se llena por el encargado al hacer entrega del espécimen solicitado)
+    * Devoluciones (se llena por el encargado al recibir el espécimen prestado)
+    * Ingreso de espécimen manualmente (no cuenta con un código de barras asignado)
 * Python + Flask
  * Implementación de notificaciones por correo para salidas y entradas a los encargados.   
 
@@ -35,8 +35,8 @@ Se busca la creación e implementación de una exhibición virtual en el entorno
     * [x] Eventos (entradas y salidas)     
   * [x] Formularios
     * [x] Solicitudes (la persona interesada ingresa qué especímenes desea retirar de colecciones)
-    * [x] Préstamos (se llena por el encargado al hacer entrega del especímen solicitado)
-    * [x] Devoluciones (se llena por el encargado al recibir el especímen prestado)
-    * [x] Ingreso de especímen manualmente (no cuenta con un código de barras asignado)
+    * [x] Préstamos (se llena por el encargado al hacer entrega del espécimen solicitado)
+    * [x] Devoluciones (se llena por el encargado al recibir el espécimen prestado)
+    * [x] Ingreso de espécimen manualmente (no cuenta con un código de barras asignado)
  * [ ] Python + Flask
   * [ ] Implementación de notificaciones por correo para salidas y entradas a los encargados.   

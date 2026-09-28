@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
-{% block title %}Editar Especímen{% endblock %}
+{% block title %}Editar Espécimen{% endblock %}
 
 {% block content %}
 
-<h1>Editar Especímen</h1>
+<h1>Editar Espécimen</h1>
 
 <form method="post">
 
@@ -64,5 +64,16 @@
     >
 
 </form>
+
+<div class="inventory-form-navigation">
+
+    <a
+        class="action-button"
+        href="{{ url_for('inventory.index') }}"
+    >
+        VOLVER AL INVENTARIO
+    </a>
+
+</div>
 
 {% endblock %}

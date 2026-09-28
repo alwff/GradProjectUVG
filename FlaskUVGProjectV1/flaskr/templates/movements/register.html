@@ -12,27 +12,32 @@ Registrar Movimiento
 
 <form method="post">
 
-    <div class="request-notes">
+    <div class="movement-identification-help">
 
-        <strong>
-            Métodos de identificación admitidos:
-        </strong>
+        <div class="movement-identification-title">
+            Métodos de identificación admitidos
+        </div>
 
-        <ul>
+        <p>
+            Puedes identificar el espécimen utilizando
+            cualquiera de los siguientes datos:
+        </p>
 
-            <li>
-                Código Portal UVG
-            </li>
+        <div class="movement-identification-methods">
 
-            <li>
+            <span>
+                Código de Portal UVG
+            </span>
+
+            <span>
                 Código de Barras
-            </li>
+            </span>
 
-            <li>
-                EPC RFID UHF
-            </li>
+            <span>
+                EPC RFID
+            </span>
 
-        </ul>
+        </div>
 
     </div>
 
@@ -59,7 +64,7 @@ Registrar Movimiento
 <div class="request-summary">
 
     <h2>
-        Especímen Encontrado
+        Espécimen Encontrado
     </h2>
 
     <p>
@@ -75,7 +80,7 @@ Registrar Movimiento
     <p>
 
         <strong>
-            Barcode:
+            Código de Barras
         </strong>
 
         {{ specimen.barcode }}

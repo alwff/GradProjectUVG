@@ -10,7 +10,7 @@
     class="action-button"
     href="{{ url_for('inventory.create') }}"
 >
-    Ingresar Especímen
+    Ingresar Espécimen
 </a>
 
 <form
@@ -62,7 +62,7 @@
             <th>Familia</th>
             <th>Colección</th>
             <th>Estado</th>
-            <th>Acción</th>
+            <th class="inventory-actions-column">Acción</th>
         </tr>
     </thead>
 
@@ -81,7 +81,7 @@
 
             <td>{{ specimen.status }}</td>
 
-            <td>
+            <td class="inventory-actions-column">
 
                 <a
                     class="small-button"

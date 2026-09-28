@@ -367,7 +367,7 @@ def register():
         if specimen is None:
 
             flash(
-                "Especímen no encontrado."
+                "Espécimen no encontrado."
             )
 
     return render_template(

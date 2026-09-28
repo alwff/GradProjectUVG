@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
-{% block title %}Ingresar Nuevo Especímen{% endblock %}
+{% block title %}Ingresar Nuevo Espécimen{% endblock %}
 
 {% block content %}
 
-<h1>Ingresar Nuevo Especímen</h1>
+<h1>Ingresar Nuevo Espécimen</h1>
 
 <form method="post">
 
@@ -32,8 +32,19 @@
     <label>Descripción</label>
     <textarea name="description"></textarea>
 
-    <input type="submit" value="Guardar Especímen">
+    <input type="submit" value="Guardar Espécimen">
 
 </form>
+
+<div class="inventory-form-navigation">
+
+    <a
+        class="action-button"
+        href="{{ url_for('inventory.index') }}"
+    >
+        VOLVER AL INVENTARIO
+    </a>
+
+</div>
 
 {% endblock %}

@@ -77,7 +77,7 @@ def create():
         db.session.add(specimen)
         db.session.commit()
 
-        flash("Especímen creado correctamente.")
+        flash("Espécimen creado correctamente.")
 
         return redirect(url_for("inventory.index"))
 
@@ -95,7 +95,7 @@ def detail(id):
     if specimen is None:
 
         flash(
-            "Especímen no encontrado."
+            "Espécimen no encontrado."
         )
 
         return redirect(
@@ -117,7 +117,7 @@ def edit(id):
     )
 
     if specimen is None:
-        flash("Especímen no encontrado.")
+        flash("Espécimen no encontrado.")
         return redirect(url_for("inventory.index"))
 
     if request.method == "POST":
@@ -133,7 +133,7 @@ def edit(id):
 
         db.session.commit()
 
-        flash("Especímen actualizado correctamente.")
+        flash("Espécimen actualizado correctamente.")
 
         return redirect(url_for("inventory.index"))
 

@@ -470,10 +470,14 @@ tr:hover {
 }
 
 .dashboard-content h2 {
-
     color: white;
 
-    margin-bottom: 1rem;
+    margin: 0;
+
+    min-height: 50px;
+
+    display: flex;
+    align-items: center;
 }
 
 /* PUBLIC HOME */
@@ -914,6 +918,8 @@ tr:hover {
 
     width: 100%;
 
+    height: 100%;
+
     padding: 2rem;
 
     border: 1px solid rgba(
@@ -932,13 +938,13 @@ tr:hover {
         0.03
     );
 
-    margin-top: 2rem;
-
 }
 
 .request-add-material {
 
     width: 100%;
+
+    height: 100%;
 
     padding: 2rem;
 
@@ -2406,4 +2412,162 @@ tr:hover {
         grid-template-columns: 1fr;
     }
 
+}
+
+/* =========================================
+   INVENTARIO - ACCIONES DE DETALLE
+   ========================================= */
+
+.inventory-detail-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+
+.inventory-detail-actions .action-button,
+.inventory-detail-actions .small-button {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 190px;
+    min-height: 46px;
+
+    padding: 0.8rem 1.2rem;
+
+    font-size: 0.9rem;
+    font-weight: bold;
+
+    border-radius: 10px;
+}
+
+.inventory-actions-column {
+    text-align: center;
+}
+
+
+.inventory-actions-column .small-button {
+    margin: 0 0.15rem;
+}
+
+.inventory-form-navigation {
+    display: flex;
+    justify-content: flex-start;
+
+    margin-top: 1.5rem;
+}
+
+
+.inventory-form-navigation .action-button {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 190px;
+    min-height: 46px;
+}
+
+/* =========================================
+   ENCABEZADOS DE PAGINA
+   ========================================= */
+
+.page-header {
+    width: 100%;
+
+    margin-bottom: 2rem;
+}
+
+
+.page-header h1 {
+    margin: 0;
+
+    color: #5DA63C;
+}
+
+
+.page-header p {
+    margin-top: 0.6rem;
+
+    line-height: 1.5;
+
+    opacity: 0.75;
+}
+
+/* =========================================
+   REGISTRO DE MOVIMIENTOS
+   ========================================= */
+
+.movement-identification-help {
+    width: 100%;
+
+    margin-bottom: 1.5rem;
+    padding: 1.3rem 1.5rem;
+
+    border: 1px solid rgba(
+        255,
+        255,
+        255,
+        0.12
+    );
+
+    border-radius: 10px;
+
+    background-color: rgba(
+        255,
+        255,
+        255,
+        0.03
+    );
+}
+
+
+.movement-identification-title {
+    margin-bottom: 0.5rem;
+
+    font-weight: bold;
+
+    color: white;
+}
+
+
+.movement-identification-help p {
+    margin-bottom: 1rem;
+
+    opacity: 0.75;
+}
+
+
+.movement-identification-methods {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 0.7rem;
+}
+
+
+.movement-identification-methods span {
+    display: inline-block;
+
+    padding: 0.4rem 0.8rem;
+
+    border: 1px solid rgba(
+        255,
+        255,
+        255,
+        0.15
+    );
+
+    border-radius: 20px;
+
+    font-size: 0.85rem;
+
+    background-color: rgba(
+        255,
+        255,
+        255,
+        0.04
+    );
 }
