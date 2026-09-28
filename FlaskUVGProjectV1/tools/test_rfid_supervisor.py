@@ -3,8 +3,10 @@ from flaskr.services.rfid_supervisor import (
     supervise_detection
 )
 from flaskr.services.rfid_alerts import (
+    create_detection_event,
     send_unauthorized_alert
 )
+
 
 app = create_app()
 
@@ -14,6 +16,19 @@ with app.app_context():
     print("Esperando deteccion RFID...")
 
     result = supervise_detection()
+
+    event = None
+
+    if result["epc"]:
+
+        event = create_detection_event(
+            result
+        )
+
+        print(
+            "Evento RFID:",
+            event.id
+        )
 
     print()
     print("Resultado del supervisor")
@@ -57,9 +72,14 @@ with app.app_context():
                 movement.notes
             )
 
-    alert_sent = send_unauthorized_alert(
-        result
-    )
+    alert_sent = False
+
+    if event:
+
+        alert_sent = send_unauthorized_alert(
+            result,
+            event
+        )
 
     print()
     print(
