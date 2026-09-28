@@ -2132,6 +2132,19 @@ tr:hover {
 
 /* ESTADISTICAS */
 
+.rfid-summary-header {
+    margin-bottom: 1rem;
+}
+
+
+.rfid-summary-header h2 {
+    margin: 0;
+
+    font-size: 1.15rem;
+
+    color: white;
+}
+
 .rfid-stats-grid {
     display: grid;
 
@@ -2180,36 +2193,6 @@ tr:hover {
     font-size: 2rem;
     color: #5DA63C;
 }
-
-
-/* ALERTA RECIENTE */
-
-.rfid-recent-alert {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 1rem;
-
-    margin-bottom: 1.5rem;
-    padding: 1rem 1.2rem;
-
-    border-left: 4px solid #D97706;
-
-    background-color: rgba(
-        217,
-        119,
-        6,
-        0.08
-    );
-}
-
-
-.rfid-recent-alert span {
-    font-size: 1.4rem;
-    font-weight: bold;
-}
-
 
 /* FILTROS */
 

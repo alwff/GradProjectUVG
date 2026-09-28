@@ -1,6 +1,5 @@
 from datetime import (
     datetime,
-    timedelta,
     timezone
 )
 
@@ -273,10 +272,6 @@ def rfid_history():
         microsecond=0
     )
 
-    recent_limit = (
-        now - timedelta(hours=24)
-    )
-
     detections_today = (
         RFIDDetectionEvent.query
         .filter(
@@ -318,17 +313,6 @@ def rfid_history():
         .count()
     )
 
-    recent_unauthorized = (
-        RFIDDetectionEvent.query
-        .filter(
-            RFIDDetectionEvent.detected_at
-            >= recent_limit,
-            RFIDDetectionEvent.classification
-            == "unauthorized"
-        )
-        .count()
-    )
-
     return render_template(
         "movements/rfid_history.html",
         events=events,
@@ -338,7 +322,6 @@ def rfid_history():
         unauthorized_today=unauthorized_today,
         unknown_today=unknown_today,
         alerts_today=alerts_today,
-        recent_unauthorized=recent_unauthorized
     )
 
 @bp.route(

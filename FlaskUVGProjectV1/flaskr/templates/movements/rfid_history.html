@@ -6,9 +6,7 @@ Historial de Movimientos RFID
 
 {% block content %}
 
-<div class="rfid-history-page">
-
-    <div class="rfid-history-header">
+<div class="rfid-history-header">
 
         <div>
             <h1>Historial de Movimientos RFID</h1>
@@ -19,22 +17,18 @@ Historial de Movimientos RFID
             </p>
         </div>
 
-        <a
-            class="action-button"
-            href="{{ url_for('movements.index') }}"
-        >
-            VOLVER A MOVIMIENTOS
-        </a>
-
     </div>
 
+    <div class="rfid-summary-header">
+        <h2>Resumen del día</h2>
+    </div>
 
     <div class="rfid-stats-grid">
 
         <div class="rfid-stat-card">
 
             <span class="rfid-stat-label">
-                Detecciones hoy
+                Detecciones
             </span>
 
             <strong class="rfid-stat-value">
@@ -47,7 +41,7 @@ Historial de Movimientos RFID
         <div class="rfid-stat-card">
 
             <span class="rfid-stat-label">
-                No autorizadas hoy
+                No autorizadas
             </span>
 
             <strong class="rfid-stat-value">
@@ -60,7 +54,7 @@ Historial de Movimientos RFID
         <div class="rfid-stat-card">
 
             <span class="rfid-stat-label">
-                EPC desconocidos hoy
+                EPC desconocidos 
             </span>
 
             <strong class="rfid-stat-value">
@@ -73,7 +67,7 @@ Historial de Movimientos RFID
         <div class="rfid-stat-card">
 
             <span class="rfid-stat-label">
-                Alertas enviadas hoy
+                Alertas enviadas 
             </span>
 
             <strong class="rfid-stat-value">
@@ -83,21 +77,6 @@ Historial de Movimientos RFID
         </div>
 
     </div>
-
-
-    <div class="rfid-recent-alert">
-
-        <strong>
-            ⚠ Detecciones RFID no autorizadas
-            en las últimas 24 horas:
-        </strong>
-
-        <span>
-            {{ recent_unauthorized }}
-        </span>
-
-    </div>
-
 
     <div class="rfid-filter-card">
 
