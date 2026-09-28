@@ -4,7 +4,20 @@
 
 {% block content %}
 
-<h1>Editar Espécimen</h1>
+<div class="inventory-form-header">
+
+    <h1>
+        Editar Espécimen
+    </h1>
+
+    <a
+        class="small-button"
+        href="{{ url_for('inventory.index') }}"
+    >
+        ← Volver al Inventario
+    </a>
+
+</div>
 
 <form method="post">
 
@@ -65,16 +78,5 @@
     >
 
 </form>
-
-<div class="inventory-form-navigation">
-
-    <a
-        class="action-button"
-        href="{{ url_for('inventory.index') }}"
-    >
-        Volver al Inventario
-    </a>
-
-</div>
 
 {% endblock %}

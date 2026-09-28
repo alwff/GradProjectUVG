@@ -35,7 +35,7 @@
             type="submit"
             class="small-button"
         >
-            BUSCAR
+            Buscar
         </button>
 
         {% if search %}
@@ -79,7 +79,23 @@
 
             <td>{{ specimen.collection }}</td>
 
-            <td>{{ specimen.status }}</td>
+            <td>
+
+                {% if specimen.status == "available" %}
+
+                <span class="specimen-status-available"> Disponible </span>
+
+                {% elif specimen.status == "loaned" %}
+
+                <span class="specimen-status-loaned">Prestado</span>
+
+                {% else %}
+
+                {{ specimen.status }}
+
+                {% endif %}
+
+            </td>
 
             <td class="inventory-actions-column">
 

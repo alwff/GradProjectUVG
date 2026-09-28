@@ -2452,22 +2452,30 @@ tr:hover {
     margin: 0 0.15rem;
 }
 
-.inventory-form-navigation {
+.inventory-form-header {
     display: flex;
-    justify-content: flex-start;
 
-    margin-top: 1.5rem;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 2rem;
+
+    margin-bottom: 1.5rem;
 }
 
 
-.inventory-form-navigation .action-button {
+.inventory-form-header h1 {
+    margin: 0;
+}
+
+
+.inventory-form-header .small-button {
     display: inline-flex;
 
     align-items: center;
     justify-content: center;
 
-    min-width: 190px;
-    min-height: 46px;
+    white-space: nowrap;
 }
 
 /* =========================================
