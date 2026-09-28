@@ -2098,3 +2098,329 @@ tr:hover {
     }
 
 }
+
+/* =========================================
+   HISTORIAL RFID
+   ========================================= */
+
+.rfid-history-page {
+    width: 100%;
+    padding: 1rem 0 4rem;
+}
+
+
+.rfid-history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 2rem;
+
+    margin-bottom: 2rem;
+}
+
+
+.rfid-history-header h1 {
+    margin-bottom: 0.5rem;
+}
+
+
+.rfid-history-header p {
+    opacity: 0.75;
+}
+
+
+/* ESTADISTICAS */
+
+.rfid-stats-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 1rem;
+
+    margin-bottom: 1.5rem;
+}
+
+
+.rfid-stat-card {
+    display: flex;
+    flex-direction: column;
+
+    gap: 0.7rem;
+
+    padding: 1.5rem;
+
+    border: 1px solid rgba(
+        255,
+        255,
+        255,
+        0.12
+    );
+
+    border-radius: 10px;
+
+    background-color: rgba(
+        255,
+        255,
+        255,
+        0.03
+    );
+}
+
+
+.rfid-stat-label {
+    font-size: 0.9rem;
+    opacity: 0.75;
+}
+
+
+.rfid-stat-value {
+    font-size: 2rem;
+    color: #5DA63C;
+}
+
+
+/* ALERTA RECIENTE */
+
+.rfid-recent-alert {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 1rem;
+
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.2rem;
+
+    border-left: 4px solid #D97706;
+
+    background-color: rgba(
+        217,
+        119,
+        6,
+        0.08
+    );
+}
+
+
+.rfid-recent-alert span {
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+
+/* FILTROS */
+
+.rfid-filter-card {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+
+    border: 1px solid rgba(
+        255,
+        255,
+        255,
+        0.1
+    );
+
+    border-radius: 10px;
+
+    background-color: rgba(
+        255,
+        255,
+        255,
+        0.03
+    );
+}
+
+
+.rfid-filter-form {
+    gap: 1.5rem;
+}
+
+
+.rfid-search-group,
+.rfid-classification-group {
+    display: flex;
+    flex-direction: column;
+
+    gap: 0.7rem;
+}
+
+
+.rfid-search-row {
+    display: flex;
+    align-items: center;
+
+    gap: 1rem;
+}
+
+
+.rfid-search-row input {
+    flex: 1;
+}
+
+
+.rfid-search-button {
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+
+.rfid-filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 0.7rem;
+}
+
+
+.rfid-filter-button {
+    display: inline-block;
+
+    padding: 0.55rem 1rem;
+
+    border: 1px solid rgba(
+        255,
+        255,
+        255,
+        0.15
+    );
+
+    border-radius: 20px;
+
+    color: white;
+    text-decoration: none;
+
+    transition: 0.2s ease;
+}
+
+
+.rfid-filter-button:hover,
+.rfid-filter-button.active {
+    border-color: #5DA63C;
+    background-color: #5DA63C;
+}
+
+
+/* TABLA */
+
+.rfid-table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+
+.rfid-history-table {
+    min-width: 1000px;
+}
+
+
+.rfid-specimen-name {
+    margin-top: 0.25rem;
+
+    font-size: 0.9rem;
+    opacity: 0.75;
+}
+
+
+.rfid-unknown-specimen {
+    opacity: 0.7;
+}
+
+
+.rfid-epc {
+    font-family: monospace;
+    white-space: nowrap;
+}
+
+
+/* BADGES */
+
+.rfid-badge,
+.rfid-alert-status {
+    display: inline-block;
+
+    padding: 0.3rem 0.8rem;
+
+    border-radius: 15px;
+
+    font-size: 0.8rem;
+    font-weight: bold;
+
+    white-space: nowrap;
+}
+
+
+.rfid-badge.authorized {
+    background-color: #5DA63C;
+}
+
+
+.rfid-badge.unauthorized {
+    background-color: #D97706;
+}
+
+
+.rfid-badge.unknown {
+    background-color: #8E44AD;
+}
+
+
+.rfid-alert-status.sent {
+    background-color: #2980B9;
+}
+
+
+.rfid-alert-status.suppressed {
+    border: 1px solid rgba(
+        255,
+        255,
+        255,
+        0.2
+    );
+
+    opacity: 0.75;
+}
+
+
+.rfid-empty-state {
+    padding: 3rem;
+
+    text-align: center;
+
+    opacity: 0.7;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+
+    .rfid-stats-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .rfid-history-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .rfid-search-row {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+}
+
+
+@media (max-width: 550px) {
+
+    .rfid-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+}

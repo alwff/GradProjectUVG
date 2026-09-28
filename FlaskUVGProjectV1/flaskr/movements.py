@@ -1,3 +1,11 @@
+from datetime import (
+    datetime,
+    timedelta,
+    timezone
+)
+
+from sqlalchemy import or_
+
 from flask import (
     Blueprint,
     render_template,
@@ -16,7 +24,8 @@ from flaskr.models import (
     Movement,
     MovementItem,
     Specimen,
-    Request
+    Request,
+    RFIDDetectionEvent
 )
 
 bp = Blueprint(
@@ -188,6 +197,148 @@ def index():
     return render_template(
         "movements/index.html",
         movements=movements
+    )
+
+@bp.route("/rfid")
+@login_required
+def rfid_history():
+
+    search = request.args.get(
+        "search",
+        ""
+    ).strip()
+
+    classification = request.args.get(
+        "classification",
+        "all"
+    ).strip()
+
+    query = RFIDDetectionEvent.query
+
+    if search:
+
+        search_term = f"%{search}%"
+
+        query = (
+            query
+            .outerjoin(
+                Specimen,
+                RFIDDetectionEvent.specimen_id
+                == Specimen.id
+            )
+            .filter(
+                or_(
+                    RFIDDetectionEvent.epc.ilike(
+                        search_term
+                    ),
+                    Specimen.portal_code.ilike(
+                        search_term
+                    ),
+                    Specimen.scientific_name.ilike(
+                        search_term
+                    )
+                )
+            )
+        )
+
+    allowed_classifications = {
+        "authorized",
+        "unauthorized",
+        "unknown_epc"
+    }
+
+    if classification in allowed_classifications:
+
+        query = query.filter(
+            RFIDDetectionEvent.classification
+            == classification
+        )
+
+    events = (
+        query
+        .order_by(
+            RFIDDetectionEvent.detected_at.desc()
+        )
+        .all()
+    )
+
+    now = datetime.now(
+        timezone.utc
+    )
+
+    today_start = now.replace(
+        hour=0,
+        minute=0,
+        second=0,
+        microsecond=0
+    )
+
+    recent_limit = (
+        now - timedelta(hours=24)
+    )
+
+    detections_today = (
+        RFIDDetectionEvent.query
+        .filter(
+            RFIDDetectionEvent.detected_at
+            >= today_start
+        )
+        .count()
+    )
+
+    unauthorized_today = (
+        RFIDDetectionEvent.query
+        .filter(
+            RFIDDetectionEvent.detected_at
+            >= today_start,
+            RFIDDetectionEvent.classification
+            == "unauthorized"
+        )
+        .count()
+    )
+
+    unknown_today = (
+        RFIDDetectionEvent.query
+        .filter(
+            RFIDDetectionEvent.detected_at
+            >= today_start,
+            RFIDDetectionEvent.classification
+            == "unknown_epc"
+        )
+        .count()
+    )
+
+    alerts_today = (
+        RFIDDetectionEvent.query
+        .filter(
+            RFIDDetectionEvent.alert_sent.is_(True),
+            RFIDDetectionEvent.alert_sent_at
+            >= today_start
+        )
+        .count()
+    )
+
+    recent_unauthorized = (
+        RFIDDetectionEvent.query
+        .filter(
+            RFIDDetectionEvent.detected_at
+            >= recent_limit,
+            RFIDDetectionEvent.classification
+            == "unauthorized"
+        )
+        .count()
+    )
+
+    return render_template(
+        "movements/rfid_history.html",
+        events=events,
+        search=search,
+        classification=classification,
+        detections_today=detections_today,
+        unauthorized_today=unauthorized_today,
+        unknown_today=unknown_today,
+        alerts_today=alerts_today,
+        recent_unauthorized=recent_unauthorized
     )
 
 @bp.route(

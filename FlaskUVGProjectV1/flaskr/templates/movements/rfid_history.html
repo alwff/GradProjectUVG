@@ -1,0 +1,406 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Historial de Movimientos RFID
+{% endblock %}
+
+{% block content %}
+
+<div class="rfid-history-page">
+
+    <div class="rfid-history-header">
+
+        <div>
+            <h1>Historial de Movimientos RFID</h1>
+
+            <p>
+                Registro de detecciones realizadas
+                en el punto de control RFID.
+            </p>
+        </div>
+
+        <a
+            class="action-button"
+            href="{{ url_for('movements.index') }}"
+        >
+            VOLVER A MOVIMIENTOS
+        </a>
+
+    </div>
+
+
+    <div class="rfid-stats-grid">
+
+        <div class="rfid-stat-card">
+
+            <span class="rfid-stat-label">
+                Detecciones hoy
+            </span>
+
+            <strong class="rfid-stat-value">
+                {{ detections_today }}
+            </strong>
+
+        </div>
+
+
+        <div class="rfid-stat-card">
+
+            <span class="rfid-stat-label">
+                No autorizadas hoy
+            </span>
+
+            <strong class="rfid-stat-value">
+                {{ unauthorized_today }}
+            </strong>
+
+        </div>
+
+
+        <div class="rfid-stat-card">
+
+            <span class="rfid-stat-label">
+                EPC desconocidos hoy
+            </span>
+
+            <strong class="rfid-stat-value">
+                {{ unknown_today }}
+            </strong>
+
+        </div>
+
+
+        <div class="rfid-stat-card">
+
+            <span class="rfid-stat-label">
+                Alertas enviadas hoy
+            </span>
+
+            <strong class="rfid-stat-value">
+                {{ alerts_today }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="rfid-recent-alert">
+
+        <strong>
+            ⚠ Detecciones RFID no autorizadas
+            en las últimas 24 horas:
+        </strong>
+
+        <span>
+            {{ recent_unauthorized }}
+        </span>
+
+    </div>
+
+
+    <div class="rfid-filter-card">
+
+        <form
+            method="get"
+            action="{{ url_for('movements.rfid_history') }}"
+            class="rfid-filter-form"
+        >
+
+            <div class="rfid-search-group">
+
+                <label for="search">
+                    Buscar espécimen o EPC
+                </label>
+
+                <div class="rfid-search-row">
+
+                    <input
+                        type="text"
+                        id="search"
+                        name="search"
+                        value="{{ search }}"
+                        placeholder="Código de Portal, nombre científico o EPC RFID"
+                    >
+
+                    <button
+                        type="submit"
+                        class="small-button rfid-search-button"
+                    >
+                        BUSCAR
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="rfid-classification-group">
+
+                <label>
+                    Resultado de la detección
+                </label>
+
+                <div class="rfid-filter-buttons">
+
+                    <a
+                        href="{{ url_for(
+                            'movements.rfid_history',
+                            search=search
+                        ) }}"
+                        class="rfid-filter-button
+                        {% if classification == 'all' %}
+                        active
+                        {% endif %}"
+                    >
+                        Todos
+                    </a>
+
+
+                    <a
+                        href="{{ url_for(
+                            'movements.rfid_history',
+                            search=search,
+                            classification='authorized'
+                        ) }}"
+                        class="rfid-filter-button
+                        {% if classification == 'authorized' %}
+                        active
+                        {% endif %}"
+                    >
+                        Autorizados
+                    </a>
+
+
+                    <a
+                        href="{{ url_for(
+                            'movements.rfid_history',
+                            search=search,
+                            classification='unauthorized'
+                        ) }}"
+                        class="rfid-filter-button
+                        {% if classification == 'unauthorized' %}
+                        active
+                        {% endif %}"
+                    >
+                        No autorizados
+                    </a>
+
+
+                    <a
+                        href="{{ url_for(
+                            'movements.rfid_history',
+                            search=search,
+                            classification='unknown_epc'
+                        ) }}"
+                        class="rfid-filter-button
+                        {% if classification == 'unknown_epc' %}
+                        active
+                        {% endif %}"
+                    >
+                        EPC desconocidos
+                    </a>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <div class="rfid-table-container">
+
+        <table class="rfid-history-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Fecha y hora
+                    </th>
+
+                    <th>
+                        Espécimen
+                    </th>
+
+                    <th>
+                        EPC RFID
+                    </th>
+
+                    <th>
+                        Resultado
+                    </th>
+
+                    <th>
+                        Motivo
+                    </th>
+
+                    <th>
+                        Alerta
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for event in events %}
+
+                <tr>
+
+                    <td>
+
+                        {{ event.detected_at.strftime(
+                            "%d/%m/%Y"
+                        ) }}
+
+                        <br>
+
+                        {{ event.detected_at.strftime(
+                            "%H:%M:%S"
+                        ) }}
+
+                    </td>
+
+
+                    <td>
+
+                        {% if event.specimen %}
+
+                        <strong>
+                            {{ event.specimen.portal_code }}
+                        </strong>
+
+                        <div class="rfid-specimen-name">
+                            {{ event.specimen.scientific_name }}
+                        </div>
+
+                        {% else %}
+
+                        <span class="rfid-unknown-specimen">
+                            No asociado
+                        </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td class="rfid-epc">
+                        {{ event.epc }}
+                    </td>
+
+
+                    <td>
+
+                        {% if event.classification == "authorized" %}
+
+                        <span class="rfid-badge authorized">
+                            Autorizado
+                        </span>
+
+                        {% elif event.classification == "unauthorized" %}
+
+                        <span class="rfid-badge unauthorized">
+                            No autorizado
+                        </span>
+
+                        {% elif event.classification == "unknown_epc" %}
+
+                        <span class="rfid-badge unknown">
+                            EPC desconocido
+                        </span>
+
+                        {% else %}
+
+                        {{ event.classification }}
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        {% if event.reason == "request" %}
+
+                        Movimiento autorizado por solicitud
+
+                        {% elif event.reason == "manual" %}
+
+                        Movimiento manual registrado
+
+                        {% elif event.reason == "no_active_exit" %}
+
+                        Sin salida vigente
+
+                        {% elif event.reason == "no_movement" %}
+
+                        Sin movimientos registrados
+
+                        {% elif event.reason == "unknown_epc" %}
+
+                        EPC no asociado a un espécimen
+
+                        {% else %}
+
+                        {{ event.reason }}
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        {% if event.alert_sent %}
+
+                        <span class="rfid-alert-status sent">
+                            Enviada
+                        </span>
+
+                        {% elif event.classification == "unauthorized" %}
+
+                        <span class="rfid-alert-status suppressed">
+                            No enviada
+                        </span>
+
+                        {% else %}
+
+                        —
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% else %}
+
+                <tr>
+
+                    <td
+                        colspan="6"
+                        class="rfid-empty-state"
+                    >
+                        No se encontraron detecciones RFID
+                        con los filtros seleccionados.
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}
