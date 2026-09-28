@@ -15,7 +15,7 @@
 
 <form
     method="get"
-    class="inventory-search-form"
+    class="inventory-filter-panel"
 >
 
     <div class="inventory-search-field">
@@ -24,23 +24,12 @@
             Buscar espécimen
         </label>
 
-        <div class="inventory-search-row">
-
-            <input
-                id="inventory-search"
-                name="search"
-                value="{{ search }}"
-                placeholder="Portal, catálogo, nombre científico, código de barras o EPC RFID"
-            >
-
-            <button
-                type="submit"
-                class="small-button"
-            >
-                BUSCAR
-            </button>
-
-        </div>
+        <input
+            id="inventory-search"
+            name="search"
+            value="{{ search }}"
+            placeholder="Portal, catálogo, nombre científico, código de barras o EPC RFID"
+        >
 
     </div>
 
@@ -159,7 +148,7 @@
             type="submit"
             class="small-button"
         >
-            APLICAR FILTROS
+            APLICAR
         </button>
 
         {% if search or family or collection or status %}
@@ -168,7 +157,7 @@
             class="small-button"
             href="{{ url_for('inventory.index') }}"
         >
-            LIMPIAR FILTROS
+            LIMPIAR
         </a>
 
         {% endif %}
