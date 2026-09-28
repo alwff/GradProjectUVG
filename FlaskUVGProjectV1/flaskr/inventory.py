@@ -163,14 +163,37 @@ def create():
     if request.method == "POST":
 
         specimen = Specimen(
-            portal_code=request.form["portal_code"],
-            catalog_number=request.form["catalog_number"],
-            scientific_name=request.form["scientific_name"],
-            taxon_family=request.form["taxon_family"],
-            collection=request.form["collection"],
-            rfid_epc=request.form["rfid_epc"],
-            barcode=request.form["barcode"],
-            description=request.form["description"]
+            portal_code=request.form[
+                "portal_code"
+            ].strip(),
+
+            catalog_number=request.form[
+                "catalog_number"
+            ].strip(),
+
+            scientific_name=request.form[
+                "scientific_name"
+            ].strip(),
+
+            taxon_family=request.form[
+                "taxon_family"
+            ].strip(),
+
+            collection=request.form[
+                "collection"
+            ].strip(),
+
+            rfid_epc=request.form[
+                "rfid_epc"
+            ].strip().upper(),
+
+            barcode=request.form[
+                "barcode"
+            ].strip(),
+
+            description=request.form[
+                "description"
+            ].strip()
         )
 
         db.session.add(specimen)
@@ -221,14 +244,46 @@ def edit(id):
 
     if request.method == "POST":
 
-        specimen.portal_code = request.form["portal_code"]
-        specimen.catalog_number = request.form["catalog_number"]
-        specimen.scientific_name = request.form["scientific_name"]
-        specimen.taxon_family = request.form["taxon_family"]
-        specimen.collection = request.form["collection"]
-        specimen.rfid_epc = request.form["rfid_epc"]
-        specimen.barcode = request.form["barcode"]
-        specimen.description = request.form["description"]
+        specimen.portal_code = (
+            request.form["portal_code"]
+            .strip()
+        )
+
+        specimen.catalog_number = (
+            request.form["catalog_number"]
+            .strip()
+        )
+
+        specimen.scientific_name = (
+            request.form["scientific_name"]
+            .strip()
+        )
+
+        specimen.taxon_family = (
+            request.form["taxon_family"]
+            .strip()
+        )
+
+        specimen.collection = (
+            request.form["collection"]
+            .strip()
+        )
+
+        specimen.rfid_epc = (
+            request.form["rfid_epc"]
+            .strip()
+            .upper()
+        )
+
+        specimen.barcode = (
+            request.form["barcode"]
+            .strip()
+        )
+
+        specimen.description = (
+            request.form["description"]
+            .strip()
+        )
 
         db.session.commit()
 
