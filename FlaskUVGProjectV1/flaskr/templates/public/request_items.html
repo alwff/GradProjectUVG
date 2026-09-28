@@ -93,20 +93,17 @@ Material Solicitado
 
         <form method="post">
 
-            <label for="portal-code">
-                Código Portal
+            <label for="specimen-search">
+                Buscar material
             </label>
 
             <div class="specimen-search-row">
 
                 <input
-                    id="portal-code"
-                    name="portal_code"
-                    value="{{
-                        selected_specimen.portal_code
-                        if selected_specimen
-                        else ''
-                    }}"
+                    id="specimen-search"
+                    name="search"
+                    value="{{ search }}"
+                    placeholder="Portal, catálogo, nombre científico, familia o colección"
                     required
                 >
 
@@ -123,6 +120,62 @@ Material Solicitado
 
         </form>
 
+        {% if search_results %}
+
+        <div class="specimen-search-results">
+
+            <h3>
+                Resultados
+            </h3>
+
+            {% for specimen in search_results %}
+
+            <div class="specimen-search-result-item">
+
+                <div class="specimen-search-result-info">
+
+                    <strong>
+                        {{ specimen.portal_code }}
+                    </strong>
+
+                    <span>
+                        {{ specimen.scientific_name }}
+                    </span>
+
+                    <small>
+                        {{ specimen.taxon_family or '—' }}
+                        ·
+                        {{ specimen.collection }}
+                    </small>
+
+                </div>
+
+                <form method="post">
+
+                    <input
+                        type="hidden"
+                        name="specimen_id"
+                        value="{{ specimen.id }}"
+                    >
+
+                    <button
+                        type="submit"
+                        name="action"
+                        value="select"
+                        class="small-button"
+                    >
+                        Seleccionar
+                    </button>
+
+                </form>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% endif %}
 
         {% if availability_error %}
 
@@ -200,8 +253,8 @@ Material Solicitado
 
                 <input
                     type="hidden"
-                    name="portal_code"
-                    value="{{ selected_specimen.portal_code }}"
+                    name="specimen_id"
+                    value="{{ selected_specimen.id }}"
                 >
 
                 <label for="specifications">
