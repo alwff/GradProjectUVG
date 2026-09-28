@@ -1,259 +1,133 @@
-{% extends 'base.html' %}
-
-{% block navbar %}{% endblock %}
-
-{% block title %}
-Exhibición Virtual
-{% endblock %}
-
-{% block content %}
-
-<!-- =========================================
-     LANDING
-     ========================================= -->
-
-<section class="exhibition-landing" id="exhibitionLanding">
-
-    <div class="exhibition-hero">
-
-        <p class="exhibition-eyebrow">
-            COLECCIONES UVG
-        </p>
-
-        <h1 class="exhibition-title">
-            Exhibición Virtual
-        </h1>
-
-        <p class="exhibition-description">
-            Explora especímenes de las Colecciones Biológicas
-            y Jardín Botánico de la Universidad del Valle de
-            Guatemala en un entorno virtual interactivo.
-        </p>
-
-        <button
-            type="button"
-            class="exhibition-enter-button"
-            id="enterExhibition"
-        >
-            EXPLORAR EXHIBICIÓN
-        </button>
-
-        <p class="exhibition-recommendation">
-            Experiencia optimizada para computadora con teclado y mouse.
-        </p>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================
-     LOADER
-     ========================================= -->
-
-<section class="exhibition-loader" id="exhibitionLoader">
-
-    <div class="exhibition-loader-content">
-
-        <img
-            src="{{ url_for('static', filename='exhibition/images/Splash.png') }}"
-            alt="Exhibición Virtual"
-            class="exhibition-splash"
-        >
-
-        <div class="exhibition-loading-info">
-
-            <span id="loadingText">
-                Cargando exhibición...
-            </span>
-
-            <span id="loadingPercentage">
-                0%
-            </span>
-
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity Web Player | Exhibition-V1.0</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+  </head>
+  <body>
+    <div id="unity-container" class="unity-desktop">
+      <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
+      <div id="unity-loading-bar">
+        <div id="unity-logo"></div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
         </div>
-
-        <div class="exhibition-progress-track">
-            <div
-                class="exhibition-progress-bar"
-                id="loadingBar"
-            ></div>
-        </div>
-
+      </div>
+      <div id="unity-warning"> </div>
+      <div id="unity-footer">
+        <div id="unity-logo-title-footer"></div>
+        <div id="unity-fullscreen-button"></div>
+        <div id="unity-build-title">Exhibition-V1.0</div>
+      </div>
     </div>
+    <script>
+      var canvas = document.querySelector("#unity-canvas");
+
+      // Shows a temporary message banner/ribbon for a few seconds, or
+      // a permanent error message on top of the canvas if type=='error'.
+      // If type=='warning', a yellow highlight color is used.
+      // Modify or remove this function to customize the visually presented
+      // way that non-critical warnings and error messages are presented to the
+      // user.
+      function unityShowBanner(msg, type) {
+        var warningBanner = document.querySelector("#unity-warning");
+        function updateBannerVisibility() {
+          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+        }
+        var div = document.createElement('div');
+        div.innerHTML = msg;
+        warningBanner.appendChild(div);
+        if (type == 'error') div.style = 'background: red; padding: 10px;';
+        else {
+          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+          setTimeout(function() {
+            warningBanner.removeChild(div);
+            updateBannerVisibility();
+          }, 5000);
+        }
+        updateBannerVisibility();
+      }
+
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/WebGL_Release_Test.loader.js";
+      var config = {
+        arguments: [],
+        dataUrl: buildUrl + "/WebGL_Release_Test.data.unityweb",
+        frameworkUrl: buildUrl + "/WebGL_Release_Test.framework.js.unityweb",
+        codeUrl: buildUrl + "/WebGL_Release_Test.wasm.unityweb",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "DefaultCompany",
+        productName: "Exhibition-V1.0",
+        productVersion: "0.1.0",
+        showBanner: unityShowBanner,
+        // errorHandler: function(err, url, line) {
+        //    alert("error " + err + " occurred at line " + line);
+        //    // Return 'true' if you handled this error and don't want Unity
+        //    // to process it further, 'false' otherwise.
+        //    return true;
+        // },
+      };
+
+      // By default, Unity keeps WebGL canvas render target size matched with
+      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
+      // Set this to false if you want to decouple this synchronization from
+      // happening inside the engine, and you would instead like to size up
+      // the canvas DOM size and WebGL render target sizes yourself.
+      // config.matchWebGLToCanvasSize = false;
+
+      // If you would like all file writes inside Unity Application.persistentDataPath
+      // directory to automatically persist so that the contents are remembered when
+      // the user revisits the site the next time, uncomment the following line:
+      // config.autoSyncPersistentDataPath = true;
+      // This autosyncing is currently not the default behavior to avoid regressing
+      // existing user projects that might rely on the earlier manual
+      // JS_FileSystem_Sync() behavior, but in future Unity version, this will be
+      // expected to change.
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        // Mobile device style: fill the whole browser client area with the game canvas:
+
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+        document.querySelector("#unity-container").className = "unity-mobile";
+        canvas.className = "unity-mobile";
+
+        // To lower canvas resolution on mobile devices to gain some
+        // performance, uncomment the following line:
+        // config.devicePixelRatio = 1;
+
+
+      } else {
+        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
+        canvas.style.width = "960px";
+        canvas.style.height = "600px";
+      }
+
+      document.querySelector("#unity-loading-bar").style.display = "block";
+
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = () => {
+        createUnityInstance(canvas, config, (progress) => {
+          document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
+              }).then((unityInstance) => {
+                document.querySelector("#unity-loading-bar").style.display = "none";
+                document.querySelector("#unity-fullscreen-button").onclick = () => {
+                  unityInstance.SetFullscreen(1);
+                };
+
+              }).catch((message) => {
+                alert(message);
+              });
+            };
 
-</section>
+      document.body.appendChild(script);
 
-
-<!-- =========================================
-     UNITY
-     ========================================= -->
-
-<section class="exhibition-player" id="exhibitionPlayer">
-
-    <div id="unity-container">
-
-        <canvas
-            id="unity-canvas"
-            tabindex="-1"
-        ></canvas>
-
-    </div>
-
-</section>
-
-
-<script>
-
-const landing = document.getElementById("exhibitionLanding");
-const loader = document.getElementById("exhibitionLoader");
-const player = document.getElementById("exhibitionPlayer");
-
-const enterButton = document.getElementById("enterExhibition");
-
-const loadingBar = document.getElementById("loadingBar");
-const loadingPercentage = document.getElementById("loadingPercentage");
-const loadingText = document.getElementById("loadingText");
-
-const canvas = document.getElementById("unity-canvas");
-
-let unityStarted = false;
-
-
-/* =========================================
-   INICIAR EXHIBICION
-   ========================================= */
-
-enterButton.addEventListener("click", function () {
-
-    if (unityStarted) {
-        return;
-    }
-
-    unityStarted = true;
-
-    landing.classList.add("is-hidden");
-    loader.classList.add("is-visible");
-
-    loadUnity();
-
-});
-
-
-/* =========================================
-   CARGAR UNITY
-   ========================================= */
-
-function loadUnity() {
-
-    const buildUrl =
-        "{{ url_for('static', filename='exhibition/Build') }}";
-
-    const loaderUrl =
-        buildUrl + "/Builds.loader.js";
-
-
-    const config = {
-
-        dataUrl: buildUrl + "/Builds.data.unityweb",
-        
-        frameworkUrl: buildUrl + "/Builds.framework.js.unityweb",
-
-        codeUrl: buildUrl + "/Builds.wasm.unityweb",
-
-        streamingAssetsUrl:
-            "StreamingAssets",
-
-        companyName:
-            "Universidad del Valle de Guatemala",
-
-        productName:
-            "Exhibición Virtual",
-
-        productVersion:
-            "1.0"
-
-    };
-
-
-    const script = document.createElement("script");
-
-    script.src = loaderUrl;
-
-
-    script.onload = function () {
-
-        createUnityInstance(
-            canvas,
-            config,
-
-            function (progress) {
-
-                const percentage =
-                    Math.round(progress * 100);
-
-                loadingBar.style.width =
-                    percentage + "%";
-
-                loadingPercentage.textContent =
-                    percentage + "%";
-
-            }
-
-        )
-        .then(function (unityInstance) {
-
-            loadingBar.style.width = "100%";
-            loadingPercentage.textContent = "100%";
-            loadingText.textContent = "Exhibición lista";
-
-            setTimeout(function () {
-
-                // Unity ya está listo detrás del splash.
-                player.classList.add("is-visible");
-
-                // Comenzar transición del splash.
-                loader.classList.remove("is-visible");
-                loader.classList.add("is-hidden");
-
-                // Dar foco cuando termine el fade.
-                setTimeout(function () {
-
-                    canvas.focus();
-
-                }, 650);
-
-            }, 450);
-
-        })
-        .catch(function (message) {
-
-            console.error(message);
-
-            loadingText.textContent =
-                "No fue posible cargar la exhibición.";
-
-            unityStarted = false;
-
-        });
-
-    };
-
-
-    script.onerror = function () {
-
-        loadingText.textContent =
-            "No fue posible cargar la exhibición.";
-
-        unityStarted = false;
-
-    };
-
-
-    document.body.appendChild(script);
-
-}
-
-</script>
-
-{% endblock %}
+    </script>
+  </body>
+</html>
