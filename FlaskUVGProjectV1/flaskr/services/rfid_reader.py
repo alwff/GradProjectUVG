@@ -42,7 +42,16 @@ def read_epc():
             response = reader.recv(4096)
 
         except socket.timeout:
+            print(
+                "DEBUG RFID: timeout sin respuesta"
+            )
             return None
+
+        print(
+            "DEBUG RFID:",
+            len(response),
+            response.hex(" ").upper()
+        )
 
         if len(response) < 22:
             return None
