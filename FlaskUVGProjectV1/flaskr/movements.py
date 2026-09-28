@@ -3,6 +3,8 @@ from datetime import (
     timezone
 )
 
+from zoneinfo import ZoneInfo
+
 from sqlalchemy import or_
 
 from flask import (
@@ -25,6 +27,10 @@ from flaskr.models import (
     Specimen,
     Request,
     RFIDDetectionEvent
+)
+
+GUATEMALA_TZ = ZoneInfo(
+    "America/Guatemala"
 )
 
 bp = Blueprint(
@@ -261,15 +267,20 @@ def rfid_history():
         .all()
     )
 
-    now = datetime.now(
-        timezone.utc
+    now_local = datetime.now(
+        GUATEMALA_TZ
     )
 
-    today_start = now.replace(
+    today_start_local = now_local.replace(
         hour=0,
         minute=0,
         second=0,
         microsecond=0
+    )
+
+    today_start = (
+        today_start_local
+        .astimezone(timezone.utc)
     )
 
     detections_today = (
@@ -313,6 +324,15 @@ def rfid_history():
         .count()
     )
 
+    def to_local_time(value):
+
+        if value is None:
+            return None
+
+        return value.astimezone(
+            GUATEMALA_TZ
+        )
+
     return render_template(
         "movements/rfid_history.html",
         events=events,
@@ -322,6 +342,7 @@ def rfid_history():
         unauthorized_today=unauthorized_today,
         unknown_today=unknown_today,
         alerts_today=alerts_today,
+        to_local_time=to_local_time
     )
 
 @bp.route(

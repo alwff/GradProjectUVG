@@ -233,13 +233,17 @@ Historial de Movimientos RFID
 
                     <td>
 
-                        {{ event.detected_at.strftime(
+                        {% set local_time = to_local_time(
+                            event.detected_at
+                        ) %}
+
+                        {{ local_time.strftime(
                             "%d/%m/%Y"
                         ) }}
 
                         <br>
 
-                        {{ event.detected_at.strftime(
+                        {{ local_time.strftime(
                             "%H:%M:%S"
                         ) }}
 
