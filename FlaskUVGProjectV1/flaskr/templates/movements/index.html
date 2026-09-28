@@ -104,24 +104,6 @@ Movimientos
                     Solicitud
                 </option>
 
-                <option
-                    value="barcode"
-                    {% if source == "barcode" %}
-                    selected
-                    {% endif %}
-                >
-                    Código de Barras
-                </option>
-
-                <option
-                    value="rfid"
-                    {% if source == "rfid" %}
-                    selected
-                    {% endif %}
-                >
-                    RFID
-                </option>
-
             </select>
 
         </div>
@@ -321,21 +303,9 @@ Movimientos
                     Manual
                 </span>
 
-                {% elif movement.source == "barcode" %}
-
-                <span class="source-badge-barcode">
-                    Código de Barras
-                </span>
-
-                {% elif movement.source == "rfid" %}
-
-                <span class="source-badge-rfid">
-                    RFID
-                </span>
-
                 {% elif movement.source == "request" %}
 
-                <span class="source-badge-manual">
+                <span class="source-badge-request">
                     Solicitud
                 </span>
 

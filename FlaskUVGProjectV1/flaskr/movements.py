@@ -268,9 +268,7 @@ def index():
 
     if source in (
         "manual",
-        "request",
-        "barcode",
-        "rfid"
+        "request"
     ):
 
         query = query.filter(
