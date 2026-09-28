@@ -10,7 +10,19 @@ from flaskr.extensions import db
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
+def login_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None:
+            flash("Debe iniciar sesión.")
+            return redirect(url_for('auth.login'))
+
+        return view(**kwargs)
+
+    return wrapped_view
+
 @bp.route('/register', methods=('GET', 'POST'))
+@login_required
 def register():
     if request.method == 'POST':
         username = request.form['username'].strip()
@@ -57,7 +69,9 @@ def register():
                     'No fue posible registrar el usuario.'
                 )
             else:
-                return redirect(url_for("auth.login"))
+                flash("Usuario registrado correctamente.")
+
+                return redirect(url_for("dashboard.index"))
 
         flash(error)
 
@@ -74,9 +88,9 @@ def login():
         error = None
 
         if user is None:
-            error = 'Incorrect username.'
+            error = 'Nombre de usuario incorrecto..'
         elif not check_password_hash(user.password, password):
-            error = 'Incorrect password.'
+            error = 'Contraseña incorrecta.'
 
         if error is None:
             session.clear()
@@ -107,13 +121,4 @@ def logout():
     )
 
 
-def login_required(view):
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        if g.user is None:
-            flash("Debe iniciar sesión.")
-            return redirect(url_for('auth.login'))
 
-        return view(**kwargs)
-
-    return wrapped_view
