@@ -35,9 +35,14 @@ def read_epc():
     ])
 
     try:
+
         reader.sendall(command)
 
-        response = reader.recv(4096)
+        try:
+            response = reader.recv(4096)
+
+        except socket.timeout:
+            return None
 
         if len(response) < 22:
             return None
@@ -47,12 +52,18 @@ def read_epc():
 
         pc = response[7:9]
 
-        epc_length = ((pc[0] >> 3) & 0x1F) * 2
+        epc_length = (
+            ((pc[0] >> 3) & 0x1F) * 2
+        )
 
         epc_start = 9
-        epc_end = epc_start + epc_length
+        epc_end = (
+            epc_start + epc_length
+        )
 
-        epc = response[epc_start:epc_end]
+        epc = response[
+            epc_start:epc_end
+        ]
 
         return epc.hex().upper()
 

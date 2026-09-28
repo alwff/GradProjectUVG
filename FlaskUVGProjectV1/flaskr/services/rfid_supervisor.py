@@ -5,10 +5,7 @@ from flaskr.models import (
 )
 from flaskr.services.rfid_reader import read_epc
 
-
-def identify_specimen():
-
-    epc = read_epc()
+def identify_specimen_by_epc(epc):
 
     if not epc:
         return None, "no_tag", None
@@ -21,6 +18,14 @@ def identify_specimen():
         return None, "unknown_epc", epc
 
     return specimen, "identified", epc
+
+def identify_specimen():
+
+    epc = read_epc()
+
+    return identify_specimen_by_epc(
+        epc
+    )
 
 def get_latest_movement(specimen):
 
@@ -68,10 +73,12 @@ def classify_detection(specimen):
         "movement": movement
     }
 
-def supervise_detection():
+def supervise_epc(epc):
 
     specimen, identification_status, epc = (
-        identify_specimen()
+        identify_specimen_by_epc(
+            epc
+        )
     )
 
     if identification_status == "no_tag":
@@ -103,3 +110,11 @@ def supervise_detection():
         "reason": classification["reason"],
         "movement": classification["movement"]
     }
+
+def supervise_detection():
+
+    epc = read_epc()
+
+    return supervise_epc(
+        epc
+    )
