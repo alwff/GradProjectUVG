@@ -1,16 +1,12 @@
 from datetime import datetime, timedelta
-from flaskr.services.email_service import send_email
 from flaskr.extensions import db
 from flaskr.models import (
     User,
     RFIDDetectionEvent
 )
+from flaskr.services.email_service import send_email
 
 RFID_ALERT_COOLDOWN_SECONDS = 300
-
-
-_last_alerts = {}
-
 
 def create_detection_event(result):
 
@@ -33,26 +29,28 @@ def create_detection_event(result):
 
 def can_send_alert(epc):
 
-    now = datetime.now()
-
-    last_alert = _last_alerts.get(epc)
-
-    if last_alert is None:
-        return True
-
-    cooldown = timedelta(
-        seconds=RFID_ALERT_COOLDOWN_SECONDS
+    cooldown_limit = (
+        datetime.now()
+        - timedelta(
+            seconds=RFID_ALERT_COOLDOWN_SECONDS
+        )
     )
 
-    if now - last_alert >= cooldown:
-        return True
+    recent_alert = (
+        RFIDDetectionEvent.query
+        .filter(
+            RFIDDetectionEvent.epc == epc,
+            RFIDDetectionEvent.alert_sent.is_(True),
+            RFIDDetectionEvent.alert_sent_at
+            >= cooldown_limit
+        )
+        .order_by(
+            RFIDDetectionEvent.alert_sent_at.desc()
+        )
+        .first()
+    )
 
-    return False
-
-
-def register_alert(epc):
-
-    _last_alerts[epc] = datetime.now()
+    return recent_alert is None
 
 def send_unauthorized_alert(
     result,
