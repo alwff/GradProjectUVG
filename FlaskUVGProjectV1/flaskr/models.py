@@ -320,7 +320,58 @@ class MovementItem(db.Model):
     specimen = db.relationship(
         "Specimen"
     )
-    
+
+class RFIDDetectionEvent(db.Model):
+
+    __tablename__ = "rfid_detection_events"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    epc = db.Column(
+        db.String(255),
+        nullable=False
+    )
+
+    specimen_id = db.Column(
+        db.Integer,
+        db.ForeignKey("specimens.id"),
+        nullable=True
+    )
+
+    specimen = db.relationship(
+        "Specimen"
+    )
+
+    classification = db.Column(
+        db.String(50),
+        nullable=False
+    )
+
+    reason = db.Column(
+        db.String(50),
+        nullable=False
+    )
+
+    detected_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        server_default=db.func.now()
+    )
+
+    alert_sent = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+
+    alert_sent_at = db.Column(
+        db.DateTime,
+        nullable=True
+    )
+
 class ExhibitionSlot(db.Model):
 
     __tablename__ = "exhibition_slots"
