@@ -18,33 +18,157 @@
     class="inventory-search-form"
 >
 
-    <label for="inventory-search">
-        Buscar espécimen
-    </label>
+    <div class="inventory-search-field">
 
-    <div class="inventory-search-row">
+        <label for="inventory-search">
+            Buscar espécimen
+        </label>
 
-        <input
-            id="inventory-search"
-            name="search"
-            value="{{ search }}"
-            placeholder="Código de portal, barras o UHF"
-        >
+        <div class="inventory-search-row">
+
+            <input
+                id="inventory-search"
+                name="search"
+                value="{{ search }}"
+                placeholder="Portal, catálogo, nombre científico, código de barras o EPC RFID"
+            >
+
+            <button
+                type="submit"
+                class="small-button"
+            >
+                BUSCAR
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="inventory-filter-grid">
+
+        <div class="inventory-filter-field">
+
+            <label for="family">
+                Familia
+            </label>
+
+            <select
+                id="family"
+                name="family"
+            >
+
+                <option value="">
+                    Todas
+                </option>
+
+                {% for option in families %}
+
+                <option
+                    value="{{ option }}"
+                    {% if family == option %}
+                    selected
+                    {% endif %}
+                >
+                    {{ option }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div class="inventory-filter-field">
+
+            <label for="collection">
+                Colección
+            </label>
+
+            <select
+                id="collection"
+                name="collection"
+            >
+
+                <option value="">
+                    Todas
+                </option>
+
+                {% for option in collections %}
+
+                <option
+                    value="{{ option }}"
+                    {% if collection == option %}
+                    selected
+                    {% endif %}
+                >
+                    {{ option }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div class="inventory-filter-field">
+
+            <label for="status">
+                Estado
+            </label>
+
+            <select
+                id="status"
+                name="status"
+            >
+
+                <option value="">
+                    Todos
+                </option>
+
+                <option
+                    value="available"
+                    {% if status == "available" %}
+                    selected
+                    {% endif %}
+                >
+                    Disponible
+                </option>
+
+                <option
+                    value="loaned"
+                    {% if status == "loaned" %}
+                    selected
+                    {% endif %}
+                >
+                    Prestado
+                </option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+
+    <div class="inventory-filter-actions">
 
         <button
             type="submit"
             class="small-button"
         >
-            Buscar
+            APLICAR FILTROS
         </button>
 
-        {% if search %}
+        {% if search or family or collection or status %}
 
         <a
             class="small-button"
             href="{{ url_for('inventory.index') }}"
         >
-            LIMPIAR
+            LIMPIAR FILTROS
         </a>
 
         {% endif %}

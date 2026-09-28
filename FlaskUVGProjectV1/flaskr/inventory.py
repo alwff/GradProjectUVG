@@ -29,32 +29,128 @@ def index():
         ""
     ).strip()
 
+    family = request.args.get(
+        "family",
+        ""
+    ).strip()
+
+    collection = request.args.get(
+        "collection",
+        ""
+    ).strip()
+
+    status = request.args.get(
+        "status",
+        ""
+    ).strip()
+
     query = Specimen.query
 
     if search:
 
+        search_term = f"%{search}%"
+
         query = query.filter(
             or_(
                 Specimen.portal_code.ilike(
-                    f"%{search}%"
+                    search_term
+                ),
+                Specimen.catalog_number.ilike(
+                    search_term
+                ),
+                Specimen.scientific_name.ilike(
+                    search_term
                 ),
                 Specimen.barcode.ilike(
-                    f"%{search}%"
+                    search_term
                 ),
                 Specimen.rfid_epc.ilike(
-                    f"%{search}%"
+                    search_term
                 )
             )
         )
 
-    specimens = query.order_by(
-        Specimen.portal_code
-    ).all()
+    if family:
+
+        query = query.filter(
+            Specimen.taxon_family
+            == family
+        )
+
+    if collection:
+
+        query = query.filter(
+            Specimen.collection
+            == collection
+        )
+
+    if status in (
+        "available",
+        "loaned"
+    ):
+
+        query = query.filter(
+            Specimen.status
+            == status
+        )
+
+    specimens = (
+        query
+        .order_by(
+            Specimen.portal_code
+        )
+        .all()
+    )
+
+    families = (
+        db.session.query(
+            Specimen.taxon_family
+        )
+        .filter(
+            Specimen.taxon_family.isnot(None),
+            Specimen.taxon_family != ""
+        )
+        .distinct()
+        .order_by(
+            Specimen.taxon_family
+        )
+        .all()
+    )
+
+    collections = (
+        db.session.query(
+            Specimen.collection
+        )
+        .filter(
+            Specimen.collection.isnot(None),
+            Specimen.collection != ""
+        )
+        .distinct()
+        .order_by(
+            Specimen.collection
+        )
+        .all()
+    )
+
+    families = [
+        value[0]
+        for value in families
+    ]
+
+    collections = [
+        value[0]
+        for value in collections
+    ]
 
     return render_template(
         "inventory/index.html",
         specimens=specimens,
-        search=search
+        search=search,
+        family=family,
+        collection=collection,
+        status=status,
+        families=families,
+        collections=collections
     )
 
 @bp.route("/create", methods=("GET", "POST"))
