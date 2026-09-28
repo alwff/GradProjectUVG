@@ -786,6 +786,118 @@ tr:hover {
     white-space: nowrap;
 }
 
+
+/* =========================================
+   BUSQUEDA PUBLICA DE ESPECIMENES
+   ========================================= */
+
+.specimen-search-results {
+    display: flex;
+    flex-direction: column;
+
+    gap: 0.7rem;
+
+    margin-top: 1.25rem;
+}
+
+
+.specimen-search-results h3 {
+    margin-bottom: 0.3rem;
+}
+
+
+.specimen-search-result-item {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 1.5rem;
+
+    padding: 1rem 1.2rem;
+
+    border: 1px solid rgba(
+        255,
+        255,
+        255,
+        0.12
+    );
+
+    border-radius: 10px;
+
+    background-color: rgba(
+        255,
+        255,
+        255,
+        0.03
+    );
+}
+
+
+.specimen-search-result-info {
+    display: flex;
+    flex-direction: column;
+
+    gap: 0.25rem;
+
+    min-width: 0;
+}
+
+
+.specimen-search-result-info strong {
+    color: white;
+
+    font-size: 1rem;
+}
+
+
+.specimen-search-result-info span {
+    font-size: 0.95rem;
+}
+
+
+.specimen-search-result-info small {
+    opacity: 0.7;
+
+    font-size: 0.85rem;
+}
+
+
+.specimen-search-result-item form {
+    width: auto;
+
+    flex-shrink: 0;
+}
+
+
+.specimen-search-result-item .small-button {
+    border: none;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+}
+
+
+@media (max-width: 650px) {
+
+    .specimen-search-result-item {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+
+    .specimen-search-result-item form {
+        width: 100%;
+    }
+
+
+    .specimen-search-result-item .small-button {
+        width: 100%;
+    }
+
+}
+
 .specimen-request-result {
     margin-top: 1.5rem;
     padding: 1.5rem;
