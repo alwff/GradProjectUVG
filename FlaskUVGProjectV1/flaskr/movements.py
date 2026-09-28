@@ -195,13 +195,172 @@ def update_request_return_status(
 @login_required
 def index():
 
-    movements = Movement.query.order_by(
-        Movement.created_at.desc()
-    ).all()
+    search = request.args.get(
+        "search",
+        ""
+    ).strip()
+
+    movement_type = request.args.get(
+        "type",
+        ""
+    ).strip()
+
+    source = request.args.get(
+        "source",
+        ""
+    ).strip()
+
+    date_from = request.args.get(
+        "date_from",
+        ""
+    ).strip()
+
+    date_to = request.args.get(
+        "date_to",
+        ""
+    ).strip()
+
+    query = Movement.query
+
+    if search:
+
+        search_term = f"%{search}%"
+
+        query = (
+            query
+            .join(MovementItem)
+            .join(
+                Specimen,
+                MovementItem.specimen_id
+                == Specimen.id
+            )
+            .filter(
+                or_(
+                    Specimen.portal_code.ilike(
+                        search_term
+                    ),
+                    Specimen.catalog_number.ilike(
+                        search_term
+                    ),
+                    Specimen.scientific_name.ilike(
+                        search_term
+                    ),
+                    Specimen.barcode.ilike(
+                        search_term
+                    ),
+                    Specimen.rfid_epc.ilike(
+                        search_term
+                    )
+                )
+            )
+            .distinct()
+        )
+
+    if movement_type in (
+        "entry",
+        "exit"
+    ):
+
+        query = query.filter(
+            Movement.movement_type
+            == movement_type
+        )
+
+    if source in (
+        "manual",
+        "request",
+        "barcode",
+        "rfid"
+    ):
+
+        query = query.filter(
+            Movement.source
+            == source
+        )
+
+    if date_from:
+
+        try:
+
+            start_local = datetime.strptime(
+                date_from,
+                "%Y-%m-%d"
+            ).replace(
+                tzinfo=GUATEMALA_TZ
+            )
+
+            start_utc = start_local.astimezone(
+                timezone.utc
+            )
+
+            query = query.filter(
+                Movement.created_at
+                >= start_utc
+            )
+
+        except ValueError:
+            pass
+
+    if date_to:
+
+        try:
+
+            end_local = datetime.strptime(
+                date_to,
+                "%Y-%m-%d"
+            ).replace(
+                hour=23,
+                minute=59,
+                second=59,
+                microsecond=999999,
+                tzinfo=GUATEMALA_TZ
+            )
+
+            end_utc = end_local.astimezone(
+                timezone.utc
+            )
+
+            query = query.filter(
+                Movement.created_at
+                <= end_utc
+            )
+
+        except ValueError:
+            pass
+
+    movements = (
+        query
+        .order_by(
+            Movement.created_at.desc(),
+            Movement.id.desc()
+        )
+        .all()
+    )
+
+    def to_local_time(value):
+
+        if value is None:
+            return None
+
+        if value.tzinfo is None:
+
+            value = value.replace(
+                tzinfo=timezone.utc
+            )
+
+        return value.astimezone(
+            GUATEMALA_TZ
+        )
 
     return render_template(
         "movements/index.html",
-        movements=movements
+        movements=movements,
+        search=search,
+        movement_type=movement_type,
+        source=source,
+        date_from=date_from,
+        date_to=date_to,
+        to_local_time=to_local_time
     )
 
 @bp.route("/rfid")

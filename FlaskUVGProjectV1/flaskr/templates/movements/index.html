@@ -10,6 +10,187 @@ Movimientos
     Historial de Movimientos
 </h1>
 
+<form
+    method="get"
+    class="movement-filter-panel"
+>
+
+    <div class="movement-search-field">
+
+        <label for="movement-search">
+            Buscar espécimen
+        </label>
+
+        <input
+            id="movement-search"
+            name="search"
+            value="{{ search }}"
+            placeholder="Portal, catálogo, nombre científico, código de barras o EPC RFID"
+        >
+
+    </div>
+
+
+    <div class="movement-filter-grid">
+
+        <div class="movement-filter-field">
+
+            <label for="movement-type">
+                Tipo
+            </label>
+
+            <select
+                id="movement-type"
+                name="type"
+            >
+
+                <option value="">
+                    Todos
+                </option>
+
+                <option
+                    value="entry"
+                    {% if movement_type == "entry" %}
+                    selected
+                    {% endif %}
+                >
+                    Entrada
+                </option>
+
+                <option
+                    value="exit"
+                    {% if movement_type == "exit" %}
+                    selected
+                    {% endif %}
+                >
+                    Salida
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="movement-filter-field">
+
+            <label for="movement-source">
+                Origen
+            </label>
+
+            <select
+                id="movement-source"
+                name="source"
+            >
+
+                <option value="">
+                    Todos
+                </option>
+
+                <option
+                    value="manual"
+                    {% if source == "manual" %}
+                    selected
+                    {% endif %}
+                >
+                    Manual
+                </option>
+
+                <option
+                    value="request"
+                    {% if source == "request" %}
+                    selected
+                    {% endif %}
+                >
+                    Solicitud
+                </option>
+
+                <option
+                    value="barcode"
+                    {% if source == "barcode" %}
+                    selected
+                    {% endif %}
+                >
+                    Código de Barras
+                </option>
+
+                <option
+                    value="rfid"
+                    {% if source == "rfid" %}
+                    selected
+                    {% endif %}
+                >
+                    RFID
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="movement-filter-field">
+
+            <label for="date-from">
+                Desde
+            </label>
+
+            <input
+                type="date"
+                id="date-from"
+                name="date_from"
+                value="{{ date_from }}"
+            >
+
+        </div>
+
+
+        <div class="movement-filter-field">
+
+            <label for="date-to">
+                Hasta
+            </label>
+
+            <input
+                type="date"
+                id="date-to"
+                name="date_to"
+                value="{{ date_to }}"
+            >
+
+        </div>
+
+    </div>
+
+
+    <div class="movement-filter-actions">
+
+        <button
+            type="submit"
+            class="small-button"
+        >
+            Buscar
+        </button>
+
+        {% if
+            search
+            or movement_type
+            or source
+            or date_from
+            or date_to
+        %}
+
+        <a
+            class="small-button"
+            href="{{ url_for('movements.index') }}"
+        >
+            Limpiar
+        </a>
+
+        {% endif %}
+
+    </div>
+
+</form>
+
 <table>
 
     <thead>
@@ -67,13 +248,17 @@ Movimientos
 
             <td>
 
-                {{ movement.created_at.strftime(
+                {% set local_time = to_local_time(
+                    movement.created_at
+                ) %}
+
+                {{ local_time.strftime(
                     "%d/%m/%Y"
                 ) }}
 
                 <br>
 
-                {{ movement.created_at.strftime(
+                {{ local_time.strftime(
                     "%H:%M"
                 ) }}
 
