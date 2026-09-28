@@ -73,17 +73,18 @@ def index():
     if family:
 
         query = query.filter(
-            Specimen.taxon_family
-            == family
+            Specimen.taxon_family.ilike(
+                family
+            )
         )
 
     if collection:
 
         query = query.filter(
-            Specimen.collection
-            == collection
+            Specimen.collection.ilike(
+                collection
+            )
         )
-
     if status in (
         "available",
         "loaned"
@@ -133,13 +134,15 @@ def index():
     )
 
     families = [
-        value[0]
+        value[0].strip()
         for value in families
+        if value[0]
     ]
 
     collections = [
-        value[0]
+        value[0].strip()
         for value in collections
+        if value[0]
     ]
 
     return render_template(
