@@ -134,7 +134,7 @@ Solicitud
             </th>
 
             <th>
-                Verificación Actual
+                Estado Actual
             </th>
 
             <th>
@@ -189,16 +189,60 @@ Solicitud
 
             <td>
 
-                {% if item_checks[item.id].available %}
+                {% if item.item_status == "pending" %}
 
-                <span class="availability-available">
-                    ✓ Disponible
-                </span>
+                    {% if item_checks[item.id].available %}
 
-                {% else %}
+                    <span class="availability-available">
+                        ✓ Disponible para aprobar
+                    </span>
 
-                <span class="availability-unavailable">
-                    ✕ No disponible
+                    {% else %}
+
+                    <span class="availability-unavailable">
+                        ✕ Conflicto de disponibilidad
+                    </span>
+
+                    {% endif %}
+
+
+                {% elif item.item_status == "approved" %}
+
+                    {% if item_movement_status[item.id] == "delivered" %}
+
+                    <span class="specimen-status-loaned">
+                        Prestado
+                    </span>
+
+                    {% elif item_movement_status[item.id] == "returned" %}
+
+                    <span class="specimen-status-available">
+                        Disponible
+                    </span>
+
+                    {% else %}
+
+                        {% if item.specimen.status == "available" %}
+
+                        <span class="specimen-status-available">
+                            Disponible
+                        </span>
+
+                        {% else %}
+
+                        <span class="specimen-status-loaned">
+                            Prestado
+                        </span>
+
+                        {% endif %}
+
+                    {% endif %}
+
+
+                {% elif item.item_status == "rejected" %}
+
+                <span>
+                    —
                 </span>
 
                 {% endif %}
