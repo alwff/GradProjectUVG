@@ -27,12 +27,8 @@ echo
 
 sudo -u postgres pg_dump \
     --format=custom \
-    --file="$BACKUP_FILE" \
-    "$DATABASE_NAME"
-
-sudo chown \
-    "$(id -un):$(id -gn)" \
-    "$BACKUP_FILE"
+    "$DATABASE_NAME" \
+    > "$BACKUP_FILE"
 
 chmod 600 "$BACKUP_FILE"
 
