@@ -138,6 +138,34 @@ def detail(id):
 
     item_checks = {}
     item_movement_status = {}
+    request_movements = (
+        db.session.query(
+            Movement.movement_type,
+            MovementItem.specimen_id
+        )
+        .join(
+            MovementItem,
+            MovementItem.movement_id == Movement.id
+        )
+        .filter(
+            Movement.request_id == request_record.id
+        )
+        .all()
+    )
+
+    delivered_specimen_ids = {
+        specimen_id
+        for movement_type, specimen_id
+        in request_movements
+        if movement_type == "exit"
+    }
+
+    returned_specimen_ids = {
+        specimen_id
+        for movement_type, specimen_id
+        in request_movements
+        if movement_type == "entry"
+    }
 
     for item in request_record.items:
 
@@ -155,27 +183,13 @@ def detail(id):
         }
 
         has_exit = (
-            Movement.query
-            .join(MovementItem)
-            .filter(
-                Movement.request_id == request_record.id,
-                Movement.movement_type == "exit",
-                MovementItem.specimen_id == item.specimen_id
-            )
-            .first()
-            is not None
+            item.specimen_id
+            in delivered_specimen_ids
         )
 
         has_entry = (
-            Movement.query
-            .join(MovementItem)
-            .filter(
-                Movement.request_id == request_record.id,
-                Movement.movement_type == "entry",
-                MovementItem.specimen_id == item.specimen_id
-            )
-            .first()
-            is not None
+            item.specimen_id
+            in returned_specimen_ids
         )
 
 
