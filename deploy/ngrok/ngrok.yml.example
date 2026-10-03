@@ -1,0 +1,10 @@
+version: "3"
+
+agent:
+  authtoken: REEMPLAZAR_CON_AUTHTOKEN_REAL
+
+tunnels:
+  flask:
+    proto: http
+    addr: 8000
+    domain: relish-angriness-submarine.ngrok-free.dev

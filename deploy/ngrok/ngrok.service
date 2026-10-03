@@ -1,0 +1,16 @@
+[Unit]
+Description=Ngrok Tunnel
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=uvg-grad
+WorkingDirectory=/home/uvg-grad
+
+ExecStart=/usr/local/bin/ngrok start flask
+
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
