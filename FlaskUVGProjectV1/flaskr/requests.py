@@ -197,13 +197,16 @@ def detail(id):
         ] = movement_status
         
     has_pending_delivery = any(
-        status == "reserved"
-        for status in item_movement_status.values()
+        item.item_status == "approved"
+        and item_movement_status[item.id] == "reserved"
+        and item.specimen.status == "available"
+        for item in request_record.items
     )
 
     has_pending_return = any(
-        status == "delivered"
-        for status in item_movement_status.values()
+        item.item_status == "approved"
+        and item_movement_status[item.id] == "delivered"
+        for item in request_record.items
     )
 
     return render_template(
