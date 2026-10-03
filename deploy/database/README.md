@@ -21,6 +21,7 @@ En ella se ejecutan:
 - PostgreSQL
 - Worker de supervisión RFID
 - Unity WebGL
+- ngrok
 - Servicios systemd
 
 La conexión física del lector RFID utiliza una interfaz Ethernet dedicada.
@@ -37,7 +38,8 @@ Laptop Ubuntu
 ├── Flask / Gunicorn
 ├── PostgreSQL
 ├── Worker RFID
-└── Unity WebGL
+├── Unity WebGL
+└── ngrok
    |
    | Ethernet directo
    | 192.168.1.23/24
@@ -53,7 +55,7 @@ con el lector RFID permanece separada de la conexión utilizada para acceder a
 Internet.
 
 El acceso a Internet se realiza mediante Wi-Fi o un punto de acceso móvil y
-se utiliza para servicios externos como Resend y ngrok.
+se utiliza para servicios externos como Resend, ngrok y GitHub.
 
 ---
 
@@ -68,6 +70,7 @@ La estructura actual es:
 deploy/
 ├── database/
 │   ├── backup-database.sh
+│   ├── copy-backup-to-usb.sh
 │   └── restore-database.sh
 │
 ├── env/
@@ -75,6 +78,11 @@ deploy/
 │
 ├── network/
 │   └── setup-rfid-network.sh
+│
+├── ngrok/
+│   ├── install-ngrok-service.sh
+│   ├── ngrok.service
+│   └── ngrok.yml.example
 │
 ├── systemd/
 │   ├── install-services.sh
@@ -173,26 +181,26 @@ pérdida de paquetes.
 La nueva máquina debe utilizar Ubuntu y disponer, como mínimo, de:
 
 - Git
-- Python 3
+- Python 3.14 o una versión compatible con el proyecto
 - soporte para entornos virtuales de Python
 - PostgreSQL
 - herramientas cliente de PostgreSQL
 - NetworkManager
 - acceso a Internet cuando se requieran servicios externos
 
-Clonar el repositorio:
+### Clonar el repositorio
 
 ```bash
 git clone https://github.com/alwff/GradProjectUVG.git
 ```
-
-### Preparar el entorno virtual de Python
 
 Ingresar al directorio de la aplicación:
 
 ```bash
 cd GradProjectUVG/FlaskUVGProjectV1
 ```
+
+### Preparar el entorno virtual de Python
 
 Crear el entorno virtual:
 
@@ -212,7 +220,7 @@ Actualizar `pip`:
 python -m pip install --upgrade pip
 ```
 
-Instalar las dependencias del proyecto:
+Instalar las dependencias:
 
 ```bash
 pip install -r requirements.txt
@@ -224,7 +232,7 @@ Instalar UVG Collections en modo editable:
 pip install -e .
 ```
 
-La instalación puede comprobarse mediante:
+Comprobar la instalación:
 
 ```bash
 pip list --editable
@@ -239,129 +247,6 @@ se encuentra declarada en `pyproject.toml` mediante:
 ```toml
 [tool.flit.module]
 name = "flaskr"
-```
-
-### Instalar y preparar PostgreSQL
-
-Instalar PostgreSQL y sus herramientas cliente utilizando los paquetes
-correspondientes de Ubuntu.
-
-Comprobar la instalación mediante:
-
-```bash
-psql --version
-pg_dump --version
-pg_restore --version
-```
-
-La instalación utilizada durante el desarrollo emplea PostgreSQL 18.
-
-El sistema utiliza actualmente el rol administrativo `postgres` para la
-conexión local de Flask con la base de datos.
-
-La configuración utilizada por la aplicación corresponde conceptualmente a:
-
-```
-Usuario: postgres
-Host: localhost
-Puerto: 5432
-Base de datos: uvg_collections
-```
-
-La contraseña del usuario `postgres` no debe almacenarse en Git.
-
-Para asignar o modificar la contraseña del rol `postgres`, ingresar a
-PostgreSQL:
-
-```bash
-sudo -u postgres psql
-```
-
-Dentro de PostgreSQL ejecutar:
-
-```sql
-\password postgres
-```
-
-PostgreSQL solicitará la nueva contraseña sin necesidad de escribirla
-directamente dentro del comando.
-
-Salir mediante:
-
-```sql
-\q
-```
-
-La variable `DATABASE_URL` almacenada en `/etc/uvgcollections.env` debe
-utilizar la misma contraseña configurada para el rol `postgres`.
-
-Su estructura es:
-
-```
-postgresql://postgres:<CONTRASEÑA>@localhost:5432/uvg_collections
-```
-
-No copiar una contraseña real al README ni al repositorio.
-
-### Crear una base vacía
-
-Si se realiza una instalación nueva sin restaurar inmediatamente un respaldo,
-la base puede crearse mediante:
-
-```bash
-sudo -u postgres createdb uvg_collections
-```
-
-Para comprobar su existencia:
-
-```bash
-sudo -u postgres psql -lqt | grep uvg_collections
-```
-
-### Recuperar una instalación existente
-
-Si existe un respaldo de una instalación anterior, copiar el archivo `.dump`
-a la carpeta local `backups/`.
-
-Posteriormente utilizar:
-
-```bash
-sudo ./deploy/database/restore-database.sh backups/<archivo>.dump
-```
-
-El script crea nuevamente `uvg_collections` y restaura su estructura y datos.
-
-Debido a que el respaldo y la restauración se realizan utilizando el rol
-`postgres`, los objetos restaurados quedan disponibles para la misma cuenta
-utilizada actualmente por Flask.
-
-### Verificar la conexión de Flask
-
-Cargar temporalmente las variables de entorno:
-
-```bash
-set -a
-source /etc/uvgcollections.env
-set +a
-```
-
-Ingresar al directorio de la aplicación:
-
-```bash
-cd ~/GradProjectUVG/FlaskUVGProjectV1
-source venv/bin/activate
-```
-
-Comprobar la conexión realizando una consulta mediante SQLAlchemy:
-
-```bash
-python -c "from flaskr import create_app; from flaskr.models import User; app=create_app(); ctx=app.app_context(); ctx.push(); print('PostgreSQL OK, usuarios:', User.query.count()); ctx.pop()"
-```
-
-Si la conexión es correcta se mostrará:
-
-```
-PostgreSQL OK, usuarios: <cantidad>
 ```
 
 ### Comprobar la aplicación manualmente
@@ -392,14 +277,122 @@ Import OK
 Los servicios systemd no requieren ejecutar manualmente `source`, ya que
 cargan `/etc/uvgcollections.env` mediante `EnvironmentFile`.
 
-Ingresar al proyecto:
+### Instalar y preparar PostgreSQL
+
+Instalar PostgreSQL y sus herramientas cliente utilizando los paquetes
+correspondientes de Ubuntu.
+
+Comprobar la instalación mediante:
 
 ```bash
-cd GradProjectUVG
+psql --version
+pg_dump --version
+pg_restore --version
 ```
 
-La instalación de las dependencias de Python y la preparación del entorno
-virtual deben realizarse antes de instalar los servicios systemd.
+La instalación utilizada durante el desarrollo emplea PostgreSQL 18.
+
+El sistema utiliza actualmente el rol administrativo `postgres` para la
+conexión local de Flask con la base de datos.
+
+La configuración corresponde conceptualmente a:
+
+```
+Usuario: postgres
+Host: localhost
+Puerto: 5432
+Base de datos: uvg_collections
+```
+
+La contraseña del usuario `postgres` no debe almacenarse en Git.
+
+Para asignar o modificar la contraseña:
+
+```bash
+sudo -u postgres psql
+```
+
+Dentro de PostgreSQL:
+
+```sql
+\password postgres
+```
+
+PostgreSQL solicitará la nueva contraseña sin necesidad de escribirla
+directamente dentro del comando.
+
+Salir mediante:
+
+```sql
+\q
+```
+
+La variable `DATABASE_URL` almacenada en `/etc/uvgcollections.env` debe
+utilizar la misma contraseña configurada para el rol `postgres`.
+
+Su estructura es:
+
+```
+postgresql://postgres:<CONTRASEÑA>@localhost:5432/uvg_collections
+```
+
+No copiar una contraseña real al README ni al repositorio.
+
+### Crear una base vacía
+
+Si se realiza una instalación nueva sin restaurar inmediatamente un respaldo:
+
+```bash
+sudo -u postgres createdb uvg_collections
+```
+
+Comprobar su existencia:
+
+```bash
+sudo -u postgres psql -lqt | grep uvg_collections
+```
+
+### Recuperar una instalación existente
+
+Si existe un respaldo de una instalación anterior, copiar el archivo `.dump`
+a `backups/`.
+
+Posteriormente utilizar:
+
+```bash
+sudo ./deploy/database/restore-database.sh backups/<archivo>.dump
+```
+
+El script crea nuevamente `uvg_collections` y restaura su estructura y datos.
+
+### Verificar la conexión de Flask con PostgreSQL
+
+Cargar las variables:
+
+```bash
+set -a
+source /etc/uvgcollections.env
+set +a
+```
+
+Activar el entorno virtual:
+
+```bash
+cd ~/GradProjectUVG/FlaskUVGProjectV1
+source venv/bin/activate
+```
+
+Comprobar la conexión:
+
+```bash
+python -c "from flaskr import create_app; from flaskr.models import User; app=create_app(); ctx=app.app_context(); ctx.push(); print('PostgreSQL OK, usuarios:', User.query.count()); ctx.pop()"
+```
+
+La salida esperada tiene la forma:
+
+```
+PostgreSQL OK, usuarios: <cantidad>
+```
 
 ---
 
@@ -408,14 +401,15 @@ virtual deben realizarse antes de instalar los servicios systemd.
 Las credenciales y claves privadas utilizadas por el sistema no deben
 almacenarse directamente en el repositorio.
 
-El archivo de referencia se encuentra en
-`deploy/env/uvgcollections.env.example`.
+El archivo de referencia se encuentra en:
 
-La configuración real del servidor debe almacenarse en:
+`deploy/env/uvgcollections.env.example`
+
+La configuración real debe almacenarse en:
 
 `/etc/uvgcollections.env`
 
-El archivo debe contener:
+El archivo contiene:
 
 ```
 DATABASE_URL=
@@ -426,16 +420,12 @@ RESEND_API_KEY=
 
 Las variables tienen las siguientes funciones:
 
-- `DATABASE_URL`: contiene la cadena de conexión utilizada por Flask para
-  acceder a PostgreSQL.
-- `SECRET_KEY`: contiene la clave utilizada por Flask para la gestión segura
-  de sesiones.
-- `MASTER_DELETE_PASSWORD`: contiene la contraseña maestra utilizada por las
-  operaciones protegidas correspondientes.
-- `RESEND_API_KEY`: contiene la credencial utilizada para el envío de correos
-  mediante Resend.
-
-Los valores reales deben configurarse únicamente en el servidor.
+- `DATABASE_URL`: conexión utilizada por Flask para acceder a PostgreSQL.
+- `SECRET_KEY`: clave utilizada por Flask para la gestión segura de sesiones.
+- `MASTER_DELETE_PASSWORD`: contraseña maestra utilizada por las operaciones
+  protegidas correspondientes.
+- `RESEND_API_KEY`: credencial utilizada para el envío de correos mediante
+  Resend.
 
 > **Nunca deben copiarse las credenciales reales al repositorio Git.**
 
@@ -446,44 +436,42 @@ EnvironmentFile=/etc/uvgcollections.env
 ```
 
 Después de modificar `/etc/uvgcollections.env`, los servicios correspondientes
-deben reiniciarse para cargar nuevamente la configuración.
+deben reiniciarse.
 
 ---
 
 ## 6. Servicios systemd
 
-El sistema utiliza dos servicios principales.
+El sistema utiliza dos servicios principales para Flask y RFID.
 
 ### `uvgcollections.service`
 
 Ejecuta la aplicación Flask mediante Gunicorn.
 
-La configuración utilizada durante el desarrollo ejecuta Gunicorn con:
+La configuración utilizada ejecuta Gunicorn con:
 
 - 1 worker
 - 2 threads
 - puerto `8000`
 - dirección `0.0.0.0`
 
-El servicio utiliza el entorno virtual ubicado dentro del proyecto y carga las
-variables desde `/etc/uvgcollections.env`.
+El servicio utiliza el entorno virtual del proyecto y carga las variables
+desde `/etc/uvgcollections.env`.
 
 ### `uvg-rfid.service`
 
-Ejecuta permanentemente el worker de supervisión RFID mediante:
+Ejecuta permanentemente el worker RFID mediante:
 
 ```bash
 python -u -m tools.rfid_worker
 ```
 
-La opción `-u` mantiene la salida de Python sin buffering, permitiendo observar
-las detecciones RFID en tiempo real mediante `journalctl`.
+La opción `-u` mantiene la salida sin buffering y permite observar las
+detecciones inmediatamente mediante `journalctl`.
 
 ### Instalar los servicios
 
-Los archivos utilizados por systemd se encuentran en `deploy/systemd/`.
-
-Para instalarlos ejecutar:
+Ejecutar:
 
 ```bash
 sudo ./deploy/systemd/install-services.sh
@@ -494,85 +482,65 @@ El script:
 1. identifica el usuario y grupo de la instalación;
 2. detecta la ubicación real del repositorio y del entorno virtual;
 3. comprueba la existencia de `/etc/uvgcollections.env`;
-4. genera los servicios adaptados a la máquina actual en `/etc/systemd/system/`;
+4. genera los servicios adaptados a la máquina actual en
+   `/etc/systemd/system/`;
 5. ejecuta `systemctl daemon-reload`;
 6. habilita ambos servicios para iniciar automáticamente con Ubuntu.
 
-Después de la instalación pueden iniciarse mediante:
+Iniciar:
 
 ```bash
 sudo systemctl start uvgcollections
 sudo systemctl start uvg-rfid
 ```
 
-Para comprobar su estado:
+Comprobar:
 
 ```bash
 sudo systemctl status uvgcollections --no-pager
 sudo systemctl status uvg-rfid --no-pager
 ```
 
-También puede comprobarse de forma compacta:
+Comprobación compacta:
 
 ```bash
 systemctl is-active uvgcollections
 systemctl is-active uvg-rfid
 ```
 
-La respuesta esperada para ambos es:
+La respuesta esperada es `active`.
 
-```
-active
-```
-
-Para comprobar si inician automáticamente con Ubuntu:
+Para comprobar el inicio automático:
 
 ```bash
 systemctl is-enabled uvgcollections
 systemctl is-enabled uvg-rfid
 ```
 
-La respuesta esperada es:
-
-```
-enabled
-```
+La respuesta esperada es `enabled`.
 
 ### Observar el worker RFID
-
-Para visualizar las detecciones y mensajes del supervisor RFID en tiempo real:
 
 ```bash
 journalctl -u uvg-rfid -f
 ```
 
-Para salir de la visualización utilizar `Ctrl+C`.
-
----
+Para salir utilizar `Ctrl+C`.
 
 ### Portabilidad de los servicios
 
-El instalador de servicios no depende del nombre de usuario `uvg-grad` ni de
-una ruta fija dentro de `/home/`.
+El instalador no depende del nombre de usuario `uvg-grad` ni de una ruta fija
+dentro de `/home/`.
 
-Al ejecutar:
-
-```bash
-sudo ./deploy/systemd/install-services.sh
-```
-
-el script detecta automáticamente:
+Detecta automáticamente:
 
 - el usuario que ejecutó `sudo`;
-- el grupo principal del usuario;
+- el grupo principal;
 - la ubicación real del repositorio;
 - el directorio `FlaskUVGProjectV1`;
 - la ubicación del entorno virtual `venv`.
 
-A partir de esta información genera los archivos utilizados por systemd con
-las rutas correspondientes a la máquina actual.
-
-Por ejemplo, durante el desarrollo se detectó automáticamente:
+Por ejemplo, durante el desarrollo detectó:
 
 ```
 Usuario:     uvg-grad
@@ -583,184 +551,178 @@ Entorno:     /home/uvg-grad/GradProjectUVG/FlaskUVGProjectV1/venv
 ```
 
 Por lo tanto, el repositorio puede instalarse bajo otro usuario o en otra ruta
-sin necesidad de editar manualmente los archivos `.service`.
+sin editar manualmente los archivos `.service`.
 
 Antes de instalar los servicios deben existir:
 
-- el entorno virtual `FlaskUVGProjectV1/venv`;
+- `FlaskUVGProjectV1/venv`;
 - Gunicorn dentro del entorno virtual;
-- el archivo `/etc/uvgcollections.env`.
+- `/etc/uvgcollections.env`.
 
-El instalador valida estos requisitos antes de generar los servicios.
-
-Después de la instalación puede comprobarse la configuración generada mediante:
+Para comprobar los servicios generados:
 
 ```bash
 sudo systemctl cat uvgcollections
 sudo systemctl cat uvg-rfid
 ```
 
-Los servicios generados deben contener el usuario, grupo, directorio de trabajo
-y rutas del entorno virtual correspondientes a la instalación actual.
+---
 
 ## 7. Respaldo de PostgreSQL
 
 La base de datos utilizada por el sistema se denomina `uvg_collections`.
 
-Para crear un respaldo ejecutar, desde la raíz del repositorio:
+Crear un respaldo desde la raíz del repositorio:
 
 ```bash
 ./deploy/database/backup-database.sh
 ```
 
-El script utiliza `pg_dump` en formato personalizado de PostgreSQL y genera
-un archivo con un nombre similar a:
+El script utiliza `pg_dump` en formato personalizado y genera un archivo
+similar a:
 
 ```
 backups/uvg_collections_2026-10-03_05-30-10.dump
 ```
 
-Los archivos generados utilizan el formato `CUSTOM` de PostgreSQL, compatible
-con `pg_restore`.
+Los respaldos incluyen estructura y datos y son compatibles con `pg_restore`.
 
-Los respaldos incluyen la estructura y los datos necesarios para reconstruir
-la base de datos.
-
-El script asigna permisos restrictivos al archivo generado:
+El archivo local utiliza permisos restrictivos:
 
 ```
 -rw-------
 ```
 
-De esta forma, únicamente el propietario puede leer o modificar directamente
-el respaldo.
-
-Para listar los respaldos existentes:
+Listar respaldos:
 
 ```bash
 ls -lh backups/
 ```
 
-Para comprobar el contenido lógico de un respaldo sin restaurarlo:
+Comprobar el contenido lógico:
 
 ```bash
 pg_restore -l backups/<archivo>.dump
 ```
 
-### Importante
+### Respaldo externo en memoria USB
 
-La carpeta `backups/` está excluida de Git.
+Mantener el respaldo únicamente en la laptop no protege frente a una falla
+física de la unidad de almacenamiento.
 
-Por lo tanto, los archivos `.dump` deben copiarse adicionalmente a un medio
-externo seguro si se desea protección frente a una falla física de la laptop
-o de su unidad de almacenamiento.
-
-Mantener un respaldo únicamente dentro de la misma laptop no protege frente
-a la pérdida física del equipo o de su almacenamiento.
-
-Tomando eso en consideración se plantea un almacenamiento secundario en una memoria usb externa.
-
----
-
-### Copia externa en memoria USB
-
-Además del respaldo almacenado localmente en `backups/`, debe mantenerse una
-segunda copia en una memoria USB destinada a respaldos del sistema.
+Por ello debe mantenerse una segunda copia en una memoria USB.
 
 El procedimiento recomendado es:
 
-1. crear primero un respaldo actualizado de PostgreSQL;
+1. crear un respaldo actualizado;
 2. conectar la memoria USB;
-3. identificar su punto de montaje;
-4. copiar el respaldo mediante el script proporcionado;
-5. verificar la copia;
-6. retirar la memoria USB de forma segura.
+3. identificarla;
+4. montarla si es necesario;
+5. copiar el respaldo mediante el script;
+6. verificar la copia;
+7. desmontar la memoria correctamente.
 
-Crear primero el respaldo:
+Crear el respaldo:
 
 ```bash
 ./deploy/database/backup-database.sh
 ```
 
-Para identificar la memoria USB puede utilizarse:
+Identificar la memoria:
 
 ```bash
 lsblk -f
 ```
 
-También pueden consultarse los dispositivos montados para el usuario:
+Durante la prueba realizada se utilizó una memoria FAT32 con etiqueta `UVG`.
+
+Si Ubuntu no la monta automáticamente, crear un punto de montaje:
 
 ```bash
-ls /media/$USER/
+sudo mkdir -p /media/$USER/UVG
 ```
 
-Una vez identificada la ruta de la memoria USB, ejecutar:
+Para una memoria FAT32 puede montarse asignando la propiedad al usuario actual:
 
 ```bash
-./deploy/database/copy-backup-to-usb.sh <ruta-usb>
+sudo mount \
+    -o uid=$(id -u),gid=$(id -g),umask=077 \
+    /dev/sdb1 \
+    /media/$USER/UVG
 ```
 
-Por ejemplo:
+> `/dev/sdb1` es únicamente un ejemplo. Debe utilizarse el dispositivo
+> identificado previamente mediante `lsblk -f`.
+
+Comprobar que el usuario pueda escribir:
+
+```bash
+touch /media/$USER/UVG/prueba_escritura.txt
+rm /media/$USER/UVG/prueba_escritura.txt
+```
+
+Copiar el respaldo más reciente:
 
 ```bash
 ./deploy/database/copy-backup-to-usb.sh \
-    /media/uvg-grad/UVG_BACKUP
+    /media/$USER/UVG
 ```
 
-El script selecciona automáticamente el respaldo más reciente disponible en
-`backups/` y crea dentro de la memoria USB el directorio:
+El script:
+
+- identifica automáticamente el respaldo más reciente;
+- crea `UVG_Collections_Backups/` dentro de la memoria;
+- copia el archivo `.dump`;
+- ejecuta `sync`;
+- compara la copia con el archivo original mediante `cmp`.
+
+La estructura resultante es:
 
 ```
-UVG_Collections_Backups/
-```
-
-Después copia el respaldo y compara la copia con el archivo original para
-comprobar que ambos coincidan.
-
-Una copia externa correcta tendrá una estructura similar a:
-
-```
-UVG_BACKUP/
+UVG/
 └── UVG_Collections_Backups/
     └── uvg_collections_2026-10-03_05-30-10.dump
 ```
 
-La memoria USB debe mantenerse separada físicamente de la laptop servidor
-cuando no se esté utilizando.
+Después de la copia:
 
-En caso de fallo de la laptop, el archivo `.dump` puede copiarse desde la
-memoria USB al directorio `backups/` de una nueva instalación y posteriormente
-restaurarse mediante `restore-database.sh`.
+```bash
+sync
+sudo umount /media/$USER/UVG
+```
+
+La memoria puede retirarse físicamente después de desmontarla.
+
+La memoria USB debe mantenerse separada de la laptop servidor cuando no esté
+siendo utilizada.
+
+---
 
 ## 8. Restauración de PostgreSQL
 
-La restauración completa puede realizarse mediante:
+La restauración completa se realiza mediante:
 
 ```bash
 sudo ./deploy/database/restore-database.sh backups/<archivo>.dump
 ```
 
-Antes de reemplazar la base de datos, el script solicita escribir:
+Antes de reemplazar la base, el script solicita escribir:
 
 ```
 RESTAURAR
 ```
 
-como confirmación explícita.
+En una restauración de producción:
 
-En una restauración de producción, el procedimiento:
-
-1. detiene el servicio de supervisión RFID;
-2. detiene el servidor Flask/Gunicorn;
-3. elimina la base `uvg_collections` existente;
-4. crea nuevamente la base de datos;
-5. restaura el archivo `.dump`;
-6. inicia nuevamente los servicios;
-7. comprueba el estado de los servicios.
+1. detiene `uvg-rfid`;
+2. detiene Flask/Gunicorn;
+3. elimina `uvg_collections`;
+4. crea nuevamente la base;
+5. restaura el `.dump`;
+6. inicia los servicios;
+7. comprueba su estado.
 
 ### Prueba de restauración sin afectar producción
-
-El script permite restaurar un respaldo en una base temporal:
 
 ```bash
 sudo env \
@@ -769,13 +731,10 @@ sudo env \
     backups/<archivo>.dump
 ```
 
-Cuando se utiliza un nombre de base diferente de `uvg_collections`, los
-servicios de producción no son detenidos.
+Cuando se utiliza un nombre diferente de `uvg_collections`, los servicios de
+producción no son detenidos.
 
-Esto permite comprobar la integridad de un respaldo sin modificar la base
-utilizada por Flask.
-
-Para consultar las tablas de la base restaurada:
+Consultar las tablas restauradas:
 
 ```bash
 sudo -u postgres psql \
@@ -783,7 +742,7 @@ sudo -u postgres psql \
     -c "\dt"
 ```
 
-La base temporal puede eliminarse posteriormente mediante:
+Eliminar posteriormente la base temporal:
 
 ```bash
 sudo -u postgres dropdb uvg_collections_restore_test
@@ -791,13 +750,9 @@ sudo -u postgres dropdb uvg_collections_restore_test
 
 ### Validación realizada
 
-El procedimiento de respaldo y restauración fue comprobado utilizando una
-base temporal independiente.
+El procedimiento fue probado restaurando una base temporal independiente.
 
-Durante la prueba se restauraron correctamente las tablas del sistema y se
-compararon registros críticos entre la base original y la restaurada.
-
-Los resultados obtenidos fueron:
+Los registros comparados fueron:
 
 | Información | Original | Restaurada |
 |---|---:|---:|
@@ -807,21 +762,20 @@ Los resultados obtenidos fueron:
 | Solicitudes | 6 | 6 |
 | Usuarios | 1 | 1 |
 
-La coincidencia de estos registros permitió verificar que el procedimiento
-recuperó correctamente tanto la estructura como los datos almacenados.
+La coincidencia permitió comprobar la recuperación de la estructura y de los
+datos almacenados.
 
 ---
 
 ## 9. Verificación del lector RFID
 
-Una vez configurada la red y arrancado `uvg-rfid.service`, comprobar primero
-la conectividad:
+Comprobar conectividad:
 
 ```bash
 ping -c 4 192.168.1.116
 ```
 
-Luego comprobar la ruta:
+Comprobar ruta:
 
 ```bash
 ip route get 192.168.1.116
@@ -829,13 +783,13 @@ ip route get 192.168.1.116
 
 La ruta debe utilizar la interfaz Ethernet dedicada.
 
-Posteriormente observar el worker:
+Observar el worker:
 
 ```bash
 journalctl -u uvg-rfid -f
 ```
 
-Al acercar un tag al lector debe aparecer una detección similar a:
+Una lectura debe producir información similar a:
 
 ```
 [DETECCION] <EPC>
@@ -843,8 +797,7 @@ Evento RFID: <ID>
 Estado: <clasificacion>
 ```
 
-Cuando el tag deja de ser detectado durante el período configurado debe
-aparecer:
+Después del período de ausencia configurado:
 
 ```
 [AUSENTE] <EPC>
@@ -854,94 +807,193 @@ aparecer:
 
 ## 10. Uso con Wi-Fi o hotspot móvil
 
-La conexión Ethernet utilizada por RFID y la conexión Wi-Fi pueden funcionar
-simultáneamente.
-
-La configuración recomendada es:
+Ethernet y Wi-Fi pueden utilizarse simultáneamente:
 
 ```
                     Internet
                        |
-                Wi-Fi / Hotspot
+                 Wi-Fi / Hotspot
                        |
                        v
-                Laptop Ubuntu
-                  /         \
-                 /           \
-        Flask / Resend      Ethernet
-        ngrok / GitHub         |
-                               v
+                 Laptop Ubuntu
+                   /         \
+                  /           \
+         Servicios web      Ethernet
+         Resend / ngrok        |
+         GitHub                v
                          Yanzeo SR682
 ```
 
-La interfaz Ethernet RFID no tiene gateway, por lo que no intenta utilizarse
-como salida a Internet.
+La interfaz Ethernet RFID no tiene gateway.
 
 Esto permite utilizar:
 
-- Ethernet directo para la comunicación con el SR682.
-- Wi-Fi o hotspot móvil para acceso a Internet.
-- Resend para correos electrónicos.
-- ngrok para acceso externo.
-- GitHub para sincronización del proyecto.
+- Ethernet directo para el SR682;
+- Wi-Fi o hotspot para Internet;
+- Resend para correo;
+- ngrok para acceso externo;
+- GitHub para sincronización.
 
-Esta configuración fue comprobada utilizando un hotspot de datos móviles
-mientras el lector RFID permanecía conectado directamente por Ethernet a la
-laptop Ubuntu.
+Esta configuración fue comprobada físicamente utilizando un hotspot móvil
+mientras el SR682 permanecía conectado directamente por Ethernet.
 
 ---
 
-## 11. Comandos de diagnóstico
+## 11. Acceso externo mediante ngrok
 
-### Estado de interfaces de red
+Ngrok proporciona acceso HTTPS externo a la aplicación Flask.
+
+La relación es:
+
+```
+Flask / Gunicorn
+localhost:8000
+      |
+      v
+ngrok
+      |
+      v
+HTTPS público
+```
+
+Los archivos de despliegue se encuentran en:
+
+```
+deploy/ngrok/
+├── install-ngrok-service.sh
+├── ngrok.service
+└── ngrok.yml.example
+```
+
+### Configuración
+
+El archivo real se almacena en:
+
+`~/.config/ngrok/ngrok.yml`
+
+La plantilla segura se encuentra en:
+
+`deploy/ngrok/ngrok.yml.example`
+
+El túnel utilizado se denomina `flask` y apunta al puerto local `8000`.
+
+El archivo real contiene el `authtoken`.
+
+> **El authtoken real nunca debe almacenarse en Git.**
+
+Comprobar la configuración:
+
+```bash
+ngrok config check
+```
+
+### Servicio systemd
+
+Ngrok se ejecuta mediante `ngrok.service` utilizando:
+
+```bash
+/usr/local/bin/ngrok start flask
+```
+
+Instalar el servicio:
+
+```bash
+sudo ./deploy/ngrok/install-ngrok-service.sh
+```
+
+El instalador detecta automáticamente el usuario y su directorio home,
+comprueba la instalación de ngrok, valida `ngrok.yml`, genera el servicio y
+lo habilita para iniciar automáticamente.
+
+Iniciar:
+
+```bash
+sudo systemctl start ngrok
+```
+
+Reiniciar:
+
+```bash
+sudo systemctl restart ngrok
+```
+
+Comprobar:
+
+```bash
+sudo systemctl status ngrok --no-pager
+systemctl is-active ngrok
+systemctl is-enabled ngrok
+```
+
+Las dos últimas comprobaciones deben devolver:
+
+```
+active
+enabled
+```
+
+El reinicio y recuperación automática del túnel fueron comprobados durante
+el desarrollo.
+
+---
+
+## 12. Comandos de diagnóstico
+
+### Estado de interfaces
 
 ```bash
 ip -br addr
 ```
 
-### Rutas de red
+### Rutas
 
 ```bash
 ip route
 ```
 
-### Ruta específica hacia el SR682
+### Ruta hacia el SR682
 
 ```bash
 ip route get 192.168.1.116
 ```
 
-### Estado de Flask/Gunicorn
+### Flask/Gunicorn
 
 ```bash
 sudo systemctl status uvgcollections --no-pager
 ```
 
-### Estado del worker RFID
+### Worker RFID
 
 ```bash
 sudo systemctl status uvg-rfid --no-pager
 ```
 
-### Logs RFID en tiempo real
+### Logs RFID
 
 ```bash
 journalctl -u uvg-rfid -f
 ```
 
-### Acceso a PostgreSQL
+### ngrok
+
+```bash
+sudo systemctl status ngrok --no-pager
+```
+
+### PostgreSQL
 
 ```bash
 sudo -u postgres psql
 ```
 
-Dentro de PostgreSQL:
+Seleccionar la base:
 
 ```sql
 \c uvg_collections
 ```
 
-Para salir:
+Salir:
 
 ```sql
 \q
@@ -949,47 +1001,58 @@ Para salir:
 
 ---
 
-## 12. Seguridad
+## 13. Seguridad
 
-Las siguientes reglas deben mantenerse en cualquier instalación:
+Las siguientes reglas deben mantenerse:
 
-- No almacenar contraseñas directamente en el código fuente.
-- No subir `/etc/uvgcollections.env` a Git.
-- No subir los respaldos de PostgreSQL a Git.
-- Mantener las API keys únicamente como variables de entorno.
-- Mantener `SECRET_KEY` fuera del repositorio.
-- Mantener `MASTER_DELETE_PASSWORD` fuera del repositorio.
-- Utilizar permisos restrictivos para los archivos `.dump`.
-- Proteger el acceso al usuario administrador de PostgreSQL.
-- Mantener `/auth/register` protegido mediante autenticación.
+- no almacenar contraseñas directamente en el código;
+- no subir `/etc/uvgcollections.env` a Git;
+- no subir los respaldos PostgreSQL a Git;
+- mantener las API keys como variables de entorno;
+- mantener `SECRET_KEY` fuera del repositorio;
+- mantener `MASTER_DELETE_PASSWORD` fuera del repositorio;
+- mantener el authtoken de ngrok fuera del repositorio;
+- utilizar permisos restrictivos para los `.dump`;
+- proteger el acceso administrativo a PostgreSQL;
+- mantener `/auth/register` protegido mediante autenticación.
 
-Las credenciales que hayan sido expuestas previamente en el historial Git
-deben considerarse comprometidas y deben ser reemplazadas.
+Las credenciales que estuvieron presentes anteriormente en el historial Git
+fueron reemplazadas durante el endurecimiento de la configuración.
+
+Los valores actualmente utilizados por el servidor se almacenan fuera del
+repositorio mediante `/etc/uvgcollections.env` y los archivos privados de
+configuración correspondientes.
 
 ---
 
-## Resumen de recuperación
+## 14. Resumen de recuperación
 
-En caso de fallo o reemplazo de la laptop servidor, el procedimiento general
-será:
+En caso de fallo o reemplazo de la laptop servidor:
 
 1. instalar Ubuntu;
 2. instalar Git, Python, PostgreSQL y NetworkManager;
 3. clonar `GradProjectUVG`;
-4. preparar el entorno virtual de Python;
-5. instalar las dependencias del proyecto;
-6. configurar PostgreSQL;
-7. copiar un respaldo `.dump` externo a `backups/`;
+4. crear y activar `FlaskUVGProjectV1/venv`;
+5. instalar `requirements.txt`;
+6. ejecutar `pip install -e .`;
+7. configurar la contraseña de PostgreSQL;
 8. crear `/etc/uvgcollections.env`;
-9. configurar la interfaz Ethernet mediante `setup-rfid-network.sh`;
-10. instalar los servicios mediante `install-services.sh`;
-11. restaurar PostgreSQL mediante `restore-database.sh`;
-12. iniciar y comprobar `uvgcollections`;
-13. iniciar y comprobar `uvg-rfid`;
-14. comprobar comunicación con `192.168.1.116`;
-15. comprobar la interfaz web;
-16. comprobar una lectura RFID física;
-17. comprobar los servicios externos necesarios.
+9. recuperar un `.dump` desde la memoria USB;
+10. configurar Ethernet mediante `setup-rfid-network.sh`;
+11. instalar los servicios mediante `install-services.sh`;
+12. restaurar PostgreSQL mediante `restore-database.sh`;
+13. iniciar y comprobar `uvgcollections`;
+14. iniciar y comprobar `uvg-rfid`;
+15. comprobar comunicación con `192.168.1.116`;
+16. configurar `~/.config/ngrok/ngrok.yml` con el authtoken real;
+17. instalar ngrok mediante `install-ngrok-service.sh`;
+18. comprobar `ngrok.service`;
+19. comprobar la interfaz web;
+20. comprobar una lectura RFID física;
+21. comprobar el envío de correo mediante Resend;
+22. comprobar el acceso externo mediante ngrok;
+23. crear un nuevo respaldo;
+24. copiar el respaldo a la memoria USB y desmontarla correctamente.
 
-Los scripts incluidos en `deploy/` fueron creados para reducir la cantidad de
-configuración manual necesaria durante este procedimiento.
+Los scripts incluidos en `deploy/` reducen la cantidad de configuración manual
+necesaria para reconstruir el servidor.
