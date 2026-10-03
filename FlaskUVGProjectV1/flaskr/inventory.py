@@ -436,7 +436,7 @@ def images(id):
 
 
         flash(
-            f"Secuencia 360 actualizada correctamente. "
+            f"Secuencia actualizada correctamente. "
             f"{len(valid_files)} imágenes cargadas."
         )
 
@@ -452,14 +452,33 @@ def images(id):
 
     if specimen_dir.exists():
 
-        images = sorted(
-            file.name
-            for file in specimen_dir.iterdir()
-            if (
-                file.is_file()
-                and file.suffix.lower()
-                in ALLOWED_IMAGE_EXTENSIONS
+        def image_sort_key(filename):
+
+            stem = Path(filename).stem
+
+            if stem.isdigit():
+                return (
+                    0,
+                    int(stem)
+                )
+
+            return (
+                1,
+                filename.lower()
             )
+
+
+        images = sorted(
+            (
+                file.name
+                for file in specimen_dir.iterdir()
+                if (
+                    file.is_file()
+                    and file.suffix.lower()
+                    in ALLOWED_IMAGE_EXTENSIONS
+                )
+            ),
+            key=image_sort_key
         )
 
 
