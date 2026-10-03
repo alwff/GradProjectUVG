@@ -491,11 +491,12 @@ sudo ./deploy/systemd/install-services.sh
 
 El script:
 
-1. comprueba la existencia de los archivos de servicio;
-2. comprueba la existencia de `/etc/uvgcollections.env`;
-3. copia los servicios a `/etc/systemd/system/`;
-4. ejecuta `systemctl daemon-reload`;
-5. habilita ambos servicios para iniciar automáticamente con Ubuntu.
+1. identifica el usuario y grupo de la instalación;
+2. detecta la ubicación real del repositorio y del entorno virtual;
+3. comprueba la existencia de `/etc/uvgcollections.env`;
+4. genera los servicios adaptados a la máquina actual en `/etc/systemd/system/`;
+5. ejecuta `systemctl daemon-reload`;
+6. habilita ambos servicios para iniciar automáticamente con Ubuntu.
 
 Después de la instalación pueden iniciarse mediante:
 
@@ -548,6 +549,59 @@ journalctl -u uvg-rfid -f
 Para salir de la visualización utilizar `Ctrl+C`.
 
 ---
+
+### Portabilidad de los servicios
+
+El instalador de servicios no depende del nombre de usuario `uvg-grad` ni de
+una ruta fija dentro de `/home/`.
+
+Al ejecutar:
+
+```bash
+sudo ./deploy/systemd/install-services.sh
+```
+
+el script detecta automáticamente:
+
+- el usuario que ejecutó `sudo`;
+- el grupo principal del usuario;
+- la ubicación real del repositorio;
+- el directorio `FlaskUVGProjectV1`;
+- la ubicación del entorno virtual `venv`.
+
+A partir de esta información genera los archivos utilizados por systemd con
+las rutas correspondientes a la máquina actual.
+
+Por ejemplo, durante el desarrollo se detectó automáticamente:
+
+```
+Usuario:     uvg-grad
+Grupo:       uvg-grad
+Repositorio: /home/uvg-grad/GradProjectUVG
+Aplicacion:  /home/uvg-grad/GradProjectUVG/FlaskUVGProjectV1
+Entorno:     /home/uvg-grad/GradProjectUVG/FlaskUVGProjectV1/venv
+```
+
+Por lo tanto, el repositorio puede instalarse bajo otro usuario o en otra ruta
+sin necesidad de editar manualmente los archivos `.service`.
+
+Antes de instalar los servicios deben existir:
+
+- el entorno virtual `FlaskUVGProjectV1/venv`;
+- Gunicorn dentro del entorno virtual;
+- el archivo `/etc/uvgcollections.env`.
+
+El instalador valida estos requisitos antes de generar los servicios.
+
+Después de la instalación puede comprobarse la configuración generada mediante:
+
+```bash
+sudo systemctl cat uvgcollections
+sudo systemctl cat uvg-rfid
+```
+
+Los servicios generados deben contener el usuario, grupo, directorio de trabajo
+y rutas del entorno virtual correspondientes a la instalación actual.
 
 ## 7. Respaldo de PostgreSQL
 
