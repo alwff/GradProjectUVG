@@ -28,6 +28,9 @@ dependencies = [
 requires = ["flit_core<4"]
 build-backend = "flit_core.buildapi"
 
+[tool.flit.module]
+name = "flaskr"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
