@@ -76,4 +76,4 @@ echo "Estado de la interfaz:"
 ip -br addr show "$INTERFACE"
 echo
 echo "Ruta hacia el lector RFID:"
-ip route get 192.168.1.116git status
+ip route get 192.168.1.116
