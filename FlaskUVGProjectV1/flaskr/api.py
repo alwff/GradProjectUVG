@@ -37,7 +37,97 @@ ALLOWED_IMAGE_EXTENSIONS = {
     ".webp"
 }
 
+def get_exhibition_serializer():
+    return URLSafeTimedSerializer(
+        current_app.config["SECRET_KEY"],
+        salt="exhibition-admin"
+    )
 
+
+def create_exhibition_token():
+    serializer = get_exhibition_serializer()
+
+    return serializer.dumps({
+        "role": "exhibition_admin"
+    })
+
+
+def validate_exhibition_token(token):
+    serializer = get_exhibition_serializer()
+
+    try:
+        data = serializer.loads(
+            token,
+            max_age=3600
+        )
+
+        return (
+            data.get("role")
+            == "exhibition_admin"
+        )
+
+    except (
+        SignatureExpired,
+        BadSignature
+    ):
+        return False
+
+def get_bearer_token():
+
+    authorization = request.headers.get(
+        "Authorization",
+        ""
+    )
+
+    if not authorization.startswith(
+        "Bearer "
+    ):
+        return None
+
+    return authorization[7:].strip()
+
+def get_specimen_images(
+    portal_code
+):
+
+    specimen_dir = (
+        SPECIMEN_ASSETS_DIR
+        / portal_code
+    )
+
+    if not specimen_dir.exists():
+        return []
+
+
+    def image_sort_key(filename):
+
+        stem = Path(filename).stem
+
+        if stem.isdigit():
+
+            return (
+                0,
+                int(stem)
+            )
+
+        return (
+            1,
+            filename.lower()
+        )
+
+
+    return sorted(
+        (
+            file.name
+            for file in specimen_dir.iterdir()
+            if (
+                file.is_file()
+                and file.suffix.lower()
+                in ALLOWED_IMAGE_EXTENSIONS
+            )
+        ),
+        key=image_sort_key
+    )
 
 @bp.route(
     "/specimen/<identifier>",
@@ -329,94 +419,3 @@ def specimen_asset(
         filename
     )
 
-def get_exhibition_serializer():
-    return URLSafeTimedSerializer(
-        current_app.config["SECRET_KEY"],
-        salt="exhibition-admin"
-    )
-
-
-def create_exhibition_token():
-    serializer = get_exhibition_serializer()
-
-    return serializer.dumps({
-        "role": "exhibition_admin"
-    })
-
-
-def validate_exhibition_token(token):
-    serializer = get_exhibition_serializer()
-
-    try:
-        data = serializer.loads(
-            token,
-            max_age=3600
-        )
-
-        return (
-            data.get("role")
-            == "exhibition_admin"
-        )
-
-    except (
-        SignatureExpired,
-        BadSignature
-    ):
-        return False
-
-def get_bearer_token():
-
-    authorization = request.headers.get(
-        "Authorization",
-        ""
-    )
-
-    if not authorization.startswith(
-        "Bearer "
-    ):
-        return None
-
-    return authorization[7:].strip()
-
-def get_specimen_images(
-    portal_code
-):
-
-    specimen_dir = (
-        SPECIMEN_ASSETS_DIR
-        / portal_code
-    )
-
-    if not specimen_dir.exists():
-        return []
-
-
-    def image_sort_key(filename):
-
-        stem = Path(filename).stem
-
-        if stem.isdigit():
-
-            return (
-                0,
-                int(stem)
-            )
-
-        return (
-            1,
-            filename.lower()
-        )
-
-
-    return sorted(
-        (
-            file.name
-            for file in specimen_dir.iterdir()
-            if (
-                file.is_file()
-                and file.suffix.lower()
-                in ALLOWED_IMAGE_EXTENSIONS
-            )
-        ),
-        key=image_sort_key
-    )
