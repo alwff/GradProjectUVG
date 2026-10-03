@@ -658,7 +658,79 @@ o de su unidad de almacenamiento.
 Mantener un respaldo únicamente dentro de la misma laptop no protege frente
 a la pérdida física del equipo o de su almacenamiento.
 
+Tomando eso en consideración se plantea un almacenamiento secundario en una memoria usb externa.
+
 ---
+
+### Copia externa en memoria USB
+
+Además del respaldo almacenado localmente en `backups/`, debe mantenerse una
+segunda copia en una memoria USB destinada a respaldos del sistema.
+
+El procedimiento recomendado es:
+
+1. crear primero un respaldo actualizado de PostgreSQL;
+2. conectar la memoria USB;
+3. identificar su punto de montaje;
+4. copiar el respaldo mediante el script proporcionado;
+5. verificar la copia;
+6. retirar la memoria USB de forma segura.
+
+Crear primero el respaldo:
+
+```bash
+./deploy/database/backup-database.sh
+```
+
+Para identificar la memoria USB puede utilizarse:
+
+```bash
+lsblk -f
+```
+
+También pueden consultarse los dispositivos montados para el usuario:
+
+```bash
+ls /media/$USER/
+```
+
+Una vez identificada la ruta de la memoria USB, ejecutar:
+
+```bash
+./deploy/database/copy-backup-to-usb.sh <ruta-usb>
+```
+
+Por ejemplo:
+
+```bash
+./deploy/database/copy-backup-to-usb.sh \
+    /media/uvg-grad/UVG_BACKUP
+```
+
+El script selecciona automáticamente el respaldo más reciente disponible en
+`backups/` y crea dentro de la memoria USB el directorio:
+
+```
+UVG_Collections_Backups/
+```
+
+Después copia el respaldo y compara la copia con el archivo original para
+comprobar que ambos coincidan.
+
+Una copia externa correcta tendrá una estructura similar a:
+
+```
+UVG_BACKUP/
+└── UVG_Collections_Backups/
+    └── uvg_collections_2026-10-03_05-30-10.dump
+```
+
+La memoria USB debe mantenerse separada físicamente de la laptop servidor
+cuando no se esté utilizando.
+
+En caso de fallo de la laptop, el archivo `.dump` puede copiarse desde la
+memoria USB al directorio `backups/` de una nueva instalación y posteriormente
+restaurarse mediante `restore-database.sh`.
 
 ## 8. Restauración de PostgreSQL
 
