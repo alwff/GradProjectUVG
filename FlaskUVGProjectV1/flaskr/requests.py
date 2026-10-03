@@ -196,12 +196,23 @@ def detail(id):
             item.id
         ] = movement_status
         
+    has_pending_delivery = any(
+        status == "reserved"
+        for status in item_movement_status.values()
+    )
+
+    has_pending_return = any(
+        status == "delivered"
+        for status in item_movement_status.values()
+    )
 
     return render_template(
         "requests/detail.html",
         request_record=request_record,
         item_checks=item_checks,
-        item_movement_status=item_movement_status
+        item_movement_status=item_movement_status,
+        has_pending_delivery=has_pending_delivery,
+        has_pending_return=has_pending_return
     )
 
 @bp.route(

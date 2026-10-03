@@ -442,6 +442,8 @@ Solicitud
 
 <div class="request-movement-actions">
 
+    {% if has_pending_delivery %}
+
     <a
         href="{{ url_for(
             'movements.request_delivery',
@@ -449,8 +451,13 @@ Solicitud
         ) }}"
         class="dashboard-button"
     >
-        REGISTRAR ENTREGA
+        Registrar Entrega
     </a>
+
+    {% endif %}
+
+
+    {% if has_pending_return %}
 
     <a
         href="{{ url_for(
@@ -459,11 +466,12 @@ Solicitud
         ) }}"
         class="dashboard-button"
     >
-        REGISTRAR DEVOLUCIÓN
+        Registrar Devolución
     </a>
 
-</div>
+    {% endif %}
 
+</div>
 
 {% elif request_record.status == "returned" %}
 
