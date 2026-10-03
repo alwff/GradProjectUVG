@@ -1,0 +1,22 @@
+[Unit]
+Description=UVG Collections RFID Supervisor
+After=network.target postgresql.service
+Wants=network.target
+
+[Service]
+User=uvg-grad
+Group=uvg-grad
+
+WorkingDirectory=/home/uvg-grad/GradProjectUVG/FlaskUVGProjectV1
+
+Environment="PATH=/home/uvg-grad/GradProjectUVG/FlaskUVGProjectV1/venv/bin"
+EnvironmentFile=/etc/uvgcollections.env
+
+ExecStart=/home/uvg-grad/GradProjectUVG/FlaskUVGProjectV1/venv/bin/python \
+          -u -m tools.rfid_worker
+
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
