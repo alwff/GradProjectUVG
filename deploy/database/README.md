@@ -186,6 +186,89 @@ Clonar el repositorio:
 git clone https://github.com/alwff/GradProjectUVG.git
 ```
 
+### Preparar el entorno virtual de Python
+
+Ingresar al directorio de la aplicación:
+
+```bash
+cd GradProjectUVG/FlaskUVGProjectV1
+```
+
+Crear el entorno virtual:
+
+```bash
+python3 -m venv venv
+```
+
+Activarlo:
+
+```bash
+source venv/bin/activate
+```
+
+Actualizar `pip`:
+
+```bash
+python -m pip install --upgrade pip
+```
+
+Instalar las dependencias del proyecto:
+
+```bash
+pip install -r requirements.txt
+```
+
+Instalar UVG Collections en modo editable:
+
+```bash
+pip install -e .
+```
+
+La instalación puede comprobarse mediante:
+
+```bash
+pip list --editable
+```
+
+Debe aparecer `uvg-collections` asociado al directorio local
+`FlaskUVGProjectV1`.
+
+El proyecto utiliza `flaskr` como paquete principal de Python. Esta relación
+se encuentra declarada en `pyproject.toml` mediante:
+
+```toml
+[tool.flit.module]
+name = "flaskr"
+```
+
+### Comprobar la aplicación manualmente
+
+Las terminales interactivas no cargan automáticamente las variables definidas
+en `/etc/uvgcollections.env`.
+
+Para cargarlas temporalmente:
+
+```bash
+set -a
+source /etc/uvgcollections.env
+set +a
+```
+
+Posteriormente puede comprobarse la creación de la aplicación:
+
+```bash
+python -c "from flaskr import create_app; app=create_app(); print('Import OK')"
+```
+
+La salida esperada es:
+
+```
+Import OK
+```
+
+Los servicios systemd no requieren ejecutar manualmente `source`, ya que
+cargan `/etc/uvgcollections.env` mediante `EnvironmentFile`.
+
 Ingresar al proyecto:
 
 ```bash
