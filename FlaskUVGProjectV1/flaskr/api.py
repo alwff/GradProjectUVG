@@ -183,19 +183,51 @@ def get_specimen(identifier):
             image_urls
     })
 
-@bp.route("/specimens", methods=["GET"])
+@bp.route(
+    "/specimens",
+    methods=["GET"]
+)
 def get_all_specimens():
-    specimens = Specimen.query.all()
 
-    return jsonify([
-    {
-        "id": s.portal_code,
-        "name": s.scientific_name,
-        "collection": s.collection
-    }
-    for s in specimens
-    
-    ])
+    specimens = Specimen.query.order_by(
+        Specimen.portal_code
+    ).all()
+
+    result = []
+
+    for specimen in specimens:
+
+        image_files = get_specimen_images(
+            specimen.portal_code
+        )
+
+        preview_url = None
+
+        if image_files:
+
+            preview_url = (
+                request.host_url.rstrip("/")
+                + "/api/specimen-assets/"
+                + specimen.portal_code
+                + "/"
+                + image_files[0]
+            )
+
+        result.append({
+            "id":
+                specimen.portal_code,
+
+            "name":
+                specimen.scientific_name,
+
+            "collection":
+                specimen.collection,
+
+            "preview":
+                preview_url
+        })
+
+    return jsonify(result)
 
 @bp.route("/exhibition/config", methods=["GET"])
 def get_exhibition_config():
