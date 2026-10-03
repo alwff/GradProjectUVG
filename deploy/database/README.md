@@ -241,6 +241,129 @@ se encuentra declarada en `pyproject.toml` mediante:
 name = "flaskr"
 ```
 
+### Instalar y preparar PostgreSQL
+
+Instalar PostgreSQL y sus herramientas cliente utilizando los paquetes
+correspondientes de Ubuntu.
+
+Comprobar la instalación mediante:
+
+```bash
+psql --version
+pg_dump --version
+pg_restore --version
+```
+
+La instalación utilizada durante el desarrollo emplea PostgreSQL 18.
+
+El sistema utiliza actualmente el rol administrativo `postgres` para la
+conexión local de Flask con la base de datos.
+
+La configuración utilizada por la aplicación corresponde conceptualmente a:
+
+```
+Usuario: postgres
+Host: localhost
+Puerto: 5432
+Base de datos: uvg_collections
+```
+
+La contraseña del usuario `postgres` no debe almacenarse en Git.
+
+Para asignar o modificar la contraseña del rol `postgres`, ingresar a
+PostgreSQL:
+
+```bash
+sudo -u postgres psql
+```
+
+Dentro de PostgreSQL ejecutar:
+
+```sql
+\password postgres
+```
+
+PostgreSQL solicitará la nueva contraseña sin necesidad de escribirla
+directamente dentro del comando.
+
+Salir mediante:
+
+```sql
+\q
+```
+
+La variable `DATABASE_URL` almacenada en `/etc/uvgcollections.env` debe
+utilizar la misma contraseña configurada para el rol `postgres`.
+
+Su estructura es:
+
+```
+postgresql://postgres:<CONTRASEÑA>@localhost:5432/uvg_collections
+```
+
+No copiar una contraseña real al README ni al repositorio.
+
+### Crear una base vacía
+
+Si se realiza una instalación nueva sin restaurar inmediatamente un respaldo,
+la base puede crearse mediante:
+
+```bash
+sudo -u postgres createdb uvg_collections
+```
+
+Para comprobar su existencia:
+
+```bash
+sudo -u postgres psql -lqt | grep uvg_collections
+```
+
+### Recuperar una instalación existente
+
+Si existe un respaldo de una instalación anterior, copiar el archivo `.dump`
+a la carpeta local `backups/`.
+
+Posteriormente utilizar:
+
+```bash
+sudo ./deploy/database/restore-database.sh backups/<archivo>.dump
+```
+
+El script crea nuevamente `uvg_collections` y restaura su estructura y datos.
+
+Debido a que el respaldo y la restauración se realizan utilizando el rol
+`postgres`, los objetos restaurados quedan disponibles para la misma cuenta
+utilizada actualmente por Flask.
+
+### Verificar la conexión de Flask
+
+Cargar temporalmente las variables de entorno:
+
+```bash
+set -a
+source /etc/uvgcollections.env
+set +a
+```
+
+Ingresar al directorio de la aplicación:
+
+```bash
+cd ~/GradProjectUVG/FlaskUVGProjectV1
+source venv/bin/activate
+```
+
+Comprobar la conexión realizando una consulta mediante SQLAlchemy:
+
+```bash
+python -c "from flaskr import create_app; from flaskr.models import User; app=create_app(); ctx=app.app_context(); ctx.push(); print('PostgreSQL OK, usuarios:', User.query.count()); ctx.pop()"
+```
+
+Si la conexión es correcta se mostrará:
+
+```
+PostgreSQL OK, usuarios: <cantidad>
+```
+
 ### Comprobar la aplicación manualmente
 
 Las terminales interactivas no cargan automáticamente las variables definidas
