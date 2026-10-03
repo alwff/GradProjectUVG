@@ -1,4 +1,10 @@
-from flask import Blueprint, jsonify, request, current_app
+from flask import (
+    Blueprint,
+    jsonify,
+    request,
+    current_app,
+    send_from_directory
+)
 from flaskr.models import (
     Specimen,
     ExhibitionSlot,
@@ -14,29 +20,77 @@ from itsdangerous import (
     SignatureExpired
 )
 
+from pathlib import Path
+
 bp = Blueprint("api", __name__, url_prefix="/api")
 
-@bp.route("/specimen/<identifier>", methods=["GET"])
+SPECIMEN_ASSETS_DIR = (
+    Path(__file__).resolve().parent
+    / "assets"
+    / "specimens"
+)
+
+ALLOWED_IMAGE_EXTENSIONS = {
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".webp"
+}
+
+
+
+@bp.route(
+    "/specimen/<identifier>",
+    methods=["GET"]
+)
 def get_specimen(identifier):
 
-    specimen = find_specimen(identifier)
+    specimen = find_specimen(
+        identifier
+    )
 
     if specimen is None:
-        return jsonify({"error": "Not found"}), 404
 
-    base_url = request.host_url + f"assets/specimens/{specimen.portal_code}"
+        return jsonify({
+            "error": "Not found"
+        }), 404
+
+
+    image_files = get_specimen_images(
+        specimen.portal_code
+    )
+
+
+    image_urls = [
+        (
+            request.host_url.rstrip("/")
+            + "/api/specimen-assets/"
+            + specimen.portal_code
+            + "/"
+            + filename
+        )
+        for filename in image_files
+    ]
+
 
     return jsonify({
-        "id": specimen.portal_code,
-        "name": specimen.scientific_name,
-        "description": specimen.description,
-        "collection": specimen.collection,
-        "status": specimen.status,
+        "id":
+            specimen.portal_code,
 
-        "images": [
-            f"{base_url}/1.png",
-            f"{base_url}/2.png"
-        ]
+        "name":
+            specimen.scientific_name,
+
+        "description":
+            specimen.description,
+
+        "collection":
+            specimen.collection,
+
+        "status":
+            specimen.status,
+
+        "images":
+            image_urls
     })
 
 @bp.route("/specimens", methods=["GET"])
@@ -244,6 +298,37 @@ def exhibition_auth():
         "token": token
     })
 
+@bp.route(
+    "/specimen-assets/<portal_code>/<path:filename>",
+    methods=["GET"]
+)
+def specimen_asset(
+    portal_code,
+    filename
+):
+
+    specimen = Specimen.query.filter_by(
+        portal_code=portal_code
+    ).first()
+
+    if specimen is None:
+
+        return jsonify({
+            "error": "Not found"
+        }), 404
+
+
+    specimen_dir = (
+        SPECIMEN_ASSETS_DIR
+        / specimen.portal_code
+    )
+
+
+    return send_from_directory(
+        specimen_dir,
+        filename
+    )
+
 def get_exhibition_serializer():
     return URLSafeTimedSerializer(
         current_app.config["SECRET_KEY"],
@@ -292,3 +377,46 @@ def get_bearer_token():
         return None
 
     return authorization[7:].strip()
+
+def get_specimen_images(
+    portal_code
+):
+
+    specimen_dir = (
+        SPECIMEN_ASSETS_DIR
+        / portal_code
+    )
+
+    if not specimen_dir.exists():
+        return []
+
+
+    def image_sort_key(filename):
+
+        stem = Path(filename).stem
+
+        if stem.isdigit():
+
+            return (
+                0,
+                int(stem)
+            )
+
+        return (
+            1,
+            filename.lower()
+        )
+
+
+    return sorted(
+        (
+            file.name
+            for file in specimen_dir.iterdir()
+            if (
+                file.is_file()
+                and file.suffix.lower()
+                in ALLOWED_IMAGE_EXTENSIONS
+            )
+        ),
+        key=image_sort_key
+    )
