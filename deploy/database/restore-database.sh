@@ -2,7 +2,7 @@
 
 set -e
 
-DATABASE_NAME="uvg_collections"
+DATABASE_NAME="${DATABASE_NAME:-uvg_collections}"
 
 if [ "$#" -ne 1 ]; then
     echo "Uso:"
