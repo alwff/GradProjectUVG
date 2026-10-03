@@ -11,8 +11,11 @@ from . import models
 
 def create_app(test_config=None):
     # create and configure the app
-    app = Flask(__name__, instance_relative_config=True)
-    
+    app = Flask(
+        __name__,
+        instance_relative_config=True
+    )
+
     CORS(
         app,
         resources={
@@ -24,14 +27,18 @@ def create_app(test_config=None):
             }
         }
     )
+
     app.config["SQLALCHEMY_DATABASE_URI"] = (
-    "postgresql://postgres:UVGserver@localhost:5432/uvg_collections"
+        os.environ["DATABASE_URL"]
     )
 
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
     app.config.from_mapping(
-    SECRET_KEY='dev',
-    MASTER_DELETE_PASSWORD='UVG2026Delete'
+        SECRET_KEY=os.environ["SECRET_KEY"],
+        MASTER_DELETE_PASSWORD=os.environ[
+            "MASTER_DELETE_PASSWORD"
+        ]
     )
 
     if test_config is None:
