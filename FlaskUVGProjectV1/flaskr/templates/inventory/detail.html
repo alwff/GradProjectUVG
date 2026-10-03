@@ -110,6 +110,16 @@ Detalle del Espécimen
     </a>
 
     <a
+        class="action-button"
+        href="{{ url_for(
+            'inventory.images',
+            id=specimen.id
+        ) }}"
+    >
+        Imágenes 360
+    </a>
+
+    <a
         class="small-button"
         href="{{ url_for('inventory.index') }}"
     >

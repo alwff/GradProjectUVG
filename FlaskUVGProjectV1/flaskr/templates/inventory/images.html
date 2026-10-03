@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Imágenes 360
+{% endblock %}
+
+{% block content %}
+
+<div class="inventory-form-header">
+
+    <div>
+
+        <h1>
+            Imágenes 360
+        </h1>
+
+        <p>
+            <strong>
+                {{ specimen.portal_code }}
+            </strong>
+            ·
+            {{ specimen.scientific_name }}
+        </p>
+
+    </div>
+
+    <a
+        class="small-button"
+        href="{{ url_for(
+            'inventory.detail',
+            id=specimen.id
+        ) }}"
+    >
+        ← Volver al Espécimen
+    </a>
+
+</div>
+
+
+<div class="request-summary">
+
+    <h2>
+        Secuencia Actual
+    </h2>
+
+    {% if images %}
+
+    <p>
+        <strong>
+            {{ images|length }}
+        </strong>
+        imágenes cargadas.
+    </p>
+
+    <p class="availability-available">
+        ✓ Secuencia 360 disponible
+    </p>
+
+    {% else %}
+
+    <p>
+        Este espécimen todavía no tiene
+        imágenes 360 cargadas.
+    </p>
+
+    {% endif %}
+
+</div>
+
+
+<div class="request-summary">
+
+    <h2>
+        Cargar Secuencia 360
+    </h2>
+
+    <p>
+        Selecciona todas las fotografías de la
+        rotación completa del espécimen.
+    </p>
+
+    <p>
+        Las imágenes serán almacenadas en el
+        mismo orden en que sean recibidas y se
+        renombrarán automáticamente como
+        <strong>001, 002, 003...</strong>
+    </p>
+
+    {% if images %}
+
+    <div class="request-notes">
+
+        <strong>
+            Importante:
+        </strong>
+
+        <p>
+            Al cargar una nueva secuencia se
+            reemplazarán todas las imágenes
+            actualmente asociadas a este espécimen.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+
+    <form
+        method="post"
+        enctype="multipart/form-data"
+    >
+
+        <label for="specimen-images">
+            Seleccionar imágenes
+        </label>
+
+        <input
+            id="specimen-images"
+            type="file"
+            name="images"
+            accept=".jpg,.jpeg,.png,.webp"
+            multiple
+            required
+        >
+
+        <div class="submit-request">
+
+            <input
+                type="submit"
+                value="{% if images %}REEMPLAZAR SECUENCIA{% else %}CARGAR SECUENCIA{% endif %}"
+            >
+
+        </div>
+
+    </form>
+
+</div>
+
+
+{% if images %}
+
+<div class="request-summary">
+
+    <h2>
+        Archivos
+    </h2>
+
+    {% for image in images %}
+
+    <div>
+        {{ image }}
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endif %}
+
+{% endblock %}

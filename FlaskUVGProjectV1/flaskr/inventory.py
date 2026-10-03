@@ -14,11 +14,28 @@ from flaskr.extensions import db
 
 from sqlalchemy import or_
 
+from pathlib import Path
+
+from werkzeug.utils import secure_filename
+
 bp = Blueprint(
     "inventory",
     __name__,
     url_prefix="/inventory"
 )
+
+SPECIMEN_ASSETS_DIR = (
+    Path(__file__).resolve().parent
+    / "assets"
+    / "specimens"
+)
+
+ALLOWED_IMAGE_EXTENSIONS = {
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".webp"
+}
 
 @bp.route("/")
 @login_required
@@ -294,4 +311,160 @@ def edit(id):
     return render_template(
         "inventory/edit.html",
         specimen=specimen
+    )
+
+@bp.route(
+    "/<int:id>/images",
+    methods=("GET", "POST")
+)
+@login_required
+def images(id):
+
+    specimen = db.session.get(
+        Specimen,
+        id
+    )
+
+    if specimen is None:
+
+        flash(
+            "Espécimen no encontrado."
+        )
+
+        return redirect(
+            url_for("inventory.index")
+        )
+
+
+    specimen_dir = (
+        SPECIMEN_ASSETS_DIR
+        / specimen.portal_code
+    )
+
+
+    if request.method == "POST":
+
+        uploaded_files = request.files.getlist(
+            "images"
+        )
+
+        valid_files = []
+
+        for uploaded_file in uploaded_files:
+
+            if not uploaded_file.filename:
+                continue
+
+            extension = Path(
+                secure_filename(
+                    uploaded_file.filename
+                )
+            ).suffix.lower()
+
+            if extension not in ALLOWED_IMAGE_EXTENSIONS:
+
+                flash(
+                    "Solo se permiten imágenes "
+                    "JPG, JPEG, PNG o WEBP."
+                )
+
+                return redirect(
+                    url_for(
+                        "inventory.images",
+                        id=specimen.id
+                    )
+                )
+
+            valid_files.append(
+                (
+                    uploaded_file,
+                    extension
+                )
+            )
+
+
+        if not valid_files:
+
+            flash(
+                "Debes seleccionar al menos "
+                "una imagen."
+            )
+
+            return redirect(
+                url_for(
+                    "inventory.images",
+                    id=specimen.id
+                )
+            )
+
+
+        specimen_dir.mkdir(
+            parents=True,
+            exist_ok=True
+        )
+
+
+        # La carga de una nueva secuencia reemplaza
+        # completamente la secuencia anterior.
+        for existing_file in specimen_dir.iterdir():
+
+            if (
+                existing_file.is_file()
+                and existing_file.suffix.lower()
+                in ALLOWED_IMAGE_EXTENSIONS
+            ):
+
+                existing_file.unlink()
+
+
+        for index, (
+            uploaded_file,
+            extension
+        ) in enumerate(
+            valid_files,
+            start=1
+        ):
+
+            filename = (
+                f"{index:03d}"
+                f"{extension}"
+            )
+
+            uploaded_file.save(
+                specimen_dir / filename
+            )
+
+
+        flash(
+            f"Secuencia 360 actualizada correctamente. "
+            f"{len(valid_files)} imágenes cargadas."
+        )
+
+        return redirect(
+            url_for(
+                "inventory.images",
+                id=specimen.id
+            )
+        )
+
+
+    images = []
+
+    if specimen_dir.exists():
+
+        images = sorted(
+            file.name
+            for file in specimen_dir.iterdir()
+            if (
+                file.is_file()
+                and file.suffix.lower()
+                in ALLOWED_IMAGE_EXTENSIONS
+            )
+        )
+
+
+    return render_template(
+        "inventory/images.html",
+        specimen=specimen,
+        images=images
     )
