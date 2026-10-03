@@ -10,7 +10,6 @@ flask-cors==6.0.5
 Flask-Login==0.6.3
 Flask-Migrate==4.1.0
 Flask-SQLAlchemy==3.1.1
--e git+https://github.com/alwff/GradProjectUVG.git@8a67f927d7cf24ace74258bbc6fd06a177f3ed47#egg=flaskr&subdirectory=flaskuvgprojectv1
 fonttools==4.62.1
 greenlet==3.5.1
 iniconfig==2.3.0
