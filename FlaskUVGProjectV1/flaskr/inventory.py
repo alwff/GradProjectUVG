@@ -4,7 +4,8 @@ from flask import (
     request,
     redirect,
     url_for,
-    flash
+    flash,
+    send_from_directory
 )
 
 from flaskr.auth import login_required
@@ -36,6 +37,42 @@ ALLOWED_IMAGE_EXTENSIONS = {
     ".png",
     ".webp"
 }
+
+@bp.route(
+    "/<int:id>/images/file/<path:filename>"
+)
+@login_required
+def image_file(
+    id,
+    filename
+):
+
+    specimen = db.session.get(
+        Specimen,
+        id
+    )
+
+    if specimen is None:
+
+        flash(
+            "Espécimen no encontrado."
+        )
+
+        return redirect(
+            url_for("inventory.index")
+        )
+
+
+    specimen_dir = (
+        SPECIMEN_ASSETS_DIR
+        / specimen.portal_code
+    )
+
+
+    return send_from_directory(
+        specimen_dir,
+        filename
+    )
 
 @bp.route("/")
 @login_required
@@ -481,9 +518,27 @@ def images(id):
             key=image_sort_key
         )
 
+    preview_images = []
+
+    if images:
+
+        preview_indexes = {
+            0,
+            len(images) // 2,
+            len(images) - 1
+        }
+
+        preview_images = [
+            images[index]
+            for index in sorted(
+                preview_indexes
+            )
+        ]
+
 
     return render_template(
         "inventory/images.html",
         specimen=specimen,
-        images=images
+        images=images,
+        preview_images=preview_images
     )

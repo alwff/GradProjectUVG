@@ -56,6 +56,32 @@ Secuencia de Imágenes
         ✓ Secuencia disponible
     </p>
 
+    <div class="sequence-preview-grid">
+
+        {% for image in preview_images %}
+
+        <div class="sequence-preview-item">
+
+            <img
+                src="{{ url_for(
+                    'inventory.image_file',
+                    id=specimen.id,
+                    filename=image
+                ) }}"
+                alt="Vista de {{ specimen.portal_code }}"
+                loading="lazy"
+            >
+
+            <span>
+                {{ image }}
+            </span>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
     {% else %}
 
     <p>
@@ -135,26 +161,5 @@ Secuencia de Imágenes
     </form>
 
 </div>
-
-
-{% if images %}
-
-<div class="request-summary">
-
-    <h2>
-        Archivos
-    </h2>
-
-    {% for image in images %}
-
-    <div>
-        {{ image }}
-    </div>
-
-    {% endfor %}
-
-</div>
-
-{% endif %}
 
 {% endblock %}
