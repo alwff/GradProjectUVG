@@ -770,7 +770,8 @@ def process_request_delivery(request_id):
 
     return redirect(
         url_for(
-            "movements.index"
+            "requests.detail",
+            id=request_record.id
         )
     )
 
@@ -1047,6 +1048,7 @@ def process_request_return(request_id):
 
     return redirect(
         url_for(
-            "movements.index"
+            "requests.detail",
+            id=request_record.id
         )
     )
