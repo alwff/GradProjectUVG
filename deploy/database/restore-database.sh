@@ -46,18 +46,18 @@ systemctl stop uvgcollections.service
 
 echo "Eliminando base de datos existente..."
 
-sudo -u postgres dropdb \
+runuser -u postgres -- dropdb \
     --if-exists \
     "$DATABASE_NAME"
 
 echo "Creando base de datos..."
 
-sudo -u postgres createdb \
+runuser -u postgres -- createdb \
     "$DATABASE_NAME"
 
 echo "Restaurando respaldo..."
 
-sudo -u postgres pg_restore \
+runuser -u postgres -- pg_restore \
     --dbname="$DATABASE_NAME" \
     < "$BACKUP_FILE"
 
