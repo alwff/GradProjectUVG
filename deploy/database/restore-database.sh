@@ -38,11 +38,25 @@ if [ "$CONFIRMATION" != "RESTAURAR" ]; then
     exit 1
 fi
 
-echo
-echo "Deteniendo servicios..."
+IS_PRODUCTION=false
 
-systemctl stop uvg-rfid.service
-systemctl stop uvgcollections.service
+if [ "$DATABASE_NAME" = "uvg_collections" ]; then
+
+    IS_PRODUCTION=true
+
+    echo
+    echo "Deteniendo servicios..."
+
+    systemctl stop uvg-rfid.service
+    systemctl stop uvgcollections.service
+
+else
+
+    echo
+    echo "Base de datos de prueba detectada."
+    echo "Los servicios no seran detenidos."
+
+fi
 
 echo "Eliminando base de datos existente..."
 
@@ -65,17 +79,21 @@ echo
 echo "Restauracion completada."
 echo
 
-echo "Iniciando servicios..."
+if [ "$IS_PRODUCTION" = true ]; then
 
-systemctl start uvgcollections.service
-systemctl start uvg-rfid.service
+    echo "Iniciando servicios..."
 
-echo
-echo "Estado de los servicios:"
-echo
+    systemctl start uvgcollections.service
+    systemctl start uvg-rfid.service
 
-systemctl is-active uvgcollections.service
-systemctl is-active uvg-rfid.service
+    echo
+    echo "Estado de los servicios:"
+    echo
+
+    systemctl is-active uvgcollections.service
+    systemctl is-active uvg-rfid.service
+
+fi
 
 echo
 echo "Base de datos restaurada correctamente."
