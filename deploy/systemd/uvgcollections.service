@@ -1,0 +1,24 @@
+[Unit]
+Description=UVG Collections Flask Server
+After=network.target postgresql.service
+
+[Service]
+User=uvg-grad
+Group=uvg-grad
+
+WorkingDirectory=/home/uvg-grad/GradProjectUVG/FlaskUVGProjectV1
+
+Environment="PATH=/home/uvg-grad/GradProjectUVG/FlaskUVGProjectV1/venv/bin"
+
+EnvironmentFile=/etc/uvgcollections.env
+
+ExecStart=/home/uvg-grad/GradProjectUVG/FlaskUVGProjectV1/venv/bin/gunicorn \
+          -w 1 --threads 2 \
+          -b 0.0.0.0:8000 \
+          "flaskr:create_app()"
+
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
