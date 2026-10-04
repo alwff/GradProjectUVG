@@ -218,6 +218,44 @@ nc -vz -w 3 10.77.0.2 49152
 
 Con el lector disponible y sin otra aplicación ocupando su conexión, la prueba
 debe confirmar que el puerto TCP `49152` es accesible.
+
+### Validación de la configuración RFID
+
+La configuración definitiva de la red RFID fue comprobada después de un
+reinicio completo de la laptop servidor.
+
+La configuración validada es:
+
+```text
+Laptop Ubuntu
+eno1: 10.77.0.1/24
+        |
+        | Ethernet directo
+        |
+        v
+Yanzeo SR682
+IP: 10.77.0.2
+TCP: 49152
+```
+
+Después del reinicio se verificó:
+
+- activación automática del perfil Ethernet `RFID`;
+- dirección `10.77.0.1/24` en la interfaz Ethernet;
+- ruta hacia `10.77.0.2` mediante la interfaz Ethernet dedicada;
+- comunicación con el lector sin pérdida de paquetes;
+- acceso al puerto TCP `49152`;
+- inicio automático de `uvg-rfid.service`;
+- conexión del worker con `10.77.0.2:49152`;
+- detección física de etiquetas RFID;
+- clasificación de eventos RFID;
+- detección de ausencia;
+- funcionamiento de las alertas por correo.
+
+También se comprobó después del reinicio que los servicios
+`uvgcollections.service`, `uvg-rfid.service` y `ngrok.service` permanecen
+habilitados y en estado `active`.
+
 ---
 
 ## 4. Requisitos de una nueva instalación
