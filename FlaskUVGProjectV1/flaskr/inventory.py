@@ -159,6 +159,36 @@ def index():
         .all()
     )
 
+    sequence_counts = {}
+
+    for specimen in specimens:
+
+        specimen_dir = (
+            SPECIMEN_ASSETS_DIR
+            / specimen.portal_code
+        )
+
+        if not specimen_dir.exists():
+
+            sequence_counts[
+                specimen.id
+            ] = 0
+
+            continue
+
+
+        sequence_counts[
+            specimen.id
+        ] = sum(
+            1
+            for file in specimen_dir.iterdir()
+            if (
+                file.is_file()
+                and file.suffix.lower()
+                in ALLOWED_IMAGE_EXTENSIONS
+            )
+        )
+
     families = (
         db.session.query(
             Specimen.taxon_family
@@ -209,7 +239,8 @@ def index():
         collection=collection,
         status=status,
         families=families,
-        collections=collections
+        collections=collections,
+        sequence_counts=sequence_counts
     )
 
 @bp.route("/create", methods=("GET", "POST"))

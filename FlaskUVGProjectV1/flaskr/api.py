@@ -201,17 +201,16 @@ def get_all_specimens():
             specimen.portal_code
         )
 
-        preview_url = None
+        if not image_files:
+                    continue
 
-        if image_files:
-
-            preview_url = (
-                request.host_url.rstrip("/")
-                + "/api/specimen-assets/"
-                + specimen.portal_code
-                + "/"
-                + image_files[0]
-            )
+        preview_url = (
+            request.host_url.rstrip("/")
+            + "/api/specimen-assets/"
+            + specimen.portal_code
+            + "/"
+            + image_files[0]
+        )
 
         result.append({
             "id":

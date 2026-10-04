@@ -175,6 +175,7 @@
             <th>Familia</th>
             <th>Colección</th>
             <th>Estado</th>
+            <th>Secuencia</th>
             <th class="inventory-actions-column">Acción</th>
         </tr>
     </thead>
@@ -205,6 +206,24 @@
                 {% else %}
 
                 {{ specimen.status }}
+
+                {% endif %}
+
+            </td>
+
+            <td>
+
+                {% if sequence_counts[specimen.id] > 0 %}
+
+                <span class="availability-available">
+                    ✓ {{ sequence_counts[specimen.id] }} imágenes
+                </span>
+
+                {% else %}
+
+                <span class="availability-unavailable">
+                    Sin imágenes
+                </span>
 
                 {% endif %}
 
