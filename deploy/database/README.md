@@ -28,7 +28,7 @@ La conexión física del lector RFID utiliza una interfaz Ethernet dedicada.
 
 La arquitectura de conexión es:
 
-```
+```text
 Internet
    |
 Wi-Fi / Hotspot
@@ -42,20 +42,31 @@ Laptop Ubuntu
 └── ngrok
    |
    | Ethernet directo
-   | 192.168.1.23/24
+   | 10.77.0.1/24
    |
    v
 Yanzeo SR682
-├── 192.168.1.116
+├── 10.77.0.2
 └── TCP 49152
 ```
 
-La interfaz Ethernet no utiliza gateway ni DNS. De esta forma, la comunicación
-con el lector RFID permanece separada de la conexión utilizada para acceder a
-Internet.
+La interfaz Ethernet dedicada al lector RFID utiliza la subred privada
+`10.77.0.0/24`, separada de la red utilizada por Wi-Fi o hotspot.
 
-El acceso a Internet se realiza mediante Wi-Fi o un punto de acceso móvil y
-se utiliza para servicios externos como Resend, ngrok y GitHub.
+Esta separación evita conflictos de enrutamiento cuando la laptop servidor se
+conecta mediante DHCP a redes externas que utilizan rangos comunes, como
+`192.168.1.0/24`.
+
+La interfaz Ethernet del servidor no utiliza gateway ni DNS. La comunicación
+con el lector RFID permanece así separada de la conexión utilizada para acceder
+a Internet.
+
+El lector SR682 utiliza como gateway configurado `10.77.0.1`, correspondiente
+a la interfaz Ethernet de la laptop servidor. El tráfico del sistema hacia
+Internet no utiliza esta interfaz.
+
+El acceso a Internet se realiza mediante Wi-Fi o un punto de acceso móvil y se
+utiliza para servicios externos como Resend, ngrok y GitHub.
 
 ---
 
@@ -99,20 +110,23 @@ para evitar que los datos de la base de datos sean publicados accidentalmente
 en GitHub.
 
 ---
-
 ## 3. Configuración del hardware RFID
 
 El lector RFID utilizado por el sistema tiene la siguiente configuración:
 
 - **Modelo:** Yanzeo SR682
-- **IP:** `192.168.1.116`
+- **IP:** `10.77.0.2`
 - **Puerto TCP:** `49152`
+- **Máscara:** `255.255.255.0`
+- **Gateway configurado:** `10.77.0.1`
+- **Modo IP:** estático
+- **Modo de operación de red:** TCP Server
 - **Alimentación:** 12 V
 
 La laptop Ubuntu utiliza una conexión Ethernet dedicada para comunicarse con
 el lector:
 
-- **IPv4:** `192.168.1.23/24`
+- **IPv4:** `10.77.0.1/24`
 - **Gateway:** ninguno
 - **DNS:** ninguno
 - **Autoconnect:** habilitado
@@ -121,8 +135,15 @@ La conexión se realiza directamente mediante cable Ethernet entre la laptop
 Ubuntu y el lector SR682. Por lo tanto, la comunicación RFID no requiere un
 router.
 
-La conexión Wi-Fi puede utilizarse simultáneamente para proporcionar acceso
-a Internet sin interferir con la comunicación Ethernet del lector.
+La red `10.77.0.0/24` se reserva para este enlace privado. La interfaz Wi-Fi
+permanece configurada mediante DHCP y puede conectarse a diferentes redes sin
+depender de una dirección IPv4 fija.
+
+La separación de subredes es importante. Durante las pruebas se comprobó que
+utilizar simultáneamente `192.168.1.0/24` para el enlace RFID y para una red
+Wi-Fi externa puede producir rutas ambiguas en Linux. Al utilizar
+`10.77.0.0/24` para RFID, el tráfico hacia el lector queda asociado de forma
+inequívoca a la interfaz Ethernet dedicada.
 
 ### Configurar la interfaz Ethernet
 
@@ -132,8 +153,8 @@ Primero identificar el nombre de la interfaz Ethernet:
 ip -br link
 ```
 
-Dependiendo del equipo, la interfaz puede llamarse `eno1`, `enp2s0`,
-`enp3s0` u otro nombre similar.
+Dependiendo del equipo, la interfaz puede llamarse `eno1`, `enp2s0`, `enp3s0`
+u otro nombre similar.
 
 Una vez identificada, ejecutar:
 
@@ -148,32 +169,55 @@ sudo ./deploy/network/setup-rfid-network.sh eno1
 ```
 
 El script crea o actualiza automáticamente el perfil de NetworkManager
-denominado `RFID` y configura la dirección `192.168.1.23/24`, sin gateway
-ni DNS.
+denominado `RFID` y configura la dirección `10.77.0.1/24`, sin gateway ni DNS.
+
+El perfil RFID debe quedar configurado para iniciar automáticamente con el
+sistema. No debe existir otro perfil Ethernet con mayor prioridad que configure
+la misma interfaz con una red diferente.
+
+Para comprobar la configuración:
+
+```bash
+ip -br addr show eno1
+```
+
+La interfaz debe mostrar la dirección:
+
+```text
+10.77.0.1/24
+```
 
 Para comprobar la ruta utilizada hacia el lector:
 
 ```bash
-ip route get 192.168.1.116
+ip route get 10.77.0.2
 ```
 
 La salida debe indicar que el tráfico utiliza la interfaz Ethernet configurada.
 
 Por ejemplo:
 
-```
-192.168.1.116 dev eno1 src 192.168.1.23
+```text
+10.77.0.2 dev eno1 src 10.77.0.1
 ```
 
-También puede comprobarse la comunicación con el lector mediante:
+También puede comprobarse la comunicación mediante:
 
 ```bash
-ping -c 4 192.168.1.116
+ping -c 4 10.77.0.2
 ```
 
 Una comunicación correcta debe presentar respuestas del lector y 0 % de
 pérdida de paquetes.
 
+Para comprobar adicionalmente el servicio TCP del lector:
+
+```bash
+nc -vz -w 3 10.77.0.2 49152
+```
+
+Con el lector disponible y sin otra aplicación ocupando su conexión, la prueba
+debe confirmar que el puerto TCP `49152` es accesible.
 ---
 
 ## 4. Requisitos de una nueva instalación
@@ -766,22 +810,33 @@ La coincidencia permitió comprobar la recuperación de la estructura y de los
 datos almacenados.
 
 ---
-
 ## 9. Verificación del lector RFID
 
 Comprobar conectividad:
 
 ```bash
-ping -c 4 192.168.1.116
+ping -c 4 10.77.0.2
 ```
 
 Comprobar ruta:
 
 ```bash
-ip route get 192.168.1.116
+ip route get 10.77.0.2
 ```
 
-La ruta debe utilizar la interfaz Ethernet dedicada.
+La salida esperada debe tener una estructura equivalente a:
+
+```text
+10.77.0.2 dev eno1 src 10.77.0.1
+```
+
+La ruta debe utilizar exclusivamente la interfaz Ethernet dedicada al RFID.
+
+Comprobar el puerto TCP:
+
+```bash
+nc -vz -w 3 10.77.0.2 49152
+```
 
 Observar el worker:
 
@@ -791,7 +846,7 @@ journalctl -u uvg-rfid -f
 
 Una lectura debe producir información similar a:
 
-```
+```text
 [DETECCION] <EPC>
 Evento RFID: <ID>
 Estado: <clasificacion>
@@ -799,32 +854,38 @@ Estado: <clasificacion>
 
 Después del período de ausencia configurado:
 
-```
+```text
 [AUSENTE] <EPC>
 ```
 
 ---
-
 ## 10. Uso con Wi-Fi o hotspot móvil
 
 Ethernet y Wi-Fi pueden utilizarse simultáneamente:
 
-```
-                    Internet
-                       |
-                 Wi-Fi / Hotspot
-                       |
-                       v
-                 Laptop Ubuntu
-                   /         \
-                  /           \
-         Servicios web      Ethernet
-         Resend / ngrok        |
-         GitHub                v
+```text
+                     Internet
+                        |
+                  Wi-Fi / Hotspot
+                    mediante DHCP
+                        |
+                        v
+                   Laptop Ubuntu
+                      /       \
+                     /         \
+          Servicios web      Ethernet
+          Resend / ngrok        |
+          GitHub                |
+                                v
                          Yanzeo SR682
+                           10.77.0.2
 ```
 
-La interfaz Ethernet RFID no tiene gateway.
+La interfaz Ethernet RFID utiliza la dirección fija `10.77.0.1/24` y no
+dispone de gateway ni DNS.
+
+La interfaz Wi-Fi obtiene su configuración mediante DHCP de la red a la que se
+conecte la laptop.
 
 Esto permite utilizar:
 
@@ -834,8 +895,20 @@ Esto permite utilizar:
 - ngrok para acceso externo;
 - GitHub para sincronización.
 
-Esta configuración fue comprobada físicamente utilizando un hotspot móvil
-mientras el SR682 permanecía conectado directamente por Ethernet.
+La red RFID utiliza deliberadamente la subred privada `10.77.0.0/24`, separada
+de la red Wi-Fi. Esto permite mover la laptop servidor entre diferentes redes
+sin depender de una dirección Wi-Fi fija y reduce el riesgo de conflictos de
+enrutamiento con redes domésticas, institucionales o puntos de acceso móviles.
+
+Durante el desarrollo se detectó un conflicto cuando tanto la interfaz Ethernet
+RFID como la red Wi-Fi utilizaban `192.168.1.0/24`. En esa situación Linux
+podía seleccionar la interfaz Ethernet RFID para responder a dispositivos de la
+red local, impidiendo conexiones directas hacia Flask aunque Gunicorn estuviera
+escuchando correctamente en `0.0.0.0:8000`.
+
+La separación de la red RFID hacia `10.77.0.0/24` elimina esa ambigüedad y
+permite que la interfaz Wi-Fi conserve su funcionamiento dinámico mediante
+DHCP.
 
 ---
 
@@ -954,7 +1027,7 @@ ip route
 ### Ruta hacia el SR682
 
 ```bash
-ip route get 192.168.1.116
+ip route get 10.77.0.2
 ```
 
 ### Flask/Gunicorn
@@ -1043,7 +1116,7 @@ En caso de fallo o reemplazo de la laptop servidor:
 12. restaurar PostgreSQL mediante `restore-database.sh`;
 13. iniciar y comprobar `uvgcollections`;
 14. iniciar y comprobar `uvg-rfid`;
-15. comprobar comunicación con `192.168.1.116`;
+15. comprobar comunicación con `10.77.0.2` y verificar que la ruta utiliza la interfaz Ethernet RFID;
 16. configurar `~/.config/ngrok/ngrok.yml` con el authtoken real;
 17. instalar ngrok mediante `install-ngrok-service.sh`;
 18. comprobar `ngrok.service`;

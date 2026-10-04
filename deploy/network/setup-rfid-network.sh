@@ -3,7 +3,9 @@
 set -e
 
 PROFILE_NAME="RFID"
-RFID_SERVER_IP="192.168.1.23/24"
+RFID_SERVER_IP="10.77.0.1/24"
+RFID_READER_IP="10.77.0.2"
+RFID_READER_PORT="49152"
 
 if [ "$#" -ne 1 ]; then
     echo "Uso:"
@@ -76,4 +78,4 @@ echo "Estado de la interfaz:"
 ip -br addr show "$INTERFACE"
 echo
 echo "Ruta hacia el lector RFID:"
-ip route get 192.168.1.116
+ip route get "$RFID_READER_IP"

@@ -1,7 +1,7 @@
 import socket
 
 
-READER_IP = "192.168.1.116"
+READER_IP = "10.77.0.2"
 READER_PORT = 49152
 READER_TIMEOUT = 3
 
