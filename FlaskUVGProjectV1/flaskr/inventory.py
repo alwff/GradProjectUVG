@@ -15,6 +15,8 @@ from flaskr.extensions import db
 
 from sqlalchemy import or_
 
+import shutil
+
 from pathlib import Path
 
 from werkzeug.utils import secure_filename
@@ -435,42 +437,152 @@ def images(id):
             )
 
 
-        specimen_dir.mkdir(
+        SPECIMEN_ASSETS_DIR.mkdir(
             parents=True,
             exist_ok=True
         )
 
+        temporary_dir = (
+            SPECIMEN_ASSETS_DIR
+            / f".{specimen.portal_code}_upload"
+        )
 
-        # La carga de una nueva secuencia reemplaza
-        # completamente la secuencia anterior.
-        for existing_file in specimen_dir.iterdir():
+        backup_dir = (
+            SPECIMEN_ASSETS_DIR
+            / f".{specimen.portal_code}_backup"
+        )
 
-            if (
-                existing_file.is_file()
-                and existing_file.suffix.lower()
-                in ALLOWED_IMAGE_EXTENSIONS
+
+        # Limpiar residuos de una operación anterior
+        # que no haya terminado correctamente.
+        if temporary_dir.exists():
+            shutil.rmtree(temporary_dir)
+
+        if backup_dir.exists():
+            shutil.rmtree(backup_dir)
+
+
+        temporary_dir.mkdir(
+            parents=True
+        )
+
+
+        try:
+
+            # Primero se guarda TODA la nueva secuencia
+            # en una carpeta temporal.
+            for index, (
+                uploaded_file,
+                extension
+            ) in enumerate(
+                valid_files,
+                start=1
             ):
 
-                existing_file.unlink()
+                filename = (
+                    f"{index:03d}"
+                    f"{extension}"
+                )
+
+                uploaded_file.save(
+                    temporary_dir / filename
+                )
 
 
-        for index, (
-            uploaded_file,
-            extension
-        ) in enumerate(
-            valid_files,
-            start=1
-        ):
+            # Comprobar que se guardó exactamente la
+            # cantidad esperada de archivos.
+            saved_files = [
+                file
+                for file in temporary_dir.iterdir()
+                if (
+                    file.is_file()
+                    and file.suffix.lower()
+                    in ALLOWED_IMAGE_EXTENSIONS
+                )
+            ]
 
-            filename = (
-                f"{index:03d}"
-                f"{extension}"
+            if len(saved_files) != len(valid_files):
+
+                raise RuntimeError(
+                    "La secuencia no se guardó completamente."
+                )
+
+
+            # La secuencia anterior se conserva
+            # temporalmente como respaldo.
+            if specimen_dir.exists():
+
+                specimen_dir.rename(
+                    backup_dir
+                )
+
+
+            try:
+
+                # Solo después de guardar y validar
+                # la secuencia nueva se activa.
+                temporary_dir.rename(
+                    specimen_dir
+                )
+
+            except Exception:
+
+                # Si falla el cambio final, restaurar
+                # inmediatamente la secuencia anterior.
+                if (
+                    backup_dir.exists()
+                    and not specimen_dir.exists()
+                ):
+
+                    backup_dir.rename(
+                        specimen_dir
+                    )
+
+                raise
+
+
+            # Llegados aquí, la nueva secuencia ya está
+            # activa y la anterior puede eliminarse.
+            if backup_dir.exists():
+
+                shutil.rmtree(
+                    backup_dir
+                )
+
+
+        except Exception:
+
+            # Nunca dejar una carga temporal incompleta.
+            if temporary_dir.exists():
+
+                shutil.rmtree(
+                    temporary_dir
+                )
+
+
+            # Protección adicional por si el error ocurrió
+            # después de apartar la secuencia anterior.
+            if (
+                backup_dir.exists()
+                and not specimen_dir.exists()
+            ):
+
+                backup_dir.rename(
+                    specimen_dir
+                )
+
+
+            flash(
+                "No fue posible reemplazar la secuencia. "
+                "La secuencia anterior fue conservada."
             )
 
-            uploaded_file.save(
-                specimen_dir / filename
+            return redirect(
+                url_for(
+                    "inventory.images",
+                    id=specimen.id
+                )
             )
-
 
         flash(
             f"Secuencia actualizada correctamente. "
