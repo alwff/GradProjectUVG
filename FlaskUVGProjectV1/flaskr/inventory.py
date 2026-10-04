@@ -507,6 +507,9 @@ def images(id):
                     "La secuencia no se guardó completamente."
                 )
 
+            raise RuntimeError(
+                "PRUEBA CONTROLADA DE FALLO"
+            )
 
             # La secuencia anterior se conserva
             # temporalmente como respaldo.
