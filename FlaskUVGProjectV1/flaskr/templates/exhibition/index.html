@@ -119,6 +119,80 @@ const canvas = document.getElementById("unity-canvas");
 
 let unityStarted = false;
 
+let unityRuntimeReady = false;
+let exhibitionRevealStarted = false;
+let exhibitionUnityInstance = null;
+
+function showSpecimenProgress(completed, total) {
+
+    if (window.exhibitionLoadFailed) {
+        return;
+    }
+
+    const percentage = total > 0
+        ? Math.round((completed / total) * 100)
+        : 100;
+
+    loadingText.textContent =
+        "Cargando especímenes… " + completed + " de " + total;
+
+    loadingBar.style.width = percentage + "%";
+    loadingPercentage.textContent = percentage + "%";
+}
+
+function revealExhibitionWhenReady() {
+    if (
+        window.exhibitionLoadFailed ||
+        !unityRuntimeReady ||
+        !window.exhibitionContentReady ||
+        exhibitionRevealStarted
+    ) {
+        return;
+    }
+
+    exhibitionRevealStarted = true;
+
+    loadingBar.style.width = "100%";
+    loadingPercentage.textContent = "100%";
+    loadingText.textContent = "Exhibición lista";
+
+    setTimeout(function () {
+        player.classList.add("is-visible");
+
+        loader.classList.remove("is-visible");
+        loader.classList.add("is-hidden");
+
+        setTimeout(function () {
+            canvas.focus();
+
+            exhibitionUnityInstance.SendMessage(
+                "AdminManager",
+                "BeginExploration"
+            );
+        }, 650);
+    }, 450);
+}
+
+window.onExhibitionLoadProgress = function (completed, total) {
+    // Unity puede enviar avisos antes de resolver su inicio.
+    if (!unityRuntimeReady) {
+        return;
+    }
+
+    showSpecimenProgress(completed, total);
+};
+
+window.onExhibitionLoadReady = function () {
+    revealExhibitionWhenReady();
+};
+
+window.onExhibitionLoadFailed = function () {
+    loadingText.textContent =
+        "No se pudo completar la carga. Recarga la página para reintentar.";
+
+    loadingPercentage.textContent = "";
+};
+
 
 /* =========================================
    INICIAR EXHIBICION
@@ -188,43 +262,36 @@ function loadUnity() {
             config,
 
             function (progress) {
+                const percentage = Math.round(progress * 100);
 
-                const percentage =
-                    Math.round(progress * 100);
-
-                loadingBar.style.width =
-                    percentage + "%";
-
-                loadingPercentage.textContent =
-                    percentage + "%";
-
+                loadingText.textContent = "Cargando exhibición…";
+                loadingBar.style.width = percentage + "%";
+                loadingPercentage.textContent = percentage + "%";
             }
 
         )
         .then(function (unityInstance) {
+            exhibitionUnityInstance = unityInstance;
+            unityRuntimeReady = true;
 
-            loadingBar.style.width = "100%";
-            loadingPercentage.textContent = "100%";
-            loadingText.textContent = "Exhibición lista";
+            if (window.exhibitionLoadFailed) {
+                window.onExhibitionLoadFailed();
+                return;
+            }
 
-            setTimeout(function () {
+            const state = window.exhibitionLoadState;
 
-                // Unity ya está listo detrás del splash.
-                player.classList.add("is-visible");
+            if (state) {
+                showSpecimenProgress(state.completed, state.total);
+            } else {
+                loadingText.textContent =
+                    "Preparando carga de especímenes…";
 
-                // Comenzar transición del splash.
-                loader.classList.remove("is-visible");
-                loader.classList.add("is-hidden");
+                loadingBar.style.width = "0%";
+                loadingPercentage.textContent = "0%";
+            }
 
-                // Dar foco cuando termine el fade.
-                setTimeout(function () {
-
-                    canvas.focus();
-
-                }, 650);
-
-            }, 450);
-
+            revealExhibitionWhenReady();
         })
         .catch(function (message) {
 
