@@ -209,6 +209,9 @@ enterButton.addEventListener("click", function () {
     landing.classList.add("is-hidden");
     loader.classList.add("is-visible");
 
+    // Mantener el contenedor de Unity visible detrás del splash.
+    player.classList.add("is-visible");
+
     loadUnity();
 
 });
