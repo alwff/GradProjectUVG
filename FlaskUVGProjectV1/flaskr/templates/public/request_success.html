@@ -51,4 +51,59 @@ Solicitud Enviada
 
 </div>
 
+<script>
+(function () {
+    let allowLeave = false;
+
+    // Cerrar, recargar o abandonar la página desde el navegador.
+    window.addEventListener("beforeunload", function (event) {
+        if (allowLeave) {
+            return;
+        }
+
+        event.preventDefault();
+        event.returnValue = true;
+    });
+
+    // Confirmación para los enlaces de esta página, incluido Inicio.
+    document.addEventListener("click", function (event) {
+        const link = event.target.closest("a[href]");
+
+        if (
+            !link ||
+            event.defaultPrevented ||
+            event.button !== 0 ||
+            event.ctrlKey ||
+            event.metaKey ||
+            event.shiftKey ||
+            event.altKey ||
+            link.hasAttribute("download") ||
+            (link.target && link.target !== "_self") ||
+            link.getAttribute("href").startsWith("#")
+        ) {
+            return;
+        }
+
+        const confirmed = window.confirm(
+            "¿Ya guardaste tu código de seguimiento?\n\n" +
+            "Lo necesitarás para consultar tu solicitud. " +
+            "¿Deseas salir de esta página?"
+        );
+
+        if (!confirmed) {
+            event.preventDefault();
+            return;
+        }
+
+        // Evitar una segunda confirmación al aceptar salir.
+        allowLeave = true;
+    });
+
+    // Restablecer la protección si se vuelve a esta página.
+    window.addEventListener("pageshow", function () {
+        allowLeave = false;
+    });
+})();
+</script>
+
 {% endblock %}
