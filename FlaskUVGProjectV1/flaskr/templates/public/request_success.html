@@ -13,14 +13,43 @@ Solicitud Enviada
     </h1>
 
     <h2>
-        Código:
+        Número de Solicitud:
     </h2>
 
     <div class="tracking-code">
+        <span id="trackingCode">{{ tracking_code }}</span>
 
-        {{ tracking_code }}
-
+        <button
+            type="button"
+            class="copy-code-button"
+            id="copyCodeButton"
+            title="Copiar código"
+            aria-label="Copiar código de seguimiento"
+        >
+            <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                aria-hidden="true"
+            >
+                <rect
+                    x="8" y="8"
+                    width="12" height="12"
+                    rx="3"
+                />
+                <path d="M16 8V5a3 3 0 0 0-3-3H5a3 3 0 0 0-3 3v8a3 3 0 0 0 3 3h3"/>
+            </svg>
+        </button>
     </div>
+
+    <span
+        id="copyCodeStatus"
+        class="copy-code-status"
+        role="status"
+    ></span>
 
     <div class="request-notes">
 
@@ -102,6 +131,28 @@ Solicitud Enviada
     // Restablecer la protección si se vuelve a esta página.
     window.addEventListener("pageshow", function () {
         allowLeave = false;
+    });
+})();
+</script>
+
+<script>
+(function () {
+    const button = document.getElementById("copyCodeButton");
+    const code = document.getElementById("trackingCode");
+    const status = document.getElementById("copyCodeStatus");
+
+    button.addEventListener("click", async function () {
+        try {
+            await navigator.clipboard.writeText(
+                code.textContent.trim()
+            );
+
+            status.textContent = "Código copiado.";
+            button.title = "Código copiado";
+        } catch (error) {
+            status.textContent =
+                "No se pudo copiar. Selecciona el código y cópialo manualmente.";
+        }
     });
 })();
 </script>

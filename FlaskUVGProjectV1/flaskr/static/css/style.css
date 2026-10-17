@@ -2974,3 +2974,46 @@ tr:hover {
 .sequence-preview-item span {
     font-size: 0.9rem;
 }
+
+.tracking-code {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.copy-code-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    flex-shrink: 0;
+
+    color: #b8b8b8;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.copy-code-button:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.copy-code-button:focus-visible {
+    outline: 2px solid #5da63c;
+    outline-offset: 3px;
+}
+
+.copy-code-status {
+    font-size: 0.9rem;
+    color: #5da63c;
+}
+
+.copy-code-status:empty {
+    display: none;
+}
