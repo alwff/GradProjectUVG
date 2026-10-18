@@ -609,6 +609,34 @@ journalctl -u uvg-rfid -f
 
 Para salir utilizar `Ctrl+C`.
 
+
+### Recuperación automática del worker RFID
+
+El sistema incorpora mecanismos de recuperación ante interrupciones temporales de PostgreSQL.
+
+En `flaskr/__init__.py`, SQLAlchemy utiliza las opciones:
+
+- `pool_pre_ping=True`: comprueba la disponibilidad de una conexión antes de reutilizarla.
+- `pool_recycle=1800`: recicla las conexiones del pool después de 1800 segundos.
+
+El proceso `tools/rfid_worker.py` incorpora una función de recuperación que intenta ejecutar `rollback()` y `remove()` sobre la sesión de SQLAlchemy cuando ocurre un error.
+
+Esto permite que el worker continúe ejecutándose y pueda recuperar el acceso a PostgreSQL cuando el servicio vuelva a estar disponible.
+
+Adicionalmente, `uvg-rfid.service` utiliza:
+
+- `Restart=always`
+- `RestartSec=5`
+
+Esta configuración permite que systemd reinicie automáticamente el worker si el proceso termina.
+
+**Validación realizada:** el 18 de octubre de 2026 se detuvo temporalmente PostgreSQL 18 mediante `pg_ctlcluster`. Después de restablecer el clúster, el worker volvió a registrar eventos RFID sin requerir un reinicio manual.
+
+La recuperación fue comprobada mediante el evento RFID número 68.
+
+La recuperación automática no garantiza que se conserven las detecciones realizadas durante una interrupción si estas no vuelven a ser leídas por el lector.
+
+
 ### Portabilidad de los servicios
 
 El instalador no depende del nombre de usuario `uvg-grad` ni de una ruta fija
@@ -648,7 +676,66 @@ sudo systemctl cat uvgcollections
 sudo systemctl cat uvg-rfid
 ```
 
----
+### Actualización del sistema y migraciones Alembic
+
+Cuando una actualización del proyecto incluya cambios en los modelos de SQLAlchemy y nuevas migraciones de Alembic, se debe actualizar el código y la base de datos de forma coordinada.
+
+El procedimiento recomendado es:
+
+1. Crear y verificar un respaldo actualizado de PostgreSQL.
+2. Detener temporalmente los servicios `uvg-rfid` y `uvgcollections`.
+3. Descargar los cambios del repositorio mediante `git pull`.
+4. Activar el entorno virtual y cargar las variables de entorno.
+5. Comprobar la revisión actual de Alembic.
+6. Aplicar las migraciones pendientes.
+7. Verificar que la base de datos alcanzó la revisión esperada.
+8. Iniciar los servicios y comprobar su funcionamiento.
+
+Desde Ubuntu, ejecutar:
+
+```bash
+cd ~/GradProjectUVG
+
+sudo systemctl stop uvg-rfid
+sudo systemctl stop uvgcollections
+
+git pull
+
+cd FlaskUVGProjectV1
+source venv/bin/activate
+
+set -a
+source /etc/uvgcollections.env
+set +a
+
+flask --app flaskr db current
+flask --app flaskr db upgrade
+flask --app flaskr db current
+
+sudo systemctl start uvgcollections
+sudo systemctl start uvg-rfid
+```
+
+**Importante:** los comandos anteriores deben ejecutarse por etapas. Antes de aplicar `db upgrade`, debe existir un respaldo verificado y debe revisarse que la migración corresponda a los cambios esperados.
+
+Si una migración falla, no se deben reiniciar los servicios hasta identificar y resolver el problema.
+
+No es necesario ejecutar `systemctl daemon-reload` cuando únicamente se modifica código Python o se aplican migraciones. Este comando se utiliza cuando cambian los archivos de configuración de systemd.
+
+#### Migración RFID de octubre de 2026
+
+El 18 de octubre de 2026 se aplicó la migración:
+
+`a7f3c91d204e_add_rfid_detection_key.py`
+
+Esta agregó la columna `detection_key` a `rfid_detection_events`, junto con una restricción de unicidad.
+
+La columna permite valores `NULL` para conservar los registros históricos.
+
+La revisión de Alembic avanzó de `d9c824ee2a80` a `a7f3c91d204e`.
+
+Después del despliegue se verificó el funcionamiento de Flask, PostgreSQL, el lector RFID y las alertas por correo.
+
 
 ## 7. Respaldo de PostgreSQL
 
@@ -1136,7 +1223,62 @@ configuración correspondientes.
 
 ---
 
-## 14. Resumen de recuperación
+## 14. Limitaciones conocidas del sistema RFID
+
+El sistema incorpora mecanismos de recuperación de conexiones PostgreSQL y prevención de registros duplicados mediante identificadores UUID.
+
+Sin embargo, para mantener la implementación dentro del alcance del prototipo, se establecieron las siguientes limitaciones.
+
+### Ausencia de una cola persistente
+
+El worker RFID utiliza los diccionarios `present_tags` y `pending_detections` para gestionar las presencias físicas y los identificadores de operaciones pendientes.
+
+Estos diccionarios se almacenan únicamente en memoria.
+
+Por lo tanto:
+
+- Si el worker termina inesperadamente, las operaciones pendientes pueden perderse.
+- Una detección realizada durante una desconexión de PostgreSQL no necesariamente se recuperará si el EPC no vuelve a leerse.
+- Los identificadores UUID pendientes no sobreviven a un reinicio del proceso.
+
+No se implementó una cola persistente de eventos.
+
+### Alcance de la deduplicación
+
+Cada operación de detección utiliza un identificador `detection_key`, generado mediante UUID.
+
+PostgreSQL aplica una restricción de unicidad sobre esta columna para impedir registros repetidos con el mismo identificador.
+
+La protección funciona mientras el worker conserva dicho UUID.
+
+No se garantiza la deduplicación de una operación pendiente si el worker se reinicia y pierde su identificador.
+
+El mecanismo es independiente del control de presencia física, que mantiene un umbral de ausencia de 10 segundos antes de permitir una nueva detección.
+
+### Entrega de alertas por correo
+
+El sistema utiliza Resend para enviar alertas cuando se detecta un movimiento no autorizado.
+
+Se mantiene un cooldown de 300 segundos por EPC para evitar notificaciones excesivas.
+
+Sin embargo, el envío del correo y la actualización de su estado en PostgreSQL no constituyen una operación transaccional única.
+
+Por ello, una interrupción durante el envío o la confirmación puede producir un estado de entrega incierto.
+
+El sistema no garantiza la entrega exactamente una vez de las alertas.
+
+### Decisión de alcance
+
+Estas limitaciones fueron aceptadas deliberadamente durante el desarrollo del prototipo.
+
+No se contempla implementar una cola persistente ni un sistema de entrega exactamente una vez como parte de esta mejora.
+
+La solución actual fue validada mediante pruebas físicas de detección RFID, recuperación de PostgreSQL y envío de alertas, y se considera suficiente para los escenarios evaluados.
+
+
+---
+
+## 15. Resumen de recuperación
 
 En caso de fallo o reemplazo de la laptop servidor:
 
