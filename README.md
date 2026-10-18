@@ -1,42 +1,109 @@
-# Trabajo de Graduación: Diseño e implementación de una exhibición virtual para colecciones biológicas utilizando códigos de barras y entornos inmersivos 
+# UVG Collections
 
-Alejandra Cardona (22043)
+**Sistema de gestión de colecciones biológicas y exhibición virtual interactiva**
 
-## Propósito
+Proyecto de graduación desarrollado para las Colecciones Biológicas de la Universidad del Valle de Guatemala (UVG).
 
-Se busca la creación e implementación de una exhibición virtual en el entorno Unity medio que se vincula a una base de datos alimentada por un sistema de lectura de códigos de barra mediante un escáner. El propósito de esta exhibición es difundir las Colecciones Biológicas de la Universidad del Valle de Guatemala a través de un ambiente atractivo e interactivo. 
+## Descripción general
 
-## ¿Cómo se divide el proyecto?
-* Unity
-* Base de Datos
-  * Especímenes
-    * Ingresados por el lector de códigos de barras.
-    * Ingresados manualmente (parte de formularios).  
-  * RFID
-    * Tags RFID
-    * Eventos (entradas y salidas)     
-  * Formularios
-    * Solicitudes (la persona interesada ingresa qué especímenes desea retirar de colecciones)
-    * Préstamos (se llena por el encargado al hacer entrega del espécimen solicitado)
-    * Devoluciones (se llena por el encargado al recibir el espécimen prestado)
-    * Ingreso de espécimen manualmente (no cuenta con un código de barras asignado)
-* Python + Flask
- * Implementación de notificaciones por correo para salidas y entradas a los encargados.   
+UVG Collections integra una plataforma web para administrar especímenes biológicos, gestionar solicitudes de material académico, registrar préstamos y devoluciones, supervisar identificaciones RFID y ofrecer una exhibición virtual interactiva desarrollada en Unity.
 
-## ¿Qué tengo ya y qué me falta?
+El sistema combina tecnologías de identificación, una base de datos relacional y una aplicación web para apoyar las actividades de gestión de las colecciones biológicas.
 
-* [x] Unity
-* [x] Base de Datos
-  * [ ] Especímenes
-    * [ ] Ingresados por el lector de códigos de barras.
-    * [x] Ingresados manualmente (parte de formularios).  
-  * [ ] RFID
-    * [ ] Tags RFID
-    * [x] Eventos (entradas y salidas)     
-  * [x] Formularios
-    * [x] Solicitudes (la persona interesada ingresa qué especímenes desea retirar de colecciones)
-    * [x] Préstamos (se llena por el encargado al hacer entrega del espécimen solicitado)
-    * [x] Devoluciones (se llena por el encargado al recibir el espécimen prestado)
-    * [x] Ingreso de espécimen manualmente (no cuenta con un código de barras asignado)
- * [ ] Python + Flask
-  * [ ] Implementación de notificaciones por correo para salidas y entradas a los encargados.   
+## Funcionalidades principales
+
+### Inventario de especímenes
+
+- Registro, consulta y actualización de especímenes.
+- Identificación mediante códigos de barras y etiquetas RFID UHF.
+- Almacenamiento de códigos del portal, números de catálogo e información taxonómica.
+- Búsqueda y consulta de registros del inventario.
+
+### Solicitudes y movimientos
+
+- Formulario público para solicitar especímenes destinados a actividades académicas.
+- Consulta del estado de las solicitudes mediante códigos de seguimiento.
+- Revisión y administración de solicitudes por los encargados.
+- Registro de préstamos, devoluciones y movimientos de especímenes.
+
+### Supervisión RFID
+
+- Lectura de etiquetas RFID UHF mediante el lector Yanzeo SR682 conectado por Ethernet.
+- Identificación de especímenes y clasificación de detecciones.
+- Registro de eventos en PostgreSQL.
+- Alertas por correo ante movimientos no autorizados.
+- Control de presencia para evitar registros repetidos por lecturas continuas.
+- Recuperación automática de sesiones después de interrupciones temporales de PostgreSQL.
+
+### Exhibición virtual
+
+- Entorno interactivo desarrollado en Unity y publicado mediante WebGL.
+- Recorrido virtual en primera persona.
+- Visualización de especímenes mediante secuencias de imágenes de 360°.
+- Integración con Flask para consultar información y cargar imágenes.
+- Herramientas administrativas para configurar elementos de la exhibición.
+
+## Tecnologías utilizadas
+
+| Componente | Tecnología |
+|---|---|
+| Aplicación web | Python y Flask |
+| Base de datos | PostgreSQL |
+| ORM y migraciones | SQLAlchemy, Flask-Migrate y Alembic |
+| Servidor de aplicación | Gunicorn |
+| Sistema operativo del servidor | Ubuntu |
+| Administración de servicios | systemd |
+| Acceso externo HTTPS | ngrok |
+| Supervisión RFID | Yanzeo SR682, UHF EPC Gen2 |
+| Lectura de códigos de barras | Zebra DS2208 |
+| Exhibición virtual | Unity WebGL |
+| Notificaciones | Resend |
+| Control de versiones | Git y GitHub |
+
+## Estructura del repositorio
+
+```text
+GradProjectUVG/
+├── FlaskUVGProjectV1/
+│   ├── flaskr/
+│   ├── tools/
+│   ├── migrations/
+│   ├── tests/
+│   └── README.md
+├── deploy/
+│   ├── database/
+│   ├── env/
+│   ├── network/
+│   ├── ngrok/
+│   ├── systemd/
+│   └── README.md
+├── UVGProject/
+└── README.md
+```
+
+## Arquitectura general
+
+El sistema utiliza una laptop Ubuntu como servidor principal.
+
+Flask y Gunicorn proporcionan la aplicación web, mientras que PostgreSQL almacena los registros de especímenes, solicitudes, movimientos y detecciones RFID.
+
+El lector Yanzeo SR682 se comunica con un worker Python mediante una conexión Ethernet dedicada. El worker procesa las detecciones y registra los eventos correspondientes en PostgreSQL.
+
+La exhibición Unity WebGL se integra con Flask mediante servicios HTTP, sin acceder directamente a la base de datos.
+
+El acceso externo a la plataforma se proporciona mediante ngrok.
+
+## Documentación
+
+- [Aplicación Flask](FlaskUVGProjectV1/README.md): estructura y desarrollo de la aplicación.
+- [Despliegue y recuperación](deploy/README.md): instalación, configuración, servicios, respaldos, restauración y mantenimiento del servidor.
+
+## Alcance
+
+El proyecto constituye un prototipo funcional para apoyar la administración y supervisión de las colecciones biológicas de la UVG.
+
+Su implementación contempla mecanismos de recuperación ante fallos temporales de PostgreSQL y control de detecciones RFID repetidas.
+
+No incluye una cola persistente de eventos ni garantiza la entrega exactamente una vez de las notificaciones por correo.
+
+Estas limitaciones forman parte del alcance definido para el prototipo.
