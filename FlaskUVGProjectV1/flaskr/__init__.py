@@ -48,6 +48,12 @@ def create_app(test_config=None):
         # load the test config if passed in
         app.config.from_mapping(test_config)
 
+    if not app.config.get("TESTING", False):
+        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+            "pool_pre_ping": True,
+            "pool_recycle": 1800
+        }
+
     # ensure the instance folder exists
     os.makedirs(app.instance_path, exist_ok=True)
 

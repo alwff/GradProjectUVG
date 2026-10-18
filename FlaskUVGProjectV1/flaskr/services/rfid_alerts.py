@@ -1,3 +1,4 @@
+from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timedelta, timezone
 from flaskr.extensions import db
 from flaskr.models import (
@@ -8,9 +9,10 @@ from flaskr.services.email_service import send_email
 
 RFID_ALERT_COOLDOWN_SECONDS = 300
 
-def create_detection_event(result):
+def create_detection_event(result, detection_key):
 
     event = RFIDDetectionEvent(
+        detection_key=detection_key,
         epc=result["epc"],
         specimen_id=(
             result["specimen"].id
@@ -22,10 +24,40 @@ def create_detection_event(result):
         alert_sent=False
     )
 
-    db.session.add(event)
-    db.session.commit()
+    try:
+        db.session.add(event)
+        db.session.commit()
 
-    return event
+        return event, True
+
+    except IntegrityError:
+
+        db.session.rollback()
+        db.session.remove()
+
+        existing_event = get_detection_event(
+            detection_key
+        )
+
+        if existing_event is not None:
+            print(
+                "[DATABASE] Detección duplicada recuperada:",
+                existing_event.id
+            )
+
+            return existing_event, False
+
+        raise
+
+def get_detection_event(detection_key):
+
+    return (
+        RFIDDetectionEvent.query
+        .filter_by(
+            detection_key=detection_key
+        )
+        .first()
+    )
 
 def can_send_alert(epc):
 

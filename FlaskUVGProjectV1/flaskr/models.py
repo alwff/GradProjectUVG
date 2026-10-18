@@ -330,6 +330,12 @@ class RFIDDetectionEvent(db.Model):
         primary_key=True
     )
 
+    detection_key = db.Column(
+        db.String(36),
+        unique=True,
+        nullable=True
+    )
+
     epc = db.Column(
         db.String(255),
         nullable=False

@@ -1,4 +1,5 @@
 import time
+import uuid
 from datetime import (
     datetime,
     timezone
@@ -7,8 +8,11 @@ from flaskr import create_app
 from flaskr.services.rfid_supervisor import (
     supervise_epc
 )
+from flaskr.extensions import db
+from sqlalchemy.exc import SQLAlchemyError
 from flaskr.services.rfid_alerts import (
     create_detection_event,
+    get_detection_event,
     send_unauthorized_alert
 )
 from flaskr.services.rfid_reader import (
@@ -20,8 +24,28 @@ RFID_ABSENCE_THRESHOLD_SECONDS = 10
 POLL_INTERVAL_SECONDS = 1
 
 app = create_app()
-
 present_tags = {}
+pending_detections = {}
+
+def reset_database_session():
+
+    try:
+        db.session.rollback()
+
+    except Exception as error:
+        print(
+            "[ERROR ROLLBACK]",
+            error
+        )
+
+    try:
+        db.session.remove()
+
+    except Exception as error:
+        print(
+            "[ERROR CLEANUP]",
+            error
+        )
 
 def register_presence(epc):
 
@@ -42,13 +66,44 @@ def update_presence(epc):
 
 def process_new_presence(epc):
 
+    if epc not in pending_detections:
+        pending_detections[epc] = str(
+            uuid.uuid4()
+        )
+
+    detection_key = pending_detections[epc]
+
+    event = get_detection_event(
+        detection_key
+    )
+
+    if event is not None:
+
+        print(
+            "[DATABASE] Evento existente recuperado:",
+            event.id
+        )
+
+        print(
+            "[DATABASE] No se genera otro evento ni otra alerta."
+        )
+
+        return
+
     result = supervise_epc(
         epc
     )
 
-    event = create_detection_event(
-        result
+    event, created = create_detection_event(
+        result,
+        detection_key
     )
+
+    if not created:
+        print(
+            "[DATABASE] Evento recuperado. No se reenvía alerta."
+        )
+        return
 
     print()
     print(
@@ -70,15 +125,24 @@ def process_new_presence(epc):
             result["specimen"].portal_code
         )
 
-    alert_sent = send_unauthorized_alert(
-        result,
-        event
-    )
-
-    if alert_sent:
-        print(
-            "[ALERTA] Correo enviado."
+    try:
+        alert_sent = send_unauthorized_alert(
+            result,
+            event
         )
+
+        if alert_sent:
+            print(
+                "[ALERTA] Correo enviado."
+            )
+
+    except Exception as error:
+        print(
+            "[ERROR ALERTA]",
+            error
+        )
+
+        reset_database_session()
 
 def remove_absent_tags():
 
@@ -146,12 +210,17 @@ def run_worker():
 
                 else:
 
+                    process_new_presence(
+                        epc
+                    )
+
                     register_presence(
                         epc
                     )
 
-                    process_new_presence(
-                        epc
+                    pending_detections.pop(
+                        epc,
+                        None
                     )
 
             remove_absent_tags()
@@ -166,6 +235,20 @@ def run_worker():
             print(
                 "Reintentando..."
             )
+        
+        except SQLAlchemyError as error:
+
+            print(
+                "[ERROR DATABASE]",
+                error
+            )
+
+            reset_database_session()
+
+            print(
+                "[DATABASE] Recuperación de sesión intentada."
+            )
+
 
         except Exception as error:
 
@@ -173,6 +256,8 @@ def run_worker():
                 "[ERROR WORKER]",
                 error
             )
+
+            reset_database_session()
 
         time.sleep(
             POLL_INTERVAL_SECONDS
