@@ -57,13 +57,13 @@
     <label>RFID EPC</label>
     <input
         name="rfid_epc"
-        value="{{ specimen.rfid_epc }}"
+        value="{{ specimen.rfid_epc or '' }}"
     >
 
     <label>Código de Barras</label>
     <input
         name="barcode"
-        value="{{ specimen.barcode }}"
+        value="{{ specimen.barcode or '' }}"
     >
 
     <label>Descripción</label>

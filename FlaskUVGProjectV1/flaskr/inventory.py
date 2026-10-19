@@ -270,13 +270,18 @@ def create():
                 "collection"
             ].strip(),
 
-            rfid_epc=request.form[
-                "rfid_epc"
-            ].strip().upper(),
+            rfid_epc=(
+                request.form["rfid_epc"]
+                .strip()
+                .upper()
+                or None
+            ),
 
-            barcode=request.form[
-                "barcode"
-            ].strip(),
+            barcode=(
+                request.form["barcode"]
+                .strip()
+                or None
+            ),
 
             description=request.form[
                 "description"
@@ -360,11 +365,13 @@ def edit(id):
             request.form["rfid_epc"]
             .strip()
             .upper()
+            or None
         )
 
         specimen.barcode = (
             request.form["barcode"]
             .strip()
+            or None
         )
 
         specimen.description = (
